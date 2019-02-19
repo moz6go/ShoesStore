@@ -20,9 +20,11 @@ class StoreMainWindow : public QMainWindow
     QHBoxLayout* h_main_layout_;
     QVBoxLayout* rv_layout_;
     QVBoxLayout* lv_layout_;
+
+    QGridLayout* main_l_;
     QTableView* t_view_;
     QTableView* t_goods_info_;
-    QTextEdit* txt_;
+    QPushButton* txt_;
     QSplitter* splitter_;
 public:
     explicit StoreMainWindow(QWidget *parent = nullptr);
@@ -32,6 +34,8 @@ private slots:
     void onActionAddGoods();
     void onActionSaleGoods();
     void onActionAddModel();
+    void onActionDelModel();
+    void onActionReport();
 };
 
 #endif // STOREMAINWINDOW_H

@@ -16,6 +16,8 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QTextEdit>
+#include <QFileSystemModel>
+#include <QPushButton>
 
 const int SIZE_WID = 32;
 
