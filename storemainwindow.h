@@ -24,7 +24,7 @@ class StoreMainWindow : public QMainWindow
     QGridLayout* main_l_;
     QTableView* t_view_;
     QTableView* t_goods_info_;
-    QPushButton* txt_;
+    QLabel* l_pic_;
     QSplitter* splitter_;
 public:
     explicit StoreMainWindow(QWidget *parent = nullptr);
