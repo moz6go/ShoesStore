@@ -52,7 +52,8 @@ void StoreMainWindow::onActionSaleGoods() {
 }
 
 void StoreMainWindow::onActionAddModel() {
-
+    AddModelDialog* add_model = new AddModelDialog(this);
+    add_model->show ();
 }
 
 void StoreMainWindow::onActionDelModel() {

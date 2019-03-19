@@ -15,12 +15,15 @@ CONFIG += c++11
 
 
 SOURCES += main.cpp\
-    storemainwindow.cpp
+    storemainwindow.cpp \
+    addmodeldialog.cpp
 
 HEADERS  +=    storemainwindow.h \
-    general.h
+    general.h \
+    addmodeldialog.h
 
-FORMS    +=    storemainwindow.ui
+FORMS    +=    storemainwindow.ui \
+    addmodeldialog.ui
 
 RESOURCES += \
     pics.qrc

@@ -2,6 +2,7 @@
 #define STOREMAINWINDOW_H
 
 #include "general.h"
+#include "addmodeldialog.h"
 
 namespace Ui {
 class StoreMainWindow;
