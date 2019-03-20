@@ -12,12 +12,25 @@ class AddModelDialog : public QDialog
 {
     Q_OBJECT
     QLabel* model_lb;
-    QTextEdit* model_te;
+    QLineEdit* model_le;
     QHBoxLayout* model_layout;
 
     QLabel* season_lb;
-    QTextEdit* season_te;
+    QLineEdit* season_le;
     QHBoxLayout* season_layout;
+
+    QLabel* brand_lb;
+    QLineEdit* brand_le;
+    QHBoxLayout* brand_layout;
+
+    QLabel* wholesaleprice_lb;
+    QLineEdit* wholesaleprice_le;
+    QHBoxLayout* wholesaleprice_layout;
+
+    QLabel* retailprice_lb;
+    QLineEdit* retailprice_le;
+    QHBoxLayout* retailprice_layout;
+
 
     QVBoxLayout* main_layout;
 
