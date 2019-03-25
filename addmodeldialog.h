@@ -36,6 +36,11 @@ class AddModelDialog : public QDialog
 
 public:
     explicit AddModelDialog(QWidget *parent = 0);
+    QString getModel();
+    QString getSeason();
+    QString getBrand();
+    double getWholesalepr();
+    double getRetailpr();
     ~AddModelDialog();
 
 private:

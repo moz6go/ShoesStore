@@ -58,12 +58,27 @@ AddModelDialog::AddModelDialog(QWidget *parent) :
     main_layout->addLayout (retailprice_layout);
 
     setLayout (main_layout);*/
-
-    ui_add_model_dialog->retailpr_le->setValidator (&PRICE_VALIDATOR);
-    ui_add_model_dialog->wholesalepr_le->setValidator (&PRICE_VALIDATOR);
+}
+QString AddModelDialog::getModel() {
+    return ui_add_model_dialog->model_le->text ();
 }
 
-AddModelDialog::~AddModelDialog()
-{
+QString AddModelDialog::getSeason () {
+    return ui_add_model_dialog->season_cb->currentText ();
+}
+
+QString AddModelDialog::getBrand () {
+    return ui_add_model_dialog->brand_cb->currentText ();
+}
+
+double AddModelDialog::getWholesalepr () {
+    return ui_add_model_dialog->wholesalepr_sb->value ();
+}
+
+double AddModelDialog::getRetailpr () {
+    return ui_add_model_dialog->retailpr_sb ->value ();
+}
+
+AddModelDialog::~AddModelDialog() {
     delete ui_add_model_dialog;
 }

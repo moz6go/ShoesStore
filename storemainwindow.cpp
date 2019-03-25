@@ -53,7 +53,13 @@ void StoreMainWindow::onActionSaleGoods() {
 
 void StoreMainWindow::onActionAddModel() {
     AddModelDialog* add_model = new AddModelDialog(this);
-    add_model->show ();
+    if(add_model->exec () == QDialog::Accepted){
+        qDebug() << add_model->getModel ();
+        qDebug() << add_model->getBrand ();
+        qDebug() << add_model->getSeason ();
+        qDebug() << add_model->getRetailpr ();
+        qDebug() << add_model->getWholesalepr ();
+    }
 }
 
 void StoreMainWindow::onActionDelModel() {
