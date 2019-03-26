@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,14 +16,17 @@ CONFIG += c++11
 
 SOURCES += main.cpp\
     storemainwindow.cpp \
-    addmodeldialog.cpp
+    addmodeldialog.cpp \
+    addgoodsdialog.cpp
 
 HEADERS  +=    storemainwindow.h \
     general.h \
-    addmodeldialog.h
+    addmodeldialog.h \
+    addgoodsdialog.h
 
 FORMS    +=    storemainwindow.ui \
-    addmodeldialog.ui
+    addmodeldialog.ui \
+    addgoodsdialog.ui
 
 RESOURCES += \
     pics.qrc

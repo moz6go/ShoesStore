@@ -19,6 +19,8 @@
 #include <QLineEdit>
 #include <QFileSystemModel>
 #include <QPushButton>
+#include <QFileDialog>
+#include <QtSql/QSql>
 
 const int SIZE_WID = 32;
 const int LABEL_WID = 150;
