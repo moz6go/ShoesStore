@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QtDebug>
+#include <QDebug>
 #include <QObject>
 #include <QThread>
 #include <QMutex>
@@ -21,6 +22,10 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include <QtSql/QSql>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlTableModel>
+#include <QSqlError>
 
 const int SIZE_WID = 32;
 

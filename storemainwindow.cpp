@@ -3,11 +3,27 @@
 
 StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::StoreMainWindow) {
     ui->setupUi(this);
+
+    sdb = QSqlDatabase::addDatabase("QSQLITE");
+    sdb.setDatabaseName("D:\\MyProjects\\Qt\\ShoesStore\\db");
+
+    if (sdb.open()) {
+        qDebug() << "Done!";
+    }
+    else {
+        qDebug() << "Error " << sdb.lastError ().text();
+    }
+
+    QSqlTableModel* model = new QSqlTableModel(this, sdb);
+    model->setTable ("model_dir");
+    model->select ();
+
     QWidget* wgt = new QWidget(this);
 
     t_bar_ = new QToolBar(this);
 
     t_view_ = new QTableView(this);
+    t_view_->setModel (model);
     l_pic_ = new QLabel("pic",this);
     t_goods_info_ = new QTableView(this);
 
@@ -55,14 +71,23 @@ void StoreMainWindow::onActionSaleGoods() {
 }
 
 void StoreMainWindow::onActionAddModel() {
-    AddModelDialog* add_model = new AddModelDialog(this);
+    AddModelDialog* add_model = new AddModelDialog (&sdb, this);
     if(add_model->exec () == QDialog::Accepted) {
-        qDebug() << add_model->getModel ();
-        qDebug() << add_model->getBrand ();
-        qDebug() << add_model->getSeason ();
-        qDebug() << add_model->getRetailpr ();
-        qDebug() << add_model->getWholesalepr ();
-        qDebug() << add_model->getPhotoPath ();
+        QSqlQuery my_query = QSqlQuery(sdb);
+        QString ins = QString("INSERT INTO model_dir (model_id, model_name, category, season, brand, pic, wholesale_price, retail_price)"
+                              "VALUES (%1, '%2', %3, %4, %5, %6, %7, %8);")
+                .arg("11111")
+                .arg(add_model->getModel ())
+                .arg(add_model->getCategory ())
+                .arg(add_model->getSeason ())
+                .arg(add_model->getBrand ())
+                .arg("Path ()")
+                .arg(QString::number (add_model->getWholesalepr ()))
+                .arg(QString::number (add_model->getRetailpr ()));
+
+        if(!my_query.exec (ins)){
+            qDebug() << my_query.lastError ().text ();
+        }
     }
 }
 

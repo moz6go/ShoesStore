@@ -13,8 +13,9 @@ class AddModelDialog : public QDialog
     Q_OBJECT
     QString photo_path;
 public:
-    explicit AddModelDialog(QWidget *parent = 0);
+    explicit AddModelDialog(QSqlDatabase* sdb_ptr, QWidget *parent = 0);
     QString getModel();
+    QString getCategory ();
     QString getSeason();
     QString getBrand();
     double getWholesalepr();

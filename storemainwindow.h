@@ -13,6 +13,7 @@ class StoreMainWindow : public QMainWindow
 {
     Q_OBJECT
     Ui::StoreMainWindow *ui;
+    QSqlDatabase sdb;
     QToolBar* t_bar_;
     QAction* a_add_goods_;
     QAction* a_sale_goods_;
