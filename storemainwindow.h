@@ -3,6 +3,7 @@
 
 #include "general.h"
 #include "addmodeldialog.h"
+#include "addgoodsdialog.h"
 
 namespace Ui {
 class StoreMainWindow;

@@ -23,9 +23,23 @@
 #include <QtSql/QSql>
 
 const int SIZE_WID = 32;
-const int LABEL_WID = 150;
-const int LINE_WID = 200;
 
-const QDoubleValidator PRICE_VALIDATOR(0.0, 1000000.0, 2);
+enum SIZES {
+
+};
+
+struct Model {
+    QString model_name;
+    QString season;
+    QString brand;
+    double wholesale_price;
+    double retail_price;
+    QString photo_path;
+};
+
+struct Product : public Model {
+
+};
+
 #endif // GENERAL
 

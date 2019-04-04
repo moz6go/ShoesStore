@@ -44,7 +44,10 @@ void StoreMainWindow::BuildToolBar() {
 }
 
 void StoreMainWindow::onActionAddGoods() {
+    AddGoodsDialog* add_goods = new AddGoodsDialog(this);
+    if(add_goods->exec () == QDialog::Accepted) {
 
+    }
 }
 
 void StoreMainWindow::onActionSaleGoods() {
