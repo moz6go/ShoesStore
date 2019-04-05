@@ -5,7 +5,7 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->setupUi(this);
 
     sdb = QSqlDatabase::addDatabase("QSQLITE");
-    sdb.setDatabaseName("D:\\MyProjects\\Qt\\ShoesStore\\db");
+    sdb.setDatabaseName(DB_PATH);
 
     if (sdb.open()) {
         qDebug() << "Done!";
@@ -14,7 +14,7 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
         qDebug() << "Error " << sdb.lastError ().text();
     }
 
-    QSqlTableModel* model = new QSqlTableModel(this, sdb);
+    model = new QSqlTableModel(this, sdb);
     model->setTable ("model_dir");
     model->select ();
 
@@ -60,7 +60,7 @@ void StoreMainWindow::BuildToolBar() {
 }
 
 void StoreMainWindow::onActionAddGoods() {
-    AddGoodsDialog* add_goods = new AddGoodsDialog(this);
+    AddGoodsDialog* add_goods = new AddGoodsDialog(&sdb, this);
     if(add_goods->exec () == QDialog::Accepted) {
 
     }
@@ -75,19 +75,20 @@ void StoreMainWindow::onActionAddModel() {
     if(add_model->exec () == QDialog::Accepted) {
         QSqlQuery my_query = QSqlQuery(sdb);
         QString ins = QString("INSERT INTO model_dir (model_id, model_name, category, season, brand, pic, wholesale_price, retail_price)"
-                              "VALUES (%1, '%2', %3, %4, %5, %6, %7, %8);")
-                .arg("11111")
+                              "VALUES (%1, '%2', '%3', '%4', '%5', '%6', '%7', '%8');")
+                .arg(model->rowCount () + 1)
                 .arg(add_model->getModel ())
                 .arg(add_model->getCategory ())
                 .arg(add_model->getSeason ())
                 .arg(add_model->getBrand ())
-                .arg("Path ()")
-                .arg(QString::number (add_model->getWholesalepr ()))
-                .arg(QString::number (add_model->getRetailpr ()));
+                .arg(add_model->getPhotoPath ())
+                .arg(add_model->getWholesalepr ())
+                .arg(add_model->getRetailpr ());
 
         if(!my_query.exec (ins)){
             qDebug() << my_query.lastError ().text ();
         }
+        model->select ();
     }
 }
 

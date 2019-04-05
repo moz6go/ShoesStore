@@ -25,10 +25,15 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlTableModel>
+#include <QSqlQueryModel>
 #include <QSqlError>
 
 const int SIZE_WID = 32;
-
+#ifdef WIN32
+const QString DB_PATH = "D:\\MyProjects\\Qt\\ShoesStore\\db";
+#else
+const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/db";
+#endif
 enum SIZES {
 
 };
