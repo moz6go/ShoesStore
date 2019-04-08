@@ -74,6 +74,12 @@ void StoreMainWindow::onActionAddModel() {
     AddModelDialog* add_model = new AddModelDialog (&sdb, this);
     if(add_model->exec () == QDialog::Accepted) {
         QSqlQuery my_query = QSqlQuery(sdb);
+        QSqlQuery q = QSqlQuery(sdb);
+        q.exec ("SELECT last_insert_rowid();");
+        QSqlRecord rec = q.record ();
+        while(q.next ()){
+            qDebug() << q.value (0);
+        }
         QString ins = QString("INSERT INTO model_dir (model_id, model_name, category, season, brand, pic, wholesale_price, retail_price)"
                               "VALUES (%1, '%2', '%3', '%4', '%5', '%6', '%7', '%8');")
                 .arg(model->rowCount () + 1)

@@ -24,6 +24,7 @@
 #include <QtSql/QSql>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QSqlTableModel>
 #include <QSqlQueryModel>
 #include <QSqlError>
