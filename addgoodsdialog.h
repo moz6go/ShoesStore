@@ -12,13 +12,14 @@ class AddGoodsDialog;
 class AddGoodsDialog : public QDialog
 {
     Q_OBJECT
-
+    Ui::AddGoodsDialog *ui_add_goods_dialog;
+    QSqlTableModel* model;
 public:
     explicit AddGoodsDialog(QWidget *parent = 0);
     ~AddGoodsDialog();
 
-private:
-    Ui::AddGoodsDialog *ui_add_goods_dialog;
+private slots:
+    void ShowPic(QString text);
 };
 
 #endif // ADDGOODSDIALOG_H

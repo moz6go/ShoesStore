@@ -31,6 +31,8 @@ class StoreMainWindow : public QMainWindow
     QTableView* t_goods_info_;
     QLabel* l_pic_;
     QSplitter* splitter_;
+
+    void resizeEvent(QResizeEvent *event);
 public:
     explicit StoreMainWindow(QWidget *parent = nullptr);
     void BuildToolBar();
@@ -41,6 +43,7 @@ private slots:
     void onActionAddModel();
     void onActionDelModel();
     void onActionReport();
+    void ShowPic();
 };
 
 #endif // STOREMAINWINDOW_H

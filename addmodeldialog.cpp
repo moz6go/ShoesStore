@@ -24,10 +24,10 @@ AddModelDialog::AddModelDialog(QWidget *parent) :
     model_season->select ();
     ui_add_model_dialog->season_cb->setModel (model_season);
 
-    connect(ui_add_model_dialog->add_pb, &QPushButton::clicked, this, &AddModelDialog::accept);
-    connect(ui_add_model_dialog->cancel_pb, &QPushButton::clicked, this, &AddModelDialog::reject);
-    connect(ui_add_model_dialog->load_pic_pb, &QPushButton::clicked, this, &AddModelDialog::LoadPic);
-
+    QObject::connect(ui_add_model_dialog->add_pb, &QPushButton::clicked, this, &AddModelDialog::accept);
+    QObject::connect(ui_add_model_dialog->cancel_pb, &QPushButton::clicked, this, &AddModelDialog::reject);
+    QObject::connect(ui_add_model_dialog->load_pic_pb, &QPushButton::clicked, this, &AddModelDialog::LoadPic);
+    QObject::connect (ui_add_model_dialog->model_le, &QLineEdit::textChanged, this, &AddModelDialog::EnableAddButton);
 }
 QString AddModelDialog::getModel() {
     return ui_add_model_dialog->model_le->text ();
@@ -63,4 +63,13 @@ AddModelDialog::~AddModelDialog() {
 
 void AddModelDialog::LoadPic(){
     photo_path = QFileDialog::getOpenFileName (this, "Виберіть фото моделі", "", "*.jpg *.png *.bmp");
+}
+
+void AddModelDialog::EnableAddButton() {
+    if(!ui_add_model_dialog->model_le->text ().isEmpty () && !photo_path.isEmpty ()){
+        ui_add_model_dialog->add_pb->setEnabled (true);
+    }
+    else {
+        ui_add_model_dialog->add_pb->setDisabled (true);
+    }
 }

@@ -261,6 +261,9 @@
    </layout>
   </widget>
   <widget class="QPushButton" name="add_pb">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>190</x>
@@ -287,6 +290,17 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>model_le</tabstop>
+  <tabstop>category_cb</tabstop>
+  <tabstop>season_cb</tabstop>
+  <tabstop>brand_cb</tabstop>
+  <tabstop>wholesalepr_sb</tabstop>
+  <tabstop>retailpr_sb</tabstop>
+  <tabstop>load_pic_pb</tabstop>
+  <tabstop>add_pb</tabstop>
+  <tabstop>cancel_pb</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

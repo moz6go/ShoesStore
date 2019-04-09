@@ -21,6 +21,8 @@
 #include <QFileSystemModel>
 #include <QPushButton>
 #include <QFileDialog>
+#include <QDate>
+#include <QBuffer>
 
 #include <QtSql/QSql>
 #include <QSqlDatabase>
@@ -45,7 +47,8 @@ const QStringList HEADERS_LIST = {
     "Виробник",
     "Оптова ціна, грн",
     "Роздрібна ціна, грн",
-    "!pic"
+    "!pic",
+    "!date"
 };
 
 enum SIZES {

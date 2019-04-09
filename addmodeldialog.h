@@ -26,6 +26,7 @@ private:
     Ui::AddModelDialog *ui_add_model_dialog;
 private slots:
     void LoadPic();
+    void EnableAddButton();
 };
 
 #endif // ADDMODELDIALOG_H
