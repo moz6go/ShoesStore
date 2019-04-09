@@ -1,12 +1,12 @@
 #include "addgoodsdialog.h"
 #include "ui_addgoodsdialog.h"
 
-AddGoodsDialog::AddGoodsDialog(QSqlDatabase* sdb_ptr, QWidget *parent) :
+AddGoodsDialog::AddGoodsDialog(QWidget *parent) :
     QDialog(parent),
     ui_add_goods_dialog(new Ui::AddGoodsDialog)
 {
     ui_add_goods_dialog->setupUi(this);
-    QSqlTableModel* model = new QSqlTableModel(this, *sdb_ptr);
+    QSqlTableModel* model = new QSqlTableModel(this);
     model->setTable ("model_dir");
     model->select ();
     ui_add_goods_dialog->model_cb->setModel (model);

@@ -1,7 +1,7 @@
 #include "addmodeldialog.h"
 #include "ui_addmodeldialog.h"
 
-AddModelDialog::AddModelDialog(QSqlDatabase* sdb_ptr, QWidget *parent) :
+AddModelDialog::AddModelDialog(QWidget *parent) :
     QDialog(parent),
     ui_add_model_dialog(new Ui::AddModelDialog)
 {
@@ -9,17 +9,17 @@ AddModelDialog::AddModelDialog(QSqlDatabase* sdb_ptr, QWidget *parent) :
     setModal (true);
     photo_path = "";
 
-    QSqlTableModel* model_category = new QSqlTableModel(this, *sdb_ptr);
+    QSqlTableModel* model_category = new QSqlTableModel(this);
     model_category->setTable ("category_dir");
     model_category->select ();
     ui_add_model_dialog->category_cb->setModel (model_category);
 
-    QSqlTableModel* model_brand = new QSqlTableModel(this, *sdb_ptr);
+    QSqlTableModel* model_brand = new QSqlTableModel(this);
     model_brand->setTable ("brand_dir");
     model_brand->select ();
     ui_add_model_dialog->brand_cb->setModel (model_brand);
 
-    QSqlTableModel* model_season = new QSqlTableModel(this, *sdb_ptr);
+    QSqlTableModel* model_season = new QSqlTableModel(this);
     model_season->setTable ("season_dir");
     model_season->select ();
     ui_add_model_dialog->season_cb->setModel (model_season);

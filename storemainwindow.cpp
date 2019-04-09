@@ -3,27 +3,43 @@
 
 StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::StoreMainWindow) {
     ui->setupUi(this);
-
-    sdb = QSqlDatabase::addDatabase("QSQLITE");
-    sdb.setDatabaseName(DB_PATH);
-
-    if (sdb.open()) {
-        qDebug() << "Done!";
-    }
-    else {
-        qDebug() << "Error " << sdb.lastError ().text();
-    }
-
-    model = new QSqlTableModel(this, sdb);
-    model->setTable ("model_dir");
-    model->select ();
-
     QWidget* wgt = new QWidget(this);
 
-    t_bar_ = new QToolBar(this);
+    sdb = new DataBase(this);
+    if (sdb->ConnectToDataBase ()) {
+        ui->statusBar->showMessage ("З'єднано з базою даних успішно!");
+    }
+    else {
+        ui->statusBar->showMessage ("Неможливо з'єднатись з базою даних!");
+    }
+
+    model = new QSqlTableModel(this);
+    model->setTable ("model_dir");
+
+    for(int i = 0; i < model->columnCount(); ++i) {
+        model->setHeaderData(i, Qt::Horizontal, HEADERS_LIST[i]);
+    }
+    model->setSort(0,Qt::AscendingOrder);
 
     t_view_ = new QTableView(this);
     t_view_->setModel (model);
+    t_view_->setColumnHidden(0, true);
+    t_view_->setColumnHidden(7, true);
+    t_view_->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
+    t_view_->verticalHeader ()->setDefaultSectionSize (20);
+    t_view_->verticalHeader()->setVisible(false);
+    //t_view_->setShowGrid(false);
+    t_view_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    t_view_->setSelectionMode(QAbstractItemView::SingleSelection);
+    t_view_->resizeColumnsToContents();
+    t_view_->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    t_view_->horizontalHeader()->setStretchLastSection(true);
+    t_view_->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 10pt; }");
+    t_view_->setStyleSheet ("QTableView { font-size: 10pt; }");
+    model->select ();
+
+    t_bar_ = new QToolBar(this);
+
     l_pic_ = new QLabel("pic",this);
     t_goods_info_ = new QTableView(this);
 
@@ -60,7 +76,7 @@ void StoreMainWindow::BuildToolBar() {
 }
 
 void StoreMainWindow::onActionAddGoods() {
-    AddGoodsDialog* add_goods = new AddGoodsDialog(&sdb, this);
+    AddGoodsDialog* add_goods = new AddGoodsDialog(this);
     if(add_goods->exec () == QDialog::Accepted) {
 
     }
@@ -71,18 +87,11 @@ void StoreMainWindow::onActionSaleGoods() {
 }
 
 void StoreMainWindow::onActionAddModel() {
-    AddModelDialog* add_model = new AddModelDialog (&sdb, this);
+    AddModelDialog* add_model = new AddModelDialog (this);
     if(add_model->exec () == QDialog::Accepted) {
-        QSqlQuery my_query = QSqlQuery(sdb);
-        QSqlQuery q = QSqlQuery(sdb);
-        q.exec ("SELECT last_insert_rowid();");
-        QSqlRecord rec = q.record ();
-        while(q.next ()){
-            qDebug() << q.value (0);
-        }
-        QString ins = QString("INSERT INTO model_dir (model_id, model_name, category, season, brand, pic, wholesale_price, retail_price)"
-                              "VALUES (%1, '%2', '%3', '%4', '%5', '%6', '%7', '%8');")
-                .arg(model->rowCount () + 1)
+        QSqlQuery my_query;
+        QString ins = QString("INSERT INTO model_dir (model_name, category, season, brand, pic, wholesale_price, retail_price)"
+                              "VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
                 .arg(add_model->getModel ())
                 .arg(add_model->getCategory ())
                 .arg(add_model->getSeason ())
@@ -95,6 +104,7 @@ void StoreMainWindow::onActionAddModel() {
             qDebug() << my_query.lastError ().text ();
         }
         model->select ();
+        ui->statusBar->showMessage ("Додано модель " + add_model->getModel ());
     }
 }
 

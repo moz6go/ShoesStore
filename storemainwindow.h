@@ -4,6 +4,7 @@
 #include "general.h"
 #include "addmodeldialog.h"
 #include "addgoodsdialog.h"
+#include "database.h"
 
 namespace Ui {
 class StoreMainWindow;
@@ -13,8 +14,8 @@ class StoreMainWindow : public QMainWindow
 {
     Q_OBJECT
     Ui::StoreMainWindow *ui;
-    QSqlDatabase sdb;
     QSqlTableModel* model;
+    DataBase* sdb;
     QToolBar* t_bar_;
     QAction* a_add_goods_;
     QAction* a_sale_goods_;

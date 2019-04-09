@@ -17,12 +17,14 @@ CONFIG += c++11
 SOURCES += main.cpp\
     storemainwindow.cpp \
     addmodeldialog.cpp \
-    addgoodsdialog.cpp
+    addgoodsdialog.cpp \
+    database.cpp
 
 HEADERS  +=    storemainwindow.h \
     general.h \
     addmodeldialog.h \
-    addgoodsdialog.h
+    addgoodsdialog.h \
+    database.h
 
 FORMS    +=    storemainwindow.ui \
     addmodeldialog.ui \

@@ -21,6 +21,7 @@
 #include <QFileSystemModel>
 #include <QPushButton>
 #include <QFileDialog>
+
 #include <QtSql/QSql>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -30,11 +31,23 @@
 #include <QSqlError>
 
 const int SIZE_WID = 32;
-#ifdef WIN32
+
+#if defined(_WIN32)
 const QString DB_PATH = "D:\\MyProjects\\Qt\\ShoesStore\\db";
 #else
 const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/db";
 #endif
+const QStringList HEADERS_LIST = {
+    "!id",
+    "Назва моделі",
+    "Сезон",
+    "Категорія",
+    "Виробник",
+    "Оптова ціна, грн",
+    "Роздрібна ціна, грн",
+    "!pic"
+};
+
 enum SIZES {
 
 };
@@ -49,7 +62,7 @@ struct Model {
 };
 
 struct Product : public Model {
-
+    unsigned size;
 };
 
 #endif // GENERAL
