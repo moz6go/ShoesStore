@@ -120,7 +120,7 @@
     <item>
      <widget class="QDoubleSpinBox" name="retailpr_sb">
       <property name="maximum">
-       <double>100000.000000000000000</double>
+       <double>1000000.000000000000000</double>
       </property>
      </widget>
     </item>
@@ -223,7 +223,7 @@
        <string/>
       </property>
       <property name="maximum">
-       <double>100000.000000000000000</double>
+       <double>1000000.000000000000000</double>
       </property>
      </widget>
     </item>

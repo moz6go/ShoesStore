@@ -16,6 +16,8 @@
 #include <QSplitter>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QCheckBox>
+#include <QSpinBox>
 #include <QTextEdit>
 #include <QLineEdit>
 #include <QFileSystemModel>

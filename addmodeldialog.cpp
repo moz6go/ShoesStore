@@ -28,6 +28,7 @@ AddModelDialog::AddModelDialog(QWidget *parent) :
     QObject::connect(ui_add_model_dialog->cancel_pb, &QPushButton::clicked, this, &AddModelDialog::reject);
     QObject::connect(ui_add_model_dialog->load_pic_pb, &QPushButton::clicked, this, &AddModelDialog::LoadPic);
     QObject::connect (ui_add_model_dialog->model_le, &QLineEdit::textChanged, this, &AddModelDialog::EnableAddButton);
+    QObject::connect (this, &AddModelDialog::PhotoLoaded, this, &AddModelDialog::EnableAddButton);
 }
 QString AddModelDialog::getModel() {
     return ui_add_model_dialog->model_le->text ();
@@ -63,6 +64,9 @@ AddModelDialog::~AddModelDialog() {
 
 void AddModelDialog::LoadPic(){
     photo_path = QFileDialog::getOpenFileName (this, "Виберіть фото моделі", "", "*.jpg *.png *.bmp");
+    if (!photo_path.isEmpty ()){
+        emit PhotoLoaded ();
+    }
 }
 
 void AddModelDialog::EnableAddButton() {

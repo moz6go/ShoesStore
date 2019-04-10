@@ -27,6 +27,8 @@ private:
 private slots:
     void LoadPic();
     void EnableAddButton();
+signals:
+    void PhotoLoaded();
 };
 
 #endif // ADDMODELDIALOG_H
