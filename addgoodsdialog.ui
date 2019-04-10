@@ -6,30 +6,33 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
-    <height>350</height>
+    <width>600</width>
+    <height>320</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>700</width>
-    <height>350</height>
+    <width>600</width>
+    <height>320</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>700</width>
-    <height>350</height>
+    <width>600</width>
+    <height>320</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Прийняти товар</string>
   </property>
   <widget class="QPushButton" name="add_goods_pb">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>490</x>
-     <y>310</y>
+     <x>380</x>
+     <y>280</y>
      <width>89</width>
      <height>25</height>
     </rect>
@@ -41,8 +44,8 @@
   <widget class="QPushButton" name="cancel_pb">
    <property name="geometry">
     <rect>
-     <x>590</x>
-     <y>310</y>
+     <x>480</x>
+     <y>280</y>
      <width>89</width>
      <height>25</height>
     </rect>
@@ -69,7 +72,7 @@
     <rect>
      <x>30</x>
      <y>20</y>
-     <width>331</width>
+     <width>221</width>
      <height>27</height>
     </rect>
    </property>
@@ -89,9 +92,9 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>270</x>
      <y>20</y>
-     <width>302</width>
+     <width>301</width>
      <height>251</height>
     </rect>
    </property>
@@ -99,6 +102,12 @@
     <item>
      <widget class="QLabel" name="pic_lbl">
       <property name="minimumSize">
+       <size>
+        <width>300</width>
+        <height>210</height>
+       </size>
+      </property>
+      <property name="maximumSize">
        <size>
         <width>300</width>
         <height>210</height>
@@ -133,6 +142,24 @@
       </item>
       <item>
        <widget class="QLineEdit" name="result_le">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>35</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -142,62 +169,20 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>30</x>
      <y>90</y>
-     <width>331</width>
+     <width>221</width>
      <height>200</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QCheckBox" name="cb_36">
-        <property name="text">
-         <string>36</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_36"/>
-      </item>
-     </layout>
-    </item>
-    <item row="3" column="2">
-     <layout class="QHBoxLayout" name="horizontalLayout_11">
-      <item>
-       <widget class="QCheckBox" name="cb_45">
-        <property name="text">
-         <string>45</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_45"/>
-      </item>
-     </layout>
-    </item>
-    <item row="4" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_6">
-      <item>
-       <widget class="QCheckBox" name="cb_40">
-        <property name="text">
-         <string>40</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_40"/>
-      </item>
-     </layout>
-    </item>
     <item row="5" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
-       <widget class="QCheckBox" name="cb_41">
+       <widget class="QLabel" name="lb_41">
         <property name="text">
          <string>41</string>
         </property>
@@ -211,7 +196,7 @@
     <item row="1" column="2">
      <layout class="QHBoxLayout" name="horizontalLayout_9">
       <item>
-       <widget class="QCheckBox" name="cb_43">
+       <widget class="QLabel" name="lb_43">
         <property name="text">
          <string>43</string>
         </property>
@@ -222,10 +207,24 @@
       </item>
      </layout>
     </item>
+    <item row="1" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="lb_37">
+        <property name="text">
+         <string>37</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sb_37"/>
+      </item>
+     </layout>
+    </item>
     <item row="2" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QCheckBox" name="cb_38">
+       <widget class="QLabel" name="lb_38">
         <property name="text">
          <string>38</string>
         </property>
@@ -236,10 +235,38 @@
       </item>
      </layout>
     </item>
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="lb_36">
+        <property name="text">
+         <string>36</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sb_36"/>
+      </item>
+     </layout>
+    </item>
+    <item row="3" column="2">
+     <layout class="QHBoxLayout" name="horizontalLayout_11">
+      <item>
+       <widget class="QLabel" name="lb_45">
+        <property name="text">
+         <string>45</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sb_45"/>
+      </item>
+     </layout>
+    </item>
     <item row="4" column="2">
      <layout class="QHBoxLayout" name="horizontalLayout_12">
       <item>
-       <widget class="QCheckBox" name="cb_46">
+       <widget class="QLabel" name="lb_46">
         <property name="text">
          <string>46</string>
         </property>
@@ -253,7 +280,7 @@
     <item row="2" column="2">
      <layout class="QHBoxLayout" name="horizontalLayout_10">
       <item>
-       <widget class="QCheckBox" name="cb_44">
+       <widget class="QLabel" name="lb_44">
         <property name="text">
          <string>44</string>
         </property>
@@ -264,38 +291,10 @@
       </item>
      </layout>
     </item>
-    <item row="3" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
-      <item>
-       <widget class="QCheckBox" name="cb_39">
-        <property name="text">
-         <string>39</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_39"/>
-      </item>
-     </layout>
-    </item>
-    <item row="1" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QCheckBox" name="cb_37">
-        <property name="text">
-         <string>37</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_37"/>
-      </item>
-     </layout>
-    </item>
     <item row="0" column="2">
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <item>
-       <widget class="QCheckBox" name="cb_42">
+       <widget class="QLabel" name="lb_42">
         <property name="text">
          <string>42</string>
         </property>
@@ -303,6 +302,34 @@
       </item>
       <item>
        <widget class="QSpinBox" name="sb_42"/>
+      </item>
+     </layout>
+    </item>
+    <item row="4" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <item>
+       <widget class="QLabel" name="lb_40">
+        <property name="text">
+         <string>40</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sb_40"/>
+      </item>
+     </layout>
+    </item>
+    <item row="3" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QLabel" name="lb_39">
+        <property name="text">
+         <string>39</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sb_39"/>
       </item>
      </layout>
     </item>
@@ -324,27 +351,16 @@
  </widget>
  <tabstops>
   <tabstop>model_cb</tabstop>
-  <tabstop>cb_36</tabstop>
   <tabstop>sb_36</tabstop>
-  <tabstop>cb_37</tabstop>
   <tabstop>sb_37</tabstop>
-  <tabstop>cb_38</tabstop>
   <tabstop>sb_38</tabstop>
-  <tabstop>cb_39</tabstop>
   <tabstop>sb_39</tabstop>
-  <tabstop>cb_40</tabstop>
   <tabstop>sb_40</tabstop>
-  <tabstop>cb_41</tabstop>
   <tabstop>sb_41</tabstop>
-  <tabstop>cb_42</tabstop>
   <tabstop>sb_42</tabstop>
-  <tabstop>cb_43</tabstop>
   <tabstop>sb_43</tabstop>
-  <tabstop>cb_44</tabstop>
   <tabstop>sb_44</tabstop>
-  <tabstop>cb_45</tabstop>
   <tabstop>sb_45</tabstop>
-  <tabstop>cb_46</tabstop>
   <tabstop>sb_46</tabstop>
   <tabstop>add_goods_pb</tabstop>
   <tabstop>cancel_pb</tabstop>

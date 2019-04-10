@@ -94,7 +94,10 @@ void StoreMainWindow::BuildToolBar() {
 void StoreMainWindow::onActionAddGoods() {
     AddGoodsDialog* add_goods = new AddGoodsDialog(this);
     if(add_goods->exec () == QDialog::Accepted) {
-
+        QList<QSpinBox*> sb_list = add_goods->GetSbList ();
+        for (auto& sb : sb_list) {
+            //qDebug() << sb->value ();
+        }
     }
 }
 

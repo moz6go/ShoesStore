@@ -11,6 +11,7 @@
 #include <QMainWindow>
 #include <QToolBar>
 #include <QLabel>
+#include <QLineEdit>
 #include <QHeaderView>
 #include <QTableView>
 #include <QSplitter>
