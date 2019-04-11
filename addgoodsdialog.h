@@ -18,6 +18,7 @@ class AddGoodsDialog : public QDialog
 public:
     explicit AddGoodsDialog(QWidget *parent = nullptr);
     QList<QSpinBox*>& GetSbList();
+    int GetGoodsCount();
     ~AddGoodsDialog();
 
 private slots:

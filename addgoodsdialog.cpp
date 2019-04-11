@@ -29,12 +29,16 @@ AddGoodsDialog::AddGoodsDialog(QWidget *parent) :
         QObject::connect (sb_list[i], static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AddGoodsDialog::SetRes);
     }
     QObject::connect (ui_add_goods_dialog->result_le, &QLineEdit::textChanged, this, &AddGoodsDialog::EnableAddButton);
-    QObject::connect(ui_add_goods_dialog->add_goods_pb, &QPushButton::clicked, this, &AddGoodsDialog::accept);
-    QObject::connect(ui_add_goods_dialog->cancel_pb, &QPushButton::clicked, this, &AddGoodsDialog::reject);
+    QObject::connect (ui_add_goods_dialog->add_goods_pb, &QPushButton::clicked, this, &AddGoodsDialog::accept);
+    QObject::connect (ui_add_goods_dialog->cancel_pb, &QPushButton::clicked, this, &AddGoodsDialog::reject);
 }
 
 QList<QSpinBox*> &AddGoodsDialog::GetSbList() {
     return sb_list;
+}
+
+int AddGoodsDialog::GetGoodsCount() {
+    return ui_add_goods_dialog->result_le->text ().toInt ();
 }
 
 

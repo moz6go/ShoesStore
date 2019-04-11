@@ -94,9 +94,17 @@ void StoreMainWindow::BuildToolBar() {
 void StoreMainWindow::onActionAddGoods() {
     AddGoodsDialog* add_goods = new AddGoodsDialog(this);
     if(add_goods->exec () == QDialog::Accepted) {
+
         QList<QSpinBox*> sb_list = add_goods->GetSbList ();
-        for (auto& sb : sb_list) {
-            //qDebug() << sb->value ();
+        //select model_id number
+        //create relation by model_id
+        for (int i = 0; i < sb_list.size (); ++i) {
+            if (sb_list[i]->value ()) {
+                int size = i + 36;
+                for(int count = 0; count < sb_list[i]->value (); ++count) {
+                    //insert into db
+                }
+            }
         }
     }
 }
