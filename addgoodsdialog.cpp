@@ -41,6 +41,9 @@ int AddGoodsDialog::GetGoodsCount() {
     return ui_add_goods_dialog->result_le->text ().toInt ();
 }
 
+QString AddGoodsDialog::GetModelName() {
+    return ui_add_goods_dialog->model_cb->currentText ();
+}
 
 void AddGoodsDialog::ShowPic(QString text) {
     QPixmap pic;

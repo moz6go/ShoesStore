@@ -14,6 +14,7 @@
 #include <QLineEdit>
 #include <QHeaderView>
 #include <QTableView>
+#include <QTableWidget>
 #include <QSplitter>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -33,6 +34,7 @@
 #include <QSqlRecord>
 #include <QSqlTableModel>
 #include <QSqlQueryModel>
+#include <QSqlRelationalTableModel>
 #include <QSqlError>
 
 const int SIZE_WID = 32;
@@ -42,6 +44,9 @@ const QString DB_PATH = "D:\\MyProjects\\Qt\\ShoesStore\\db";
 #else
 const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/db";
 #endif
+
+const QString MODEL_DIR = "model_dir";
+const QString AVAILABLE_GOODS_DIR = "available_goods_dir";
 const QStringList HEADERS_LIST = {
     "!id",
     "Назва моделі",
@@ -52,6 +57,33 @@ const QStringList HEADERS_LIST = {
     "Роздрібна ціна, грн",
     "!pic",
     "!date"
+};
+
+const QStringList MODEL_DIR_COLUMNS = {
+    "model_id",
+    "model_name",
+    "season",
+    "category",
+    "brand",
+    "wholesale_price",
+    "retail_price",
+    "pic",
+    "date"
+};
+
+const QStringList AVAILABLE_GOODS_DIR_COLUMNS = {
+    "model_id",
+    "model_name",
+    "season",
+    "category",
+    "brand",
+    "wholesale_price",
+    "retail_price",
+    "pic",
+    "date",
+    "godds_id",
+    "goods_size",
+    "goods_date"
 };
 
 enum SIZES {
@@ -72,4 +104,3 @@ struct Product : public Model {
 };
 
 #endif // GENERAL
-

@@ -15,6 +15,7 @@ class StoreMainWindow : public QMainWindow
     Q_OBJECT
     Ui::StoreMainWindow *ui;
     QSqlTableModel* model;
+    QSqlRelationalTableModel* rel_model;
     DataBase* sdb;
     QToolBar* t_bar_;
     QAction* a_add_goods_;
@@ -28,11 +29,12 @@ class StoreMainWindow : public QMainWindow
 
     QGridLayout* main_l_;
     QTableView* t_view_;
-    QTableView* t_goods_info_;
+    QTableWidget* t_goods_info_;
     QLabel* l_pic_;
     QSplitter* splitter_;
 
     void resizeEvent(QResizeEvent *event);
+    void GoodsInfoTableInit();
 public:
     explicit StoreMainWindow(QWidget *parent = nullptr);
     void BuildToolBar();
@@ -44,6 +46,7 @@ private slots:
     void onActionDelModel();
     void onActionReport();
     void ShowPic();
+    void ShowGoodsInfo();
 };
 
 #endif // STOREMAINWINDOW_H

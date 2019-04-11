@@ -19,6 +19,7 @@ public:
     explicit AddGoodsDialog(QWidget *parent = nullptr);
     QList<QSpinBox*>& GetSbList();
     int GetGoodsCount();
+    QString GetModelName();
     ~AddGoodsDialog();
 
 private slots:
