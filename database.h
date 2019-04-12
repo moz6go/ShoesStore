@@ -14,8 +14,11 @@ class DataBase : public QObject
 
 public:
     DataBase (QObject *parent = 0);
+    ~DataBase ();
     bool ConnectToDataBase();
-    bool InsertIntoTable(const QString& table,const QVariantList &data);
+    bool InsertDataIntoTable (const QString& query_str, const QStringList& bind_values_list, const QVariantList& data);
+    int GetGoodsCount(const int& model_id, const int& size);
+    int GetModelId(const QString& model_name);
 };
 
 #endif // DATABASE_H

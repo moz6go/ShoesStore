@@ -15,29 +15,30 @@ class StoreMainWindow : public QMainWindow
     Q_OBJECT
     Ui::StoreMainWindow *ui;
     QSqlTableModel* model;
-    QSqlRelationalTableModel* rel_model;
     DataBase* sdb;
-    QToolBar* t_bar_;
-    QAction* a_add_goods_;
-    QAction* a_sale_goods_;
-    QAction* a_add_new_model_;
-    QAction* a_del_model_;
-    QAction* a_report_;
-    QHBoxLayout* h_main_layout_;
-    QVBoxLayout* rv_layout_;
-    QVBoxLayout* lv_layout_;
+    AddGoodsDialog* add_goods;
+    QToolBar* toolbar;
+    QAction* action_add_goods;
+    QAction* action_sale_goods;
+    QAction* action_add_new_model;
+    QAction* action_del_model;
+    QAction* action_report;
+    QHBoxLayout* h_main_layout;
+    QVBoxLayout* rv_layout;
+    QVBoxLayout* lv_layout;
 
-    QGridLayout* main_l_;
-    QTableView* t_view_;
-    QTableWidget* t_goods_info_;
-    QLabel* l_pic_;
-    QSplitter* splitter_;
+    QTableView* main_table_view;
+    QTableWidget* goods_info_table;
+    QLabel* pic_label;
+    QSplitter* splitter;
 
     void resizeEvent(QResizeEvent *event);
+    void MaibTableInit();
     void GoodsInfoTableInit();
+    void BuildToolBar();
+    void AddGoodsThread();
 public:
     explicit StoreMainWindow(QWidget *parent = nullptr);
-    void BuildToolBar();
     ~StoreMainWindow();
 private slots:
     void onActionAddGoods();

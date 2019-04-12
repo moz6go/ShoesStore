@@ -58,13 +58,16 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>60</y>
-     <width>301</width>
-     <height>17</height>
+     <y>40</y>
+     <width>221</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="text">
     <string>Виберіть розмір та кількість товару:</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QWidget" name="layoutWidget1">
@@ -94,7 +97,7 @@
     <rect>
      <x>270</x>
      <y>20</y>
-     <width>301</width>
+     <width>302</width>
      <height>251</height>
     </rect>
    </property>

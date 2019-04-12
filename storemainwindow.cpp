@@ -17,128 +17,129 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     model->setTable ("model_dir");
 
     for(int i = 0; i < model->columnCount(); ++i) {
-        model->setHeaderData(i, Qt::Horizontal, HEADERS_LIST[i]);
+        model->setHeaderData(i, Qt::Horizontal, MAIN_TABLE_HEADERS_LIST[i]);
     }
     model->setSort(0, Qt::AscendingOrder);
 
-    t_view_ = new QTableView(this);
-    t_view_->setModel (model);
+    main_table_view = new QTableView(this);
+    MaibTableInit ();
     model->select ();
 
-    t_view_->setColumnHidden(0, true);
-    t_view_->setColumnHidden(7, true);
-    t_view_->setColumnHidden(8, true);
-
-    t_view_->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
-    t_view_->verticalHeader ()->setDefaultSectionSize (20);
-    t_view_->verticalHeader()->setVisible(false);
-    t_view_->setSelectionBehavior(QAbstractItemView::SelectRows);
-    t_view_->setSelectionMode(QAbstractItemView::SingleSelection);
-    t_view_->resizeColumnsToContents();
-    t_view_->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    t_view_->horizontalHeader()->setStretchLastSection(true);
-    t_view_->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
-    t_view_->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 10pt; }");
-    t_view_->setStyleSheet ("QTableView { font-size: 10pt; }");
-    t_view_->setMinimumWidth (700);
-    t_view_->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
-
-    t_bar_ = new QToolBar(this);
+    toolbar = new QToolBar(this);
     BuildToolBar ();
 
-    l_pic_ = new QLabel(this);
+    pic_label = new QLabel(this);
 
-    t_goods_info_ = new QTableWidget(this);
+    goods_info_table = new QTableWidget(this);
     GoodsInfoTableInit();
-    h_main_layout_ = new QHBoxLayout();
-    rv_layout_ = new QVBoxLayout();
-    lv_layout_ = new QVBoxLayout();
 
-    lv_layout_->addWidget (t_view_);
-    rv_layout_->addWidget (l_pic_);
-    rv_layout_->addWidget (t_goods_info_);
+    h_main_layout = new QHBoxLayout();
+    rv_layout = new QVBoxLayout();
+    lv_layout = new QVBoxLayout();
 
-    h_main_layout_->addLayout (lv_layout_);
-    h_main_layout_->addLayout (rv_layout_);
-    wgt->setLayout (h_main_layout_);
+    lv_layout->addWidget (main_table_view);
+    rv_layout->addWidget (pic_label);
+    rv_layout->addWidget (goods_info_table);
+
+    h_main_layout->addLayout (lv_layout);
+    h_main_layout->addLayout (rv_layout);
+    wgt->setLayout (h_main_layout);
     setCentralWidget (wgt);
 
     setMinimumSize(1050, 600);
 
-    QObject::connect (t_view_, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
-    QObject::connect (t_view_, &QTableView::clicked, this, &StoreMainWindow::ShowGoodsInfo);
+    QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
+    QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowGoodsInfo);
 }
 
 void StoreMainWindow::resizeEvent(QResizeEvent *event) {
     for(int i = 0; i < model->columnCount(); ++i) {
-        t_view_->setColumnWidth(i, this->width() / model->columnCount());
+        main_table_view->setColumnWidth(i, this->width() / model->columnCount());
     }
     QMainWindow::resizeEvent(event);
 }
 
+void StoreMainWindow::MaibTableInit() {
+    main_table_view->setModel (model);
+    main_table_view->setColumnHidden(0, true);
+    main_table_view->setColumnHidden(7, true);
+    main_table_view->setColumnHidden(8, true);
+    main_table_view->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
+    main_table_view->verticalHeader ()->setDefaultSectionSize (20);
+    main_table_view->verticalHeader()->setVisible(false);
+    main_table_view->setSelectionBehavior(QAbstractItemView::SelectRows);
+    main_table_view->setSelectionMode(QAbstractItemView::SingleSelection);
+    main_table_view->resizeColumnsToContents();
+    main_table_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    main_table_view->horizontalHeader()->setStretchLastSection(true);
+    main_table_view->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
+    main_table_view->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 10pt; }");
+    main_table_view->setStyleSheet ("QTableView { font-size: 10pt; }");
+    main_table_view->setMinimumWidth (700);
+    main_table_view->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
+}
+
 void StoreMainWindow::GoodsInfoTableInit() {
-    t_goods_info_->clear ();
-    t_goods_info_->setRowCount (0);
-    t_goods_info_->setColumnCount(2);
-    t_goods_info_->setHorizontalHeaderLabels (QStringList() << "Розмір" << "Кількість");
-    t_goods_info_->setMaximumSize(300, 250);
-    t_goods_info_->setMinimumSize(300, 250);
-    t_goods_info_->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
-    t_goods_info_->verticalHeader ()->setDefaultSectionSize (20);
-    t_goods_info_->verticalHeader ()->setVisible(false);
-    t_goods_info_->setSelectionBehavior(QAbstractItemView::SelectRows);
-    t_goods_info_->setSelectionMode(QAbstractItemView::SingleSelection);
-    t_goods_info_->resizeColumnsToContents();
-    t_goods_info_->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    t_goods_info_->horizontalHeader()->setStretchLastSection(true);
-    t_goods_info_->setColumnWidth (0, 100);
-    t_goods_info_->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 10pt; }");
-    t_goods_info_->setStyleSheet ("QTableWidget { font-size: 10pt; }");
+    goods_info_table->clear ();
+    goods_info_table->setRowCount (0);
+    goods_info_table->setColumnCount(2);
+    goods_info_table->setHorizontalHeaderLabels (QStringList() << "Розмір" << "Кількість");
+    goods_info_table->setMaximumSize(300, 250);
+    goods_info_table->setMinimumSize(300, 250);
+    goods_info_table->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
+    goods_info_table->verticalHeader ()->setDefaultSectionSize (20);
+    goods_info_table->verticalHeader ()->setVisible(false);
+    goods_info_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    goods_info_table->setSelectionMode(QAbstractItemView::SingleSelection);
+    goods_info_table->resizeColumnsToContents();
+    goods_info_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    goods_info_table->horizontalHeader()->setStretchLastSection(true);
+    goods_info_table->setColumnWidth (0, 100);
+    goods_info_table->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 10pt; }");
+    goods_info_table->setStyleSheet ("QTableWidget { font-size: 10pt; }");
 }
 
 void StoreMainWindow::BuildToolBar() {
-    a_add_goods_ = t_bar_->addAction(QPixmap(":/pics/pics/add_goods.png"), "Прийняти товар", this, SLOT(onActionAddGoods()));
-    a_sale_goods_ = t_bar_->addAction(QPixmap(":/pics/pics/sale_goods.png"), "Продати товар", this, SLOT(onActionSaleGoods()));
-    t_bar_->addSeparator ();
-    a_add_new_model_ = t_bar_->addAction(QPixmap(":/pics/pics/add_model.png"), "Додати нову модель", this, SLOT(onActionAddModel()));
-    a_del_model_ = t_bar_->addAction(QPixmap(":/pics/pics/delete.png"), "Видалити модель", this, SLOT(onActionDelModel()));
-    t_bar_->addSeparator ();
-    a_report_ = t_bar_->addAction(QPixmap(":/pics/pics/report.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
+    action_add_goods = toolbar->addAction(QPixmap(":/pics/pics/add_goods.png"), "Прийняти товар", this, SLOT(onActionAddGoods()));
+    action_sale_goods = toolbar->addAction(QPixmap(":/pics/pics/sale_goods.png"), "Продати товар", this, SLOT(onActionSaleGoods()));
+    toolbar->addSeparator ();
+    action_add_new_model = toolbar->addAction(QPixmap(":/pics/pics/add_model.png"), "Додати нову модель", this, SLOT(onActionAddModel()));
+    action_del_model = toolbar->addAction(QPixmap(":/pics/pics/delete.png"), "Видалити модель", this, SLOT(onActionDelModel()));
+    toolbar->addSeparator ();
+    action_report = toolbar->addAction(QPixmap(":/pics/pics/report.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
 
-    t_bar_->setMovable (false);
-    t_bar_->setIconSize (QSize(SIZE_WID, SIZE_WID));
-    addToolBar(Qt::TopToolBarArea, t_bar_);
+    toolbar->setMovable (false);
+    toolbar->setIconSize (QSize(SIZE_WID, SIZE_WID));
+    addToolBar(Qt::TopToolBarArea, toolbar);
 }
 
-void StoreMainWindow::onActionAddGoods() {
-    AddGoodsDialog* add_goods = new AddGoodsDialog(this);
-    if(add_goods->exec () == QDialog::Accepted) {
-        ui->statusBar->showMessage ("Зачекайте, додаю товар...");
+void StoreMainWindow::AddGoodsThread() {
+    QList<QSpinBox*> sb_list = add_goods->GetSbList ();
+    int model_id = sdb->GetModelId (add_goods->GetModelName ());
 
-        QList<QSpinBox*> sb_list = add_goods->GetSbList ();
-        QSqlQuery sel_query;
-        sel_query.exec ("SELECT model_id FROM model_dir WHERE model_name = '" + add_goods->GetModelName () + "'");
-        QSqlRecord rec = sel_query.record ();
-        sel_query.next ();
-        int model_id =  sel_query.value(rec.indexOf("model_id")).toInt();
-        for (int i = 0; i < sb_list.size (); ++i) {
-            if (sb_list[i]->value ()) {
-                int size = i + 36;
-                for(int count = 0; count < sb_list[i]->value (); ++count) {
-                    QSqlQuery query;
-                    query.prepare ("INSERT INTO available_goods_dir (model_id, goods_size, goods_date)"
-                                   "VALUES (:model_id, :goods_size, :goods_date);");
-                    query.bindValue (":model_id", model_id);
-                    query.bindValue (":goods_size", size);
-                    query.bindValue (":goods_date", QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss"));
+    for (int i = 0; i < sb_list.size (); ++i) {
+        if (sb_list[i]->value ()) {
+            int size = i + 36;
+            for (int count = 0; count < sb_list[i]->value (); ++count) {
+                QVariantList data = QVariantList() << model_id
+                                                   << size
+                                                   << QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss");
 
-                    if(!query.exec ()) {
-                        ui->statusBar->showMessage ( query.lastError ().text ());
-                    }
+                if (!sdb->InsertDataIntoTable(ADD_GOODS_QUERY, ADD_GOODS_BIND_VALUES, data)) {
+                    ui->statusBar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
                 }
             }
         }
-        ui->statusBar->showMessage ("Додано " + QString::number(add_goods->GetGoodsCount ()) + " одиниць моделі " + add_goods->GetModelName ());
+    }
+    ui->statusBar->showMessage ("Додано " + QString::number(add_goods->GetGoodsCount ()) + " одиниць моделі " + add_goods->GetModelName ());
+}
+
+void StoreMainWindow::onActionAddGoods() {
+    add_goods = new AddGoodsDialog(this);
+    if (add_goods->exec () == QDialog::Accepted) {
+        ui->statusBar->showMessage ("Зачекайте, додаю товар...");
+        std::thread thr(&StoreMainWindow::AddGoodsThread, this);
+        thr.detach ();
     }
 }
 
@@ -150,25 +151,24 @@ void StoreMainWindow::onActionAddModel() {
     AddModelDialog* add_model = new AddModelDialog (this);
     if(add_model->exec () == QDialog::Accepted) {
         QPixmap pic(add_model->getPhotoPath ());
-        QByteArray bArr;
-        QBuffer buff(&bArr);
+        QByteArray pic_byte_arr;
+        QBuffer buff(&pic_byte_arr);
         buff.open (QIODevice::WriteOnly);
-        pic.save (&buff,"JPG");
-        QSqlQuery query;
-        query.prepare ("INSERT INTO model_dir (model_name, category, season, brand, wholesale_price, retail_price, pic, date)"
-                          "VALUES (:model_name, :category, :season, :brand, :wholesale_price, :retail_price, :pic, :date);");
-        query.bindValue (":model_name", add_model->getModel ());
-        query.bindValue (":category", add_model->getCategory ());
-        query.bindValue (":season", add_model->getSeason ());
-        query.bindValue (":brand", add_model->getBrand ());
-        query.bindValue (":wholesale_price", QString::number (add_model->getWholesalepr ()));
-        query.bindValue (":retail_price", QString::number (add_model->getRetailpr ()));
-        query.bindValue (":pic", bArr);
-        query.bindValue (":date", QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss"));
+        pic.save (&buff, "JPG");
 
-        if(!query.exec ()){
-            ui->statusBar->showMessage (query.lastError ().text ());
+        QVariantList data = QVariantList() << add_model->getModel ()
+                                           << add_model->getCategory ()
+                                           << add_model->getSeason ()
+                                           << add_model->getBrand ()
+                                           << QString::number (add_model->getWholesalepr ())
+                                           << QString::number (add_model->getRetailpr ())
+                                           << pic_byte_arr
+                                           << QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss");
+
+        if (!sdb->InsertDataIntoTable (ADD_MODEL_QUERY, ADD_MODEL_BIND_VALUES, data)) {
+            ui->statusBar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
         }
+
         model->select ();
         ui->statusBar->showMessage ("Додано модель " + add_model->getModel () + ", виробник " + add_model->getBrand ());
     }
@@ -184,39 +184,35 @@ void StoreMainWindow::onActionReport() {
 
 void StoreMainWindow::ShowPic() {
     QPixmap pic;
-    pic.loadFromData (model->data(model->index (t_view_->currentIndex ().row (), 7)).toByteArray ());
-    l_pic_->setPixmap (pic.scaledToWidth (300));
+    pic.loadFromData (model->data(model->index (main_table_view->currentIndex ().row (), 7)).toByteArray ());
+    pic_label->setPixmap (pic.scaledToWidth (300));
     if(pic.width () > pic.height ()){
-        l_pic_->setAlignment (Qt::AlignTop);
+        pic_label->setAlignment (Qt::AlignTop);
     }
     else {
-        l_pic_->setAlignment (Qt::AlignCenter);
+        pic_label->setAlignment (Qt::AlignCenter);
     }
 }
 
 void StoreMainWindow::ShowGoodsInfo() {
     GoodsInfoTableInit();
     int sum_count(0);
-    int model_id = model->data (model->index (t_view_->currentIndex ().row (), 0)).toInt ();
+    int model_id = model->data (model->index (main_table_view->currentIndex ().row (), 0)).toInt ();
     for (int size = 36; size <= 46; ++size) {
-        QSqlQuery sel_query;
-        sel_query.exec ("SELECT COUNT(*) FROM available_goods_dir WHERE model_id = " + QString::number (model_id) + " AND goods_size = " + QString::number (size));
-        QSqlRecord rec = sel_query.record ();
-        sel_query.next ();
-        int count = sel_query.value (0).toInt ();
+        int count = sdb->GetGoodsCount (model_id, size);
         sum_count += count;
         if(count) {
-            t_goods_info_->insertRow (t_goods_info_->rowCount ());
+            goods_info_table->insertRow (goods_info_table->rowCount ());
             for(int col = 0; col < 2; ++col) {
                 QTableWidgetItem* item = new QTableWidgetItem (col == 0 ? QString::number (size) : QString::number (count));
-                t_goods_info_->setItem(t_goods_info_->rowCount() - 1, col, item);
+                goods_info_table->setItem(goods_info_table->rowCount() - 1, col, item);
             }
         }
     }
-    t_goods_info_->insertRow (t_goods_info_->rowCount ());
+    goods_info_table->insertRow (goods_info_table->rowCount ());
     for(int col = 0; col < 2; ++col) {
         QTableWidgetItem* item = new QTableWidgetItem (col == 0 ? "ВСЬОГО" : QString::number (sum_count));
-        t_goods_info_->setItem(t_goods_info_->rowCount() - 1, col, item);
+        goods_info_table->setItem(goods_info_table->rowCount() - 1, col, item);
     }
 }
 
