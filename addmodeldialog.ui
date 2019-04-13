@@ -161,7 +161,7 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>30</y>
+     <y>22</y>
      <width>341</width>
      <height>27</height>
     </rect>
@@ -267,7 +267,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>310</y>
+     <y>320</y>
      <width>89</width>
      <height>25</height>
     </rect>
@@ -280,7 +280,7 @@
    <property name="geometry">
     <rect>
      <x>290</x>
-     <y>310</y>
+     <y>320</y>
      <width>89</width>
      <height>25</height>
     </rect>
@@ -289,6 +289,59 @@
     <string>Скасувати</string>
    </property>
   </widget>
+  <widget class="QLabel" name="warning_lbl">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>46</y>
+     <width>181</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel {color: red}</string>
+   </property>
+   <property name="text">
+    <string>модель з такою назвою вже існує!</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="pic_lbl">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>295</y>
+     <width>341</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>layoutWidget1</zorder>
+  <zorder>layoutWidget2</zorder>
+  <zorder>layoutWidget3</zorder>
+  <zorder>layoutWidget4</zorder>
+  <zorder>layoutWidget5</zorder>
+  <zorder>layoutWidget6</zorder>
+  <zorder>layoutWidget_2</zorder>
+  <zorder>add_pb</zorder>
+  <zorder>cancel_pb</zorder>
+  <zorder>warning_lbl</zorder>
+  <zorder>picture_le</zorder>
+  <zorder>pic_lbl</zorder>
  </widget>
  <tabstops>
   <tabstop>model_le</tabstop>

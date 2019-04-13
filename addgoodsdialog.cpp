@@ -1,16 +1,18 @@
 #include "addgoodsdialog.h"
 #include "ui_addgoodsdialog.h"
 
-AddGoodsDialog::AddGoodsDialog(QWidget *parent) :
+AddGoodsDialog::AddGoodsDialog(DataBase* data_base, QWidget *parent) :
     QDialog(parent),
     ui_add_goods_dialog(new Ui::AddGoodsDialog)
 {
     ui_add_goods_dialog->setupUi(this);
+    sdb = data_base;
     model = new QSqlTableModel(this);
     model->setTable ("model_dir");
     model->select ();
     ui_add_goods_dialog->model_cb->setModel (model);
     ui_add_goods_dialog->model_cb->setModelColumn (1);
+    ui_add_goods_dialog->model_cb->setCurrentIndex(1);
     ui_add_goods_dialog->pic_lbl->clear ();
 
     sb_list << ui_add_goods_dialog->sb_36 <<
@@ -47,11 +49,7 @@ QString AddGoodsDialog::GetModelName() {
 
 void AddGoodsDialog::ShowPic(QString text) {
     QPixmap pic;
-    QSqlQuery query;
-    query.exec ("SELECT pic FROM model_dir WHERE model_name = '" + text + "'");
-    QSqlRecord rec = query.record ();
-    query.next ();
-    pic.loadFromData (query.value (rec.indexOf ("pic")).toByteArray ());
+    pic.loadFromData (sdb->SelectPic (MODEL_DIR, MODEL_DIR_COLUMNS[1], text));
     ui_add_goods_dialog->pic_lbl->setPixmap (pic.scaledToWidth (300));
     if(pic.width () > pic.height ()) {
         ui_add_goods_dialog->pic_lbl->setAlignment (Qt::AlignTop);

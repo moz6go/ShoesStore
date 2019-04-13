@@ -6,8 +6,6 @@
 #include <QtDebug>
 #include <QDebug>
 #include <QObject>
-#include <QThread>
-#include <QMutex>
 #include <QMainWindow>
 #include <QToolBar>
 #include <QLabel>
@@ -27,6 +25,9 @@
 #include <QFileDialog>
 #include <QDate>
 #include <QBuffer>
+#include <QMessageBox>
+#include <QStyleFactory>
+#include <QThread>
 
 #include <QtSql/QSql>
 #include <QSqlDatabase>
@@ -38,7 +39,6 @@
 #include <QSqlError>
 
 #include <thread>
-#include <mutex>
 
 const int SIZE_WID = 32;
 
@@ -96,21 +96,18 @@ const QStringList MODEL_DIR_COLUMNS = {
 
 const QStringList AVAILABLE_GOODS_DIR_COLUMNS = {
     "model_id",
-    "model_name",
-    "season",
-    "category",
-    "brand",
-    "wholesale_price",
-    "retail_price",
-    "pic",
-    "date",
     "godds_id",
     "goods_size",
     "goods_date"
 };
 
-enum SIZES {
-
+enum State {
+    DEFAULT = 1,
+    ADD_GOODS,
+    SALE_GOODS,
+    ADD_MODEL,
+    DELETE_MODEL,
+    REPORT
 };
 
 struct Model {

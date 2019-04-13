@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "general.h"
+#include "database.h"
 
 namespace Ui {
 class AddModelDialog;
@@ -11,9 +12,11 @@ class AddModelDialog;
 class AddModelDialog : public QDialog
 {
     Q_OBJECT
+    DataBase* sdb;
     QString photo_path;
+    Ui::AddModelDialog *ui_add_model_dialog;
 public:
-    explicit AddModelDialog(QWidget *parent = 0);
+    explicit AddModelDialog(DataBase* data_base, QWidget *parent = 0);
     QString getModel();
     QString getCategory ();
     QString getSeason();
@@ -22,8 +25,6 @@ public:
     double getRetailpr();
     QString getPhotoPath();
     ~AddModelDialog();
-private:
-    Ui::AddModelDialog *ui_add_model_dialog;
 private slots:
     void LoadPic();
     void EnableAddButton();

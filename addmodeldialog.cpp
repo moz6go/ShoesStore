@@ -1,13 +1,15 @@
 #include "addmodeldialog.h"
 #include "ui_addmodeldialog.h"
 
-AddModelDialog::AddModelDialog(QWidget *parent) :
+AddModelDialog::AddModelDialog(DataBase* data_base, QWidget *parent) :
     QDialog(parent),
     ui_add_model_dialog(new Ui::AddModelDialog)
 {
     ui_add_model_dialog->setupUi(this);
     setModal (true);
     photo_path = "";
+    sdb = data_base;
+    ui_add_model_dialog->warning_lbl->setVisible (false);
 
     QSqlTableModel* model_category = new QSqlTableModel(this);
     model_category->setTable ("category_dir");
@@ -63,17 +65,32 @@ AddModelDialog::~AddModelDialog() {
 }
 
 void AddModelDialog::LoadPic(){
-    photo_path = QFileDialog::getOpenFileName (this, "Виберіть фото моделі", "", "*.jpg *.png *.bmp");
+    photo_path = QFileDialog::getOpenFileName (this, "Виберіть фото моделі", QDir::homePath (), "*.jpg *.png *.bmp");
     if (!photo_path.isEmpty ()){
-        emit PhotoLoaded ();
+        ui_add_model_dialog->pic_lbl->setText (photo_path.right (photo_path.size () - photo_path.lastIndexOf ('/') - 1));
     }
+    else {
+        ui_add_model_dialog->pic_lbl->setText("");
+    }
+    emit PhotoLoaded ();
 }
 
 void AddModelDialog::EnableAddButton() {
-    if(!ui_add_model_dialog->model_le->text ().isEmpty () && !photo_path.isEmpty ()){
+
+    bool photo_ok = !photo_path.isEmpty ();
+    bool text_ok = !ui_add_model_dialog->model_le->text ().isEmpty ();
+    bool model_ok = !sdb->SelectCount (MODEL_DIR, MODEL_DIR_COLUMNS[1], ui_add_model_dialog->model_le->text ());
+
+    if(photo_ok && text_ok && model_ok) {
+        ui_add_model_dialog->warning_lbl->setVisible (false);
         ui_add_model_dialog->add_pb->setEnabled (true);
     }
+    else if (model_ok) {
+        ui_add_model_dialog->warning_lbl->setVisible (false);
+        ui_add_model_dialog->add_pb->setDisabled (true);
+    }
     else {
+        ui_add_model_dialog->warning_lbl->setVisible (true);
         ui_add_model_dialog->add_pb->setDisabled (true);
     }
 }

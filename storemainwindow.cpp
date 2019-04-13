@@ -10,7 +10,7 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
         ui->statusBar->showMessage ("З'єднано з базою даних успішно!");
     }
     else {
-        ui->statusBar->showMessage ("Неможливо з'єднатись з базою даних!");
+        QMessageBox::critical (this, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
     }
 
     model = new QSqlTableModel(this);
@@ -22,8 +22,7 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     model->setSort(0, Qt::AscendingOrder);
 
     main_table_view = new QTableView(this);
-    MaibTableInit ();
-    model->select ();
+    MainTableInit ();
 
     toolbar = new QToolBar(this);
     BuildToolBar ();
@@ -45,11 +44,12 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     h_main_layout->addLayout (rv_layout);
     wgt->setLayout (h_main_layout);
     setCentralWidget (wgt);
-
+    SetState(DEFAULT);
     setMinimumSize(1050, 600);
 
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowGoodsInfo);
+    Update(0);
 }
 
 void StoreMainWindow::resizeEvent(QResizeEvent *event) {
@@ -59,7 +59,7 @@ void StoreMainWindow::resizeEvent(QResizeEvent *event) {
     QMainWindow::resizeEvent(event);
 }
 
-void StoreMainWindow::MaibTableInit() {
+void StoreMainWindow::MainTableInit() {
     main_table_view->setModel (model);
     main_table_view->setColumnHidden(0, true);
     main_table_view->setColumnHidden(7, true);
@@ -114,32 +114,81 @@ void StoreMainWindow::BuildToolBar() {
 }
 
 void StoreMainWindow::AddGoodsThread() {
-    QList<QSpinBox*> sb_list = add_goods->GetSbList ();
-    int model_id = sdb->GetModelId (add_goods->GetModelName ());
+}
 
-    for (int i = 0; i < sb_list.size (); ++i) {
-        if (sb_list[i]->value ()) {
-            int size = i + 36;
-            for (int count = 0; count < sb_list[i]->value (); ++count) {
-                QVariantList data = QVariantList() << model_id
-                                                   << size
-                                                   << QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss");
+void StoreMainWindow::SetState(State state) {
+    switch (state) {
+    case DEFAULT:
+        action_sale_goods->setEnabled (true);
+        action_add_goods->setEnabled (true);
+        action_del_model->setEnabled (true);
+        action_add_new_model->setEnabled (true);
+        action_report->setEnabled (true);
+        break;
+    case ADD_GOODS:
+        action_sale_goods->setDisabled (true);
+        action_add_goods->setDisabled (true);
+        action_del_model->setDisabled (true);
+        action_add_new_model->setDisabled (true);
+        action_report->setDisabled (true);
+        break;
+    case SALE_GOODS:
+        action_sale_goods->setEnabled (true);
+        action_add_goods->setEnabled (true);
+        action_del_model->setEnabled (true);
+        action_add_new_model->setEnabled (true);
+        action_report->setEnabled (true);
+        break;
+    case ADD_MODEL:
+        action_sale_goods->setEnabled (true);
+        action_add_goods->setEnabled (true);
+        action_del_model->setEnabled (true);
+        action_add_new_model->setEnabled (true);
+        action_report->setEnabled (true);
+        break;
+    case DELETE_MODEL:
+        action_sale_goods->setEnabled (true);
+        action_add_goods->setEnabled (true);
+        action_del_model->setEnabled (true);
+        action_add_new_model->setEnabled (true);
+        action_report->setEnabled (true);
+        break;
+    case REPORT:
+        action_sale_goods->setEnabled (true);
+        action_add_goods->setEnabled (true);
+        action_del_model->setEnabled (true);
+        action_add_new_model->setEnabled (true);
+        action_report->setEnabled (true);
+    }
+}
 
-                if (!sdb->InsertDataIntoTable(ADD_GOODS_QUERY, ADD_GOODS_BIND_VALUES, data)) {
-                    ui->statusBar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
+
+void StoreMainWindow::onActionAddGoods() {
+    add_goods = new AddGoodsDialog(sdb, this);
+    if (add_goods->exec () == QDialog::Accepted) {
+        SetState(ADD_GOODS);
+        ui->statusBar->showMessage ("Зачекайте, додаю товар...");
+
+        QList<QSpinBox*> sb_list = add_goods->GetSbList ();
+        int model_id = sdb->GetModelId (add_goods->GetModelName ());
+
+        for (int i = 0; i < sb_list.size (); ++i) {
+            if (sb_list[i]->value ()) {
+                int size = i + 36;
+                for (int count = 0; count < sb_list[i]->value (); ++count) {
+                    QVariantList data = QVariantList() << model_id
+                                                       << size
+                                                       << QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss");
+
+                    if (!sdb->InsertDataIntoTable(ADD_GOODS_QUERY, ADD_GOODS_BIND_VALUES, data)) {
+                        ui->statusBar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
+                    }
                 }
             }
         }
-    }
-    ui->statusBar->showMessage ("Додано " + QString::number(add_goods->GetGoodsCount ()) + " одиниць моделі " + add_goods->GetModelName ());
-}
-
-void StoreMainWindow::onActionAddGoods() {
-    add_goods = new AddGoodsDialog(this);
-    if (add_goods->exec () == QDialog::Accepted) {
-        ui->statusBar->showMessage ("Зачекайте, додаю товар...");
-        std::thread thr(&StoreMainWindow::AddGoodsThread, this);
-        thr.detach ();
+        Update (main_table_view->currentIndex ().row ());
+        SetState(DEFAULT);
+        ui->statusBar->showMessage ("Додано " + QString::number(add_goods->GetGoodsCount ()) + " одиниць моделі " + add_goods->GetModelName ());
     }
 }
 
@@ -148,7 +197,7 @@ void StoreMainWindow::onActionSaleGoods() {
 }
 
 void StoreMainWindow::onActionAddModel() {
-    AddModelDialog* add_model = new AddModelDialog (this);
+    AddModelDialog* add_model = new AddModelDialog (sdb, this);
     if(add_model->exec () == QDialog::Accepted) {
         QPixmap pic(add_model->getPhotoPath ());
         QByteArray pic_byte_arr;
@@ -168,14 +217,31 @@ void StoreMainWindow::onActionAddModel() {
         if (!sdb->InsertDataIntoTable (ADD_MODEL_QUERY, ADD_MODEL_BIND_VALUES, data)) {
             ui->statusBar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
         }
-
-        model->select ();
+        Update(model->rowCount ());
         ui->statusBar->showMessage ("Додано модель " + add_model->getModel () + ", виробник " + add_model->getBrand ());
     }
 }
 
 void StoreMainWindow::onActionDelModel() {
-
+    if(sdb->SelectCount (AVAILABLE_GOODS_DIR,
+                         AVAILABLE_GOODS_DIR_COLUMNS[0],
+                         model->data (model->index (main_table_view->currentIndex ().row (), 0)).toString ())) {
+        QMessageBox::warning (this, "Помилка!", "Неможливо видалити модель, є наявні товари!");
+    }
+    else{
+        QString model_name = model->data (model->index (main_table_view->currentIndex ().row (), 1)).toString ();
+        QMessageBox* msgbox = new QMessageBox(QMessageBox::Question,
+                                              "Видалити модель",
+                                              "Ви дійсно бажаєте видалити з бази даних модель " + model_name +"?",
+                                              QMessageBox::No | QMessageBox::Yes,
+                                              this);
+        if(msgbox->exec () == QMessageBox::Yes) {
+            if(sdb->DeleteRow (MODEL_DIR, MODEL_DIR_COLUMNS[1], model_name)){
+                ui->statusBar->showMessage ("Видалено модель " + model_name);
+            }
+            Update(main_table_view->currentIndex ().row () - 1);
+        }
+    }
 }
 
 void StoreMainWindow::onActionReport() {
@@ -199,7 +265,12 @@ void StoreMainWindow::ShowGoodsInfo() {
     int sum_count(0);
     int model_id = model->data (model->index (main_table_view->currentIndex ().row (), 0)).toInt ();
     for (int size = 36; size <= 46; ++size) {
-        int count = sdb->GetGoodsCount (model_id, size);
+        int count = sdb->SelectCount (
+                AVAILABLE_GOODS_DIR,
+                AVAILABLE_GOODS_DIR_COLUMNS[0],
+                AVAILABLE_GOODS_DIR_COLUMNS[2],
+                QString::number (model_id),
+                QString::number (size));
         sum_count += count;
         if(count) {
             goods_info_table->insertRow (goods_info_table->rowCount ());
@@ -214,6 +285,13 @@ void StoreMainWindow::ShowGoodsInfo() {
         QTableWidgetItem* item = new QTableWidgetItem (col == 0 ? "ВСЬОГО" : QString::number (sum_count));
         goods_info_table->setItem(goods_info_table->rowCount() - 1, col, item);
     }
+}
+
+void StoreMainWindow::Update(int row) {
+    model->select ();
+    main_table_view->selectRow (row);
+    ShowPic ();
+    ShowGoodsInfo ();
 }
 
 StoreMainWindow::~StoreMainWindow() {

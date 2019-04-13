@@ -33,10 +33,11 @@ class StoreMainWindow : public QMainWindow
     QSplitter* splitter;
 
     void resizeEvent(QResizeEvent *event);
-    void MaibTableInit();
+    void MainTableInit();
     void GoodsInfoTableInit();
     void BuildToolBar();
     void AddGoodsThread();
+    void SetState(State state);
 public:
     explicit StoreMainWindow(QWidget *parent = nullptr);
     ~StoreMainWindow();
@@ -48,6 +49,9 @@ private slots:
     void onActionReport();
     void ShowPic();
     void ShowGoodsInfo();
+    void Update(int row);
+signals:
+    void finishAddGoods();
 };
 
 #endif // STOREMAINWINDOW_H

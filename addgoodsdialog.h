@@ -12,11 +12,12 @@ class AddGoodsDialog;
 class AddGoodsDialog : public QDialog
 {
     Q_OBJECT
-    Ui::AddGoodsDialog *ui_add_goods_dialog;
+    DataBase* sdb;
     QSqlTableModel* model;
     QList<QSpinBox*> sb_list;
+    Ui::AddGoodsDialog *ui_add_goods_dialog;
 public:
-    explicit AddGoodsDialog(QWidget *parent = nullptr);
+    explicit AddGoodsDialog(DataBase* data_base, QWidget *parent = nullptr);
     QList<QSpinBox*>& GetSbList();
     int GetGoodsCount();
     QString GetModelName();
