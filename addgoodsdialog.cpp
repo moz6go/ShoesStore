@@ -6,17 +6,14 @@ AddGoodsDialog::AddGoodsDialog(DataBase* data_base, QWidget *parent) :
     ui_add_goods_dialog(new Ui::AddGoodsDialog)
 {
     ui_add_goods_dialog->setupUi(this);
+    setModal (true);
     sdb = data_base;
-    model = new QSqlTableModel(this);
-    model->setTable (MODELS_TABLE);
-    model->select ();
 
-//    QDataWidgetMapper* mapper = new QDataWidgetMapper;
-//    mapper->setModel (model);
-//    mapper->addMapping (ui_add_goods_dialog->model_cb, 0);
-//    mapper->toFirst ();
-    ui_add_goods_dialog->model_cb->setModel (model);
-    ui_add_goods_dialog->model_cb->setModelColumn (1);
+    QSqlQueryModel* brand_model = new QSqlQueryModel(this);
+    brand_model->setQuery ("SELECT DISTINCT " + BRAND + " FROM " + MODELS_TABLE);
+    ui_add_goods_dialog->brand_cb->setModel (brand_model);
+
+    UpdateModelList (ui_add_goods_dialog->brand_cb->currentText ());
 
     sb_list << ui_add_goods_dialog->sb_36 <<
                ui_add_goods_dialog->sb_37 <<
@@ -31,6 +28,7 @@ AddGoodsDialog::AddGoodsDialog(DataBase* data_base, QWidget *parent) :
                ui_add_goods_dialog->sb_46;
 
     QObject::connect (ui_add_goods_dialog->model_cb, &QComboBox::currentTextChanged, this, &AddGoodsDialog::ShowPic);
+    QObject::connect (ui_add_goods_dialog->brand_cb, &QComboBox::currentTextChanged, this, &AddGoodsDialog::UpdateModelList);
     for (int i = 0; i < sb_list.size (); ++i) {
         QObject::connect (sb_list[i], static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AddGoodsDialog::SetRes);
     }
@@ -62,6 +60,12 @@ void AddGoodsDialog::ShowPic(QString text) {
     else {
         ui_add_goods_dialog->pic_lbl->setAlignment (Qt::AlignCenter);
     }
+}
+
+void AddGoodsDialog::UpdateModelList(QString brand) {
+    QSqlQueryModel* model = new QSqlQueryModel(this);
+    model->setQuery ("SELECT " + MODEL_NAME + " FROM " + MODELS_TABLE + " WHERE " + BRAND + " ='" + brand + "'");
+    ui_add_goods_dialog->model_cb->setModel (model);
 }
 
 void AddGoodsDialog::SetRes(int i) {

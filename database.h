@@ -22,8 +22,7 @@ public:
     int SelectCount(const QString& from, const QString& where1, const QString& where2, const QString& equal1, const QString& equal2);
     bool DeleteRow(const QString& from, const QString& where, const QString& equal);
     QByteArray SelectPic(const QString& from, const QString& where, const QString& equal);
-
-    int GetModelId(const QString& model_name);
+    QString Select(const QString &select, const QString& from, const QString& where, const QString& equal);
 };
 
 #endif // DATABASE_H

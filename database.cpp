@@ -65,12 +65,12 @@ QByteArray DataBase::SelectPic(const QString &from, const QString &where, const 
     return query.value (rec.indexOf ("pic")).toByteArray ();
 }
 
-int DataBase::GetModelId(const QString &model_name) {
+QString DataBase::Select(const QString &select, const QString &from, const QString &where, const QString &equal) {
     QSqlQuery sel_query;
-    sel_query.exec ("SELECT model_id FROM "+ MODELS_TABLE +" WHERE "+ MODEL_NAME +" = '" + model_name + "'");
+    sel_query.exec ("SELECT " + select + " FROM "+ from +" WHERE "+ where +" = '" + equal + "'");
     QSqlRecord rec = sel_query.record ();
     sel_query.next ();
-    return  sel_query.value(rec.indexOf("model_id")).toInt();
+    return  sel_query.value(rec.indexOf(select)).toString ();
 }
 
 bool DataBase::OpenDataBase() {

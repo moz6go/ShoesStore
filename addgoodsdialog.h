@@ -13,7 +13,6 @@ class AddGoodsDialog : public QDialog
 {
     Q_OBJECT
     DataBase* sdb;
-    QSqlTableModel* model;
     QList<QSpinBox*> sb_list;
     Ui::AddGoodsDialog *ui_add_goods_dialog;
 public:
@@ -25,6 +24,7 @@ public:
 
 private slots:
     void ShowPic(QString text);
+    void UpdateModelList(QString brand);
     void SetRes(int i);
     void EnableAddButton();
 };

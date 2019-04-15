@@ -170,7 +170,7 @@ void StoreMainWindow::onActionAddGoods() {
         ui->statusBar->showMessage ("Зачекайте, додаю товар...");
 
         QList<QSpinBox*> sb_list = add_goods->GetSbList ();
-        int model_id = sdb->GetModelId (add_goods->GetModelName ());
+        int model_id = sdb->Select (MODEL_ID, MODELS_TABLE, MODEL_NAME, add_goods->GetModelName ()).toInt ();
 
         for (int i = 0; i < sb_list.size (); ++i) {
             if (sb_list[i]->value ()) {
@@ -193,7 +193,10 @@ void StoreMainWindow::onActionAddGoods() {
 }
 
 void StoreMainWindow::onActionSaleGoods() {
+    sale_goods = new SaleDialog(sdb, this);
+    if (sale_goods->exec () == QDialog::Accepted){
 
+    }
 }
 
 void StoreMainWindow::onActionAddModel() {

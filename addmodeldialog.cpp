@@ -1,7 +1,7 @@
 #include "addmodeldialog.h"
 #include "ui_addmodeldialog.h"
 
-AddModelDialog::AddModelDialog(DataBase* data_base, QWidget *parent) :
+AddModelDialog::AddModelDialog (DataBase* data_base, QWidget *parent) :
     QDialog(parent),
     ui_add_model_dialog(new Ui::AddModelDialog)
 {
