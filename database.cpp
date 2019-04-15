@@ -67,7 +67,7 @@ QByteArray DataBase::SelectPic(const QString &from, const QString &where, const 
 
 int DataBase::GetModelId(const QString &model_name) {
     QSqlQuery sel_query;
-    sel_query.exec ("SELECT model_id FROM model_dir WHERE model_name = '" + model_name + "'");
+    sel_query.exec ("SELECT model_id FROM "+ MODELS_TABLE +" WHERE "+ MODEL_NAME +" = '" + model_name + "'");
     QSqlRecord rec = sel_query.record ();
     sel_query.next ();
     return  sel_query.value(rec.indexOf("model_id")).toInt();

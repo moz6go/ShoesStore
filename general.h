@@ -28,6 +28,7 @@
 #include <QMessageBox>
 #include <QStyleFactory>
 #include <QThread>
+#include <QDataWidgetMapper>
 
 #include <QtSql/QSql>
 #include <QSqlDatabase>
@@ -38,8 +39,6 @@
 #include <QSqlRelationalTableModel>
 #include <QSqlError>
 
-#include <thread>
-
 const int SIZE_WID = 32;
 
 #if defined(_WIN32)
@@ -48,27 +47,105 @@ const QString DB_PATH = "D:\\MyProjects\\Qt\\ShoesStore\\db";
 const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/db";
 #endif
 
-const QString ADD_MODEL_QUERY = "INSERT INTO model_dir (model_name, category, season, brand, wholesale_price, retail_price, pic, date)"
-                                "VALUES (:model_name, :category, :season, :brand, :wholesale_price, :retail_price, :pic, :date);";
+//tables
+const QString MODELS_TABLE = "models";
+const QString AVAILABLE_GOODS_TABLE = "available_goods";
+const QString BRANDS_TABLE = "brands";
+const QString CATEGORIES_TABLE = "categories";
+const QString SEASONS_TABLE = "seasons";
+const QString SOLD_GOODS_TABLE = "sold_goods";
+
+//columns
+const QString MODEL_ID = "model_id";
+const QString MODEL_NAME = "model_name";
+const QString SEASON = "season";
+const QString CATEGORY = "category";
+const QString BRAND = "brand";
+const QString WHOLESALE_PRICE = "wholesale_price";
+const QString RETAIL_PRICE = "retail_price";
+const QString PIC = "pic";
+const QString DATE = "date";
+
+const QString GOODS_ID = "godds_id";
+const QString GOODS_SIZE = "goods_size";
+const QString GOODS_DATE = "goods_date";
+
+const QString SALE_PRICE = "sale_price";
+const QString SALE_DATE = "sale_date";
+const QString PROFIT = "profit";
+
+/*const QStringList MODELS_TABLE_HEADERS = {
+    MODEL_ID,
+    MODEL_NAME,
+    SEASON,
+    CATEGORY,
+    BRAND,
+    WHOLESALE_PRICE,
+    RETAIL_PRICE,
+    PIC,
+    DATE
+};
+const QStringList AVAILABLE_GOODS_TABLE_HEADERS = {
+    MODEL_ID,
+    GOODS_ID,
+    GOODS_SIZE,
+    GOODS_DATE
+};
+const QStringList SOLD_GOODS_TABLE_HEADERS = {
+    MODEL_ID,
+    GOODS_ID,
+    GOODS_SIZE,
+    GOODS_DATE,
+    SALE_PRICE,
+    SALE_DATE,
+    PROFIT
+};*/
+
+const QString ADD_MODEL_QUERY = "INSERT INTO "+ MODELS_TABLE +" ("
+        + MODEL_NAME + ", "
+        + SEASON + ", "
+        + CATEGORY + ", "
+        + BRAND + ", "
+        + WHOLESALE_PRICE + ", "
+        + RETAIL_PRICE + ", "
+        + PIC + ", "
+        + DATE + ")"
+    "VALUES ("
+        ":" + MODEL_NAME + ", "
+        ":" + SEASON + ", "
+        ":" + CATEGORY + ", "
+        ":" + BRAND + ", "
+        ":" + WHOLESALE_PRICE + ", "
+        ":" + RETAIL_PRICE + ", "
+        ":" + PIC + ", "
+        ":" + DATE + ");";
+
+
 const QStringList ADD_MODEL_BIND_VALUES = {
-    ":model_name",
-    ":category",
-    ":season",
-    ":brand",
-    ":wholesale_price",
-    ":retail_price",
-    ":pic",
-    ":date"
+    ":" + MODEL_NAME,
+    ":" + SEASON,
+    ":" + CATEGORY,
+    ":" + BRAND,
+    ":" + WHOLESALE_PRICE,
+    ":" + RETAIL_PRICE,
+    ":" + PIC,
+    ":" + DATE
 };
-const QString ADD_GOODS_QUERY = "INSERT INTO available_goods_dir (model_id, goods_size, goods_date)"
-                                "VALUES (:model_id, :goods_size, :goods_date);";
+
+const QString ADD_GOODS_QUERY = "INSERT INTO " + AVAILABLE_GOODS_TABLE + " ("
+        + MODEL_ID + ", "
+        + GOODS_SIZE + ", "
+        + GOODS_DATE + ")"
+    "VALUES ("
+        ":" + MODEL_ID + ", "
+        ":" + GOODS_SIZE + ", "
+        ":" + GOODS_DATE + ");";
+
 const QStringList ADD_GOODS_BIND_VALUES = {
-    ":model_id",
-    ":goods_size",
-    ":goods_date"
+    ":" + MODEL_ID,
+    ":" + GOODS_SIZE,
+    ":" + GOODS_DATE
 };
-const QString MODEL_DIR = "model_dir";
-const QString AVAILABLE_GOODS_DIR = "available_goods_dir";
 
 const QStringList MAIN_TABLE_HEADERS_LIST = {
     "!id",
@@ -81,26 +158,6 @@ const QStringList MAIN_TABLE_HEADERS_LIST = {
     "!pic",
     "!date"
 };
-
-const QStringList MODEL_DIR_COLUMNS = {
-    "model_id",
-    "model_name",
-    "season",
-    "category",
-    "brand",
-    "wholesale_price",
-    "retail_price",
-    "pic",
-    "date"
-};
-
-const QStringList AVAILABLE_GOODS_DIR_COLUMNS = {
-    "model_id",
-    "godds_id",
-    "goods_size",
-    "goods_date"
-};
-
 enum State {
     DEFAULT = 1,
     ADD_GOODS,

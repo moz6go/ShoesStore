@@ -12,17 +12,17 @@ AddModelDialog::AddModelDialog(DataBase* data_base, QWidget *parent) :
     ui_add_model_dialog->warning_lbl->setVisible (false);
 
     QSqlTableModel* model_category = new QSqlTableModel(this);
-    model_category->setTable ("category_dir");
+    model_category->setTable (CATEGORIES_TABLE);
     model_category->select ();
     ui_add_model_dialog->category_cb->setModel (model_category);
 
     QSqlTableModel* model_brand = new QSqlTableModel(this);
-    model_brand->setTable ("brand_dir");
+    model_brand->setTable (BRANDS_TABLE);
     model_brand->select ();
     ui_add_model_dialog->brand_cb->setModel (model_brand);
 
     QSqlTableModel* model_season = new QSqlTableModel(this);
-    model_season->setTable ("season_dir");
+    model_season->setTable (SEASONS_TABLE);
     model_season->select ();
     ui_add_model_dialog->season_cb->setModel (model_season);
 
@@ -79,7 +79,7 @@ void AddModelDialog::EnableAddButton() {
 
     bool photo_ok = !photo_path.isEmpty ();
     bool text_ok = !ui_add_model_dialog->model_le->text ().isEmpty ();
-    bool model_ok = !sdb->SelectCount (MODEL_DIR, MODEL_DIR_COLUMNS[1], ui_add_model_dialog->model_le->text ());
+    bool model_ok = !sdb->SelectCount (MODELS_TABLE, MODEL_NAME, ui_add_model_dialog->model_le->text ());
 
     if(photo_ok && text_ok && model_ok) {
         ui_add_model_dialog->warning_lbl->setVisible (false);

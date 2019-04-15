@@ -14,12 +14,12 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     }
 
     model = new QSqlTableModel(this);
-    model->setTable ("model_dir");
+    model->setTable (MODELS_TABLE);
 
-    for(int i = 0; i < model->columnCount(); ++i) {
-        model->setHeaderData(i, Qt::Horizontal, MAIN_TABLE_HEADERS_LIST[i]);
+    for(int col = 0; col < model->columnCount(); ++col) {
+        model->setHeaderData(col, Qt::Horizontal, MAIN_TABLE_HEADERS_LIST[col]);
     }
-    model->setSort(0, Qt::AscendingOrder);
+    model->setSort (0, Qt::AscendingOrder);
 
     main_table_view = new QTableView(this);
     MainTableInit ();
@@ -223,8 +223,8 @@ void StoreMainWindow::onActionAddModel() {
 }
 
 void StoreMainWindow::onActionDelModel() {
-    if(sdb->SelectCount (AVAILABLE_GOODS_DIR,
-                         AVAILABLE_GOODS_DIR_COLUMNS[0],
+    if(sdb->SelectCount (AVAILABLE_GOODS_TABLE,
+                         MODEL_ID,
                          model->data (model->index (main_table_view->currentIndex ().row (), 0)).toString ())) {
         QMessageBox::warning (this, "Помилка!", "Неможливо видалити модель, є наявні товари!");
     }
@@ -236,7 +236,7 @@ void StoreMainWindow::onActionDelModel() {
                                               QMessageBox::No | QMessageBox::Yes,
                                               this);
         if(msgbox->exec () == QMessageBox::Yes) {
-            if(sdb->DeleteRow (MODEL_DIR, MODEL_DIR_COLUMNS[1], model_name)){
+            if(sdb->DeleteRow (MODELS_TABLE, MODEL_NAME, model_name)){
                 ui->statusBar->showMessage ("Видалено модель " + model_name);
             }
             Update(main_table_view->currentIndex ().row () - 1);
@@ -251,12 +251,14 @@ void StoreMainWindow::onActionReport() {
 void StoreMainWindow::ShowPic() {
     QPixmap pic;
     pic.loadFromData (model->data(model->index (main_table_view->currentIndex ().row (), 7)).toByteArray ());
-    pic_label->setPixmap (pic.scaledToWidth (300));
-    if(pic.width () > pic.height ()){
-        pic_label->setAlignment (Qt::AlignTop);
-    }
-    else {
-        pic_label->setAlignment (Qt::AlignCenter);
+    if (!pic.isNull ()){
+        pic_label->setPixmap (pic.scaledToWidth (300));
+        if(pic.width () > pic.height ()){
+            pic_label->setAlignment (Qt::AlignTop);
+        }
+        else {
+            pic_label->setAlignment (Qt::AlignCenter);
+        }
     }
 }
 
@@ -266,9 +268,9 @@ void StoreMainWindow::ShowGoodsInfo() {
     int model_id = model->data (model->index (main_table_view->currentIndex ().row (), 0)).toInt ();
     for (int size = 36; size <= 46; ++size) {
         int count = sdb->SelectCount (
-                AVAILABLE_GOODS_DIR,
-                AVAILABLE_GOODS_DIR_COLUMNS[0],
-                AVAILABLE_GOODS_DIR_COLUMNS[2],
+                AVAILABLE_GOODS_TABLE,
+                MODEL_ID,
+                GOODS_SIZE,
                 QString::number (model_id),
                 QString::number (size));
         sum_count += count;

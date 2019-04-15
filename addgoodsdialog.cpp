@@ -8,12 +8,15 @@ AddGoodsDialog::AddGoodsDialog(DataBase* data_base, QWidget *parent) :
     ui_add_goods_dialog->setupUi(this);
     sdb = data_base;
     model = new QSqlTableModel(this);
-    model->setTable ("model_dir");
+    model->setTable (MODELS_TABLE);
     model->select ();
+
+//    QDataWidgetMapper* mapper = new QDataWidgetMapper;
+//    mapper->setModel (model);
+//    mapper->addMapping (ui_add_goods_dialog->model_cb, 0);
+//    mapper->toFirst ();
     ui_add_goods_dialog->model_cb->setModel (model);
     ui_add_goods_dialog->model_cb->setModelColumn (1);
-    ui_add_goods_dialog->model_cb->setCurrentIndex(1);
-    ui_add_goods_dialog->pic_lbl->clear ();
 
     sb_list << ui_add_goods_dialog->sb_36 <<
                ui_add_goods_dialog->sb_37 <<
@@ -26,6 +29,7 @@ AddGoodsDialog::AddGoodsDialog(DataBase* data_base, QWidget *parent) :
                ui_add_goods_dialog->sb_44 <<
                ui_add_goods_dialog->sb_45 <<
                ui_add_goods_dialog->sb_46;
+
     QObject::connect (ui_add_goods_dialog->model_cb, &QComboBox::currentTextChanged, this, &AddGoodsDialog::ShowPic);
     for (int i = 0; i < sb_list.size (); ++i) {
         QObject::connect (sb_list[i], static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AddGoodsDialog::SetRes);
@@ -33,6 +37,7 @@ AddGoodsDialog::AddGoodsDialog(DataBase* data_base, QWidget *parent) :
     QObject::connect (ui_add_goods_dialog->result_le, &QLineEdit::textChanged, this, &AddGoodsDialog::EnableAddButton);
     QObject::connect (ui_add_goods_dialog->add_goods_pb, &QPushButton::clicked, this, &AddGoodsDialog::accept);
     QObject::connect (ui_add_goods_dialog->cancel_pb, &QPushButton::clicked, this, &AddGoodsDialog::reject);
+    ShowPic(ui_add_goods_dialog->model_cb->currentText ());
 }
 
 QList<QSpinBox*> &AddGoodsDialog::GetSbList() {
@@ -49,7 +54,7 @@ QString AddGoodsDialog::GetModelName() {
 
 void AddGoodsDialog::ShowPic(QString text) {
     QPixmap pic;
-    pic.loadFromData (sdb->SelectPic (MODEL_DIR, MODEL_DIR_COLUMNS[1], text));
+    pic.loadFromData (sdb->SelectPic (MODELS_TABLE, MODEL_NAME, text));
     ui_add_goods_dialog->pic_lbl->setPixmap (pic.scaledToWidth (300));
     if(pic.width () > pic.height ()) {
         ui_add_goods_dialog->pic_lbl->setAlignment (Qt::AlignTop);
