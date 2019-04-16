@@ -10,16 +10,25 @@ SaleDialog::SaleDialog(DataBase* data_base, QWidget *parent) :
 
     sdb = data_base;
     QSqlQueryModel* brand_model = new QSqlQueryModel(this);
-    brand_model->setQuery ("SELECT DISTINCT " + BRAND + " FROM " + MODELS_TABLE);
+    brand_model->setQuery ("SELECT DISTINCT " + BRAND + " FROM " + AVAILABLE_GOODS_TABLE);
     ui_sale->brand_cb->setModel (brand_model);
     UpdateModelList (ui_sale->brand_cb->currentText ());
 
     QObject::connect (ui_sale->model_cb, &QComboBox::currentTextChanged, this, &SaleDialog::ShowInfo);
     QObject::connect (ui_sale->brand_cb, &QComboBox::currentTextChanged, this, &SaleDialog::UpdateModelList);
+    QObject::connect (ui_sale->size_cb, &QComboBox::currentTextChanged, this, &SaleDialog::UpdateCount);
 
     QObject::connect (ui_sale->sale_pb, &QPushButton::clicked, this, &SaleDialog::accept);
     QObject::connect (ui_sale->cancel_pb, &QPushButton::clicked, this, &SaleDialog::reject);
     ShowInfo(ui_sale->model_cb->currentText ());
+}
+
+QString SaleDialog::GetModel() {
+    return ui_sale->model_cb->currentText ();
+}
+
+QString SaleDialog::GetSize() {
+    return ui_sale->size_cb->currentText ();
 }
 
 SaleDialog::~SaleDialog() {
@@ -36,30 +45,36 @@ void SaleDialog::ShowInfo(QString text) {
     else {
         ui_sale->pic_lbl->setAlignment (Qt::AlignCenter);
     }
-    SetPrices ();
+    UpdatePrices ();
     UpdateSizes (ui_sale->model_cb->currentText ());
+
 }
 
 void SaleDialog::UpdateModelList(QString brand) {
-    QString model_id = sdb->Select (MODEL_ID, MODELS_TABLE, MODEL_NAME, ui_sale->model_cb->currentText ());
     QSqlQueryModel* model = new QSqlQueryModel(this);
-    model->setQuery ("SELECT " + MODEL_NAME + " FROM " + MODELS_TABLE + " WHERE " + BRAND + " = '" + brand + "'");
+    model->setQuery ("SELECT DISTINCT " + MODEL_NAME +
+                     " FROM " + AVAILABLE_GOODS_TABLE +
+                     " WHERE " + BRAND + " = '" + brand + "'");
     ui_sale->model_cb->setModel (model);
 }
 
 void SaleDialog::UpdateSizes(QString model) {
-    QString model_id = sdb->Select (MODEL_ID, MODELS_TABLE, MODEL_NAME, model);
+    QString model_id = sdb->SelectRow (MODEL_ID, MODELS_TABLE, MODEL_NAME, model);
     QSqlQueryModel* model_sizes = new QSqlQueryModel(this);
-    model_sizes->setQuery ("SELECT DISTINCT " + GOODS_SIZE + " FROM " + AVAILABLE_GOODS_TABLE + " WHERE " + MODEL_ID + " ='" + model_id + "'" );
+    model_sizes->setQuery ("SELECT DISTINCT " + GOODS_SIZE +
+                           " FROM " + AVAILABLE_GOODS_TABLE +
+                           " WHERE " + MODEL_ID + " ='" + model_id + "'" );
     ui_sale->size_cb->setModel (model_sizes);
 }
 
-void SaleDialog::SetPrices() {
-    ui_sale->wholesale_price_sb->setValue (sdb->Select (WHOLESALE_PRICE, MODELS_TABLE, MODEL_NAME, ui_sale->model_cb->currentText ()).toDouble ());
-    ui_sale->retail_price_sb->setValue (sdb->Select (RETAIL_PRICE, MODELS_TABLE, MODEL_NAME, ui_sale->model_cb->currentText ()).toDouble ());
+void SaleDialog::UpdatePrices() {
+    ui_sale->wholesale_price_sb->setValue (sdb->SelectRow (WHOLESALE_PRICE, MODELS_TABLE, MODEL_NAME, ui_sale->model_cb->currentText ()).toDouble ());
+    ui_sale->retail_price_sb->setValue (sdb->SelectRow (RETAIL_PRICE, MODELS_TABLE, MODEL_NAME, ui_sale->model_cb->currentText ()).toDouble ());
     ui_sale->price_sb->setValue (ui_sale->retail_price_sb->value ());
 }
 
-void SaleDialog::EnableSaleButton() {
-
+void SaleDialog::UpdateCount() {
+    int count = sdb->SelectCount (AVAILABLE_GOODS_TABLE, MODEL_NAME, GOODS_SIZE, ui_sale->model_cb->currentText (), ui_sale->size_cb->currentText ());
+    ui_sale->count_sb->setValue (1);
+    ui_sale->count_sb->setMaximum (count);
 }

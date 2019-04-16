@@ -73,12 +73,30 @@ QString DataBase::Select(const QString &select, const QString &from, const QStri
     return  sel_query.value(rec.indexOf(select)).toString ();
 }
 
+QVariantList DataBase::SelectRow(const QString &select,
+                                 const QString &from,
+                                 const QString &where1,
+                                 const QString &where2,
+                                 const QString &equal1,
+                                 const QString &equal2,
+                                 const int& col_count) {
+    QSqlQuery sel_query;
+    sel_query.exec ("SELECT " + select + " FROM "+ from + " WHERE " + where1 + " = '" + equal1 + "' AND " + where2 + " = '" + equal2 + "'");
+    QVariantList data;
+    sel_query.next ();
+    for (int i = 0; i < 6; ++ i) {
+        data.append (sel_query.value (i));
+    }
+    return data;
+}
+
 bool DataBase::OpenDataBase() {
     sdb = QSqlDatabase::addDatabase("QSQLITE");
     sdb.setDatabaseName(DB_PATH);
     if(sdb.open()){
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }

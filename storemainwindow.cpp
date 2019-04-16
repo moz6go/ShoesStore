@@ -170,13 +170,16 @@ void StoreMainWindow::onActionAddGoods() {
         ui->statusBar->showMessage ("Зачекайте, додаю товар...");
 
         QList<QSpinBox*> sb_list = add_goods->GetSbList ();
-        int model_id = sdb->Select (MODEL_ID, MODELS_TABLE, MODEL_NAME, add_goods->GetModelName ()).toInt ();
-
+        QString brand = add_goods->GetBrand ();
+        QString model_name = add_goods->GetModelName ();
+        int model_id = sdb->SelectRow (MODEL_ID, MODELS_TABLE, MODEL_NAME, add_goods->GetModelName ()).toInt ();
         for (int i = 0; i < sb_list.size (); ++i) {
             if (sb_list[i]->value ()) {
                 int size = i + 36;
                 for (int count = 0; count < sb_list[i]->value (); ++count) {
                     QVariantList data = QVariantList() << model_id
+                                                       << model_name
+                                                       << brand
                                                        << size
                                                        << QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss");
 
@@ -194,8 +197,13 @@ void StoreMainWindow::onActionAddGoods() {
 
 void StoreMainWindow::onActionSaleGoods() {
     sale_goods = new SaleDialog(sdb, this);
-    if (sale_goods->exec () == QDialog::Accepted){
+    if (sale_goods->exec () == QDialog::Accepted) {
+        QVariantList goods_id = sdb->SelectRow ("*", AVAILABLE_GOODS_TABLE, MODEL_NAME, GOODS_SIZE, sale_goods->GetModel (), sale_goods->GetSize (), GOODS_COL_COUNT);
+        QString model_id = sdb->SelectRow (MODEL_ID, MODELS_TABLE, MODEL_NAME, sale_goods->GetModel ());
 
+        QVariantList data = {
+
+        };
     }
 }
 

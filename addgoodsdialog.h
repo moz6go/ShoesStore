@@ -20,6 +20,7 @@ public:
     QList<QSpinBox*>& GetSbList();
     int GetGoodsCount();
     QString GetModelName();
+    QString GetBrand();
     ~AddGoodsDialog();
 
 private slots:

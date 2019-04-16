@@ -50,6 +50,10 @@ QString AddGoodsDialog::GetModelName() {
     return ui_add_goods_dialog->model_cb->currentText ();
 }
 
+QString AddGoodsDialog::GetBrand() {
+    return ui_add_goods_dialog->brand_cb->currentText ();
+}
+
 void AddGoodsDialog::ShowPic(QString text) {
     QPixmap pic;
     pic.loadFromData (sdb->SelectPic (MODELS_TABLE, MODEL_NAME, text));

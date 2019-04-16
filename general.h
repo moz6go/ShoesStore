@@ -55,6 +55,10 @@ const QString CATEGORIES_TABLE = "categories";
 const QString SEASONS_TABLE = "seasons";
 const QString SOLD_GOODS_TABLE = "sold_goods";
 
+//count of columns
+int MODELS_COL_COUNT = 9;
+int GOODS_COL_COUNT = 6;
+
 //columns
 const QString MODEL_ID = "model_id";
 const QString MODEL_NAME = "model_name";
@@ -66,7 +70,7 @@ const QString RETAIL_PRICE = "retail_price";
 const QString PIC = "pic";
 const QString DATE = "date";
 
-const QString GOODS_ID = "godds_id";
+const QString GOODS_ID = "goods_id";
 const QString GOODS_SIZE = "goods_size";
 const QString GOODS_DATE = "goods_date";
 
@@ -87,6 +91,7 @@ const QString PROFIT = "profit";
 };
 const QStringList AVAILABLE_GOODS_TABLE_HEADERS = {
     MODEL_ID,
+    BRAND,
     GOODS_ID,
     GOODS_SIZE,
     GOODS_DATE
@@ -134,15 +139,21 @@ const QStringList ADD_MODEL_BIND_VALUES = {
 
 const QString ADD_GOODS_QUERY = "INSERT INTO " + AVAILABLE_GOODS_TABLE + " ("
         + MODEL_ID + ", "
+        + MODEL_NAME + ", "
+        + BRAND + ", "
         + GOODS_SIZE + ", "
         + GOODS_DATE + ")"
     "VALUES ("
         ":" + MODEL_ID + ", "
+        ":" + MODEL_NAME + ", "
+        ":" + BRAND + ", "
         ":" + GOODS_SIZE + ", "
         ":" + GOODS_DATE + ");";
 
 const QStringList ADD_GOODS_BIND_VALUES = {
     ":" + MODEL_ID,
+    ":" + MODEL_NAME,
+    ":" + BRAND,
     ":" + GOODS_SIZE,
     ":" + GOODS_DATE
 };

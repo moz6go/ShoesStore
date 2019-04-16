@@ -16,14 +16,16 @@ class SaleDialog : public QDialog
     Ui::SaleDialog *ui_sale;
 public:
     explicit SaleDialog(DataBase* data_base, QWidget *parent = nullptr);
+    QString GetModel();
+    QString GetSize();
     ~SaleDialog();
 
 private slots:
     void ShowInfo(QString text);
     void UpdateModelList(QString brand);
     void UpdateSizes(QString model);
-    void SetPrices();
-    void EnableSaleButton();
+    void UpdatePrices();
+    void UpdateCount();
 };
 
 #endif // SALEDIALOG_H
