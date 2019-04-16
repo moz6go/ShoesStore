@@ -56,8 +56,8 @@ const QString SEASONS_TABLE = "seasons";
 const QString SOLD_GOODS_TABLE = "sold_goods";
 
 //count of columns
-int MODELS_COL_COUNT = 9;
-int GOODS_COL_COUNT = 6;
+const int MODELS_COL_COUNT = 9;
+const int GOODS_COL_COUNT = 6;
 
 //columns
 const QString MODEL_ID = "model_id";

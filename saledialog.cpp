@@ -31,6 +31,18 @@ QString SaleDialog::GetSize() {
     return ui_sale->size_cb->currentText ();
 }
 
+double SaleDialog::GetPrice() {
+    return ui_sale->price_sb->value ();
+}
+
+double SaleDialog::GetProfit() {
+    return ui_sale->price_sb->value () - ui_sale->wholesale_price_sb->value ();
+}
+
+int SaleDialog::GetCount() {
+    return ui_sale->count_sb->value ();
+}
+
 SaleDialog::~SaleDialog() {
     delete ui_sale;
 }
@@ -59,7 +71,7 @@ void SaleDialog::UpdateModelList(QString brand) {
 }
 
 void SaleDialog::UpdateSizes(QString model) {
-    QString model_id = sdb->SelectRow (MODEL_ID, MODELS_TABLE, MODEL_NAME, model);
+    QString model_id = sdb->Select (MODEL_ID, MODELS_TABLE, MODEL_NAME, model);
     QSqlQueryModel* model_sizes = new QSqlQueryModel(this);
     model_sizes->setQuery ("SELECT DISTINCT " + GOODS_SIZE +
                            " FROM " + AVAILABLE_GOODS_TABLE +
@@ -68,8 +80,8 @@ void SaleDialog::UpdateSizes(QString model) {
 }
 
 void SaleDialog::UpdatePrices() {
-    ui_sale->wholesale_price_sb->setValue (sdb->SelectRow (WHOLESALE_PRICE, MODELS_TABLE, MODEL_NAME, ui_sale->model_cb->currentText ()).toDouble ());
-    ui_sale->retail_price_sb->setValue (sdb->SelectRow (RETAIL_PRICE, MODELS_TABLE, MODEL_NAME, ui_sale->model_cb->currentText ()).toDouble ());
+    ui_sale->wholesale_price_sb->setValue (sdb->Select (WHOLESALE_PRICE, MODELS_TABLE, MODEL_NAME, ui_sale->model_cb->currentText ()).toDouble ());
+    ui_sale->retail_price_sb->setValue (sdb->Select (RETAIL_PRICE, MODELS_TABLE, MODEL_NAME, ui_sale->model_cb->currentText ()).toDouble ());
     ui_sale->price_sb->setValue (ui_sale->retail_price_sb->value ());
 }
 

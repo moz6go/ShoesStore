@@ -18,6 +18,9 @@ public:
     explicit SaleDialog(DataBase* data_base, QWidget *parent = nullptr);
     QString GetModel();
     QString GetSize();
+    double GetPrice();
+    double GetProfit();
+    int GetCount();
     ~SaleDialog();
 
 private slots:

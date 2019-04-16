@@ -51,7 +51,8 @@ public:
                            const QString& equal1,
                            const QString& equal2,
                            const int& col_count);
-
+    QString GenerateInsertQuery(QString table, QStringList columns);
+    QStringList GenerateBindValues(QStringList columns);
 };
 
 #endif // DATABASE_H

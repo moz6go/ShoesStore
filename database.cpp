@@ -84,10 +84,42 @@ QVariantList DataBase::SelectRow(const QString &select,
     sel_query.exec ("SELECT " + select + " FROM "+ from + " WHERE " + where1 + " = '" + equal1 + "' AND " + where2 + " = '" + equal2 + "'");
     QVariantList data;
     sel_query.next ();
-    for (int i = 0; i < 6; ++ i) {
+    for (int i = 0; i < col_count; ++ i) {
         data.append (sel_query.value (i));
     }
     return data;
+}
+
+QString DataBase::GenerateInsertQuery(QString table, QStringList columns) {
+    QString query = "INSERT INTO " + table +" (";
+    for (int col = 0; col < columns.size(); ++col) {
+        if(col == columns.size () - 1) {
+            query += columns[col] + ")";
+        }
+        else {
+            query += columns[col] + ", ";
+        }
+    }
+
+    query += "VALUES (";
+
+    for (int col = 0; col < columns.size(); ++col) {
+        if(col == columns.size () - 1){
+            query += ":" + columns[col] + ");";
+        }
+        else {
+            query += ":" + columns[col] + ", ";
+        }
+    }
+    return query;
+}
+
+QStringList DataBase::GenerateBindValues(QStringList columns) {
+    QStringList bind_val;
+    for (int i = 0; i < columns.size (); ++i) {
+        bind_val.append (":" + columns[i]);
+    }
+    return bind_val;
 }
 
 bool DataBase::OpenDataBase() {

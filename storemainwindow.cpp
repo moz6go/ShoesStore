@@ -172,7 +172,7 @@ void StoreMainWindow::onActionAddGoods() {
         QList<QSpinBox*> sb_list = add_goods->GetSbList ();
         QString brand = add_goods->GetBrand ();
         QString model_name = add_goods->GetModelName ();
-        int model_id = sdb->SelectRow (MODEL_ID, MODELS_TABLE, MODEL_NAME, add_goods->GetModelName ()).toInt ();
+        int model_id = sdb->Select (MODEL_ID, MODELS_TABLE, MODEL_NAME, add_goods->GetModelName ()).toInt ();
         for (int i = 0; i < sb_list.size (); ++i) {
             if (sb_list[i]->value ()) {
                 int size = i + 36;
@@ -198,12 +198,31 @@ void StoreMainWindow::onActionAddGoods() {
 void StoreMainWindow::onActionSaleGoods() {
     sale_goods = new SaleDialog(sdb, this);
     if (sale_goods->exec () == QDialog::Accepted) {
-        QVariantList goods_id = sdb->SelectRow ("*", AVAILABLE_GOODS_TABLE, MODEL_NAME, GOODS_SIZE, sale_goods->GetModel (), sale_goods->GetSize (), GOODS_COL_COUNT);
-        QString model_id = sdb->SelectRow (MODEL_ID, MODELS_TABLE, MODEL_NAME, sale_goods->GetModel ());
+        for (int count = 0; count < sale_goods->GetCount (); ++count) {
+            QVariantList data = sdb->SelectRow ("*",
+                                                AVAILABLE_GOODS_TABLE,
+                                                MODEL_NAME,
+                                                GOODS_SIZE,
+                                                sale_goods->GetModel (),
+                                                sale_goods->GetSize (),
+                                                GOODS_COL_COUNT);
+            data.append (sale_goods->GetPrice ());
+            data.append (sale_goods->GetProfit ());
+            data.append (QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss"));
+            QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_ID, GOODS_SIZE, GOODS_DATE, SALE_PRICE, PROFIT, SALE_DATE };
 
-        QVariantList data = {
-
-        };
+            if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (SOLD_GOODS_TABLE, columns),
+                                           sdb->GenerateBindValues (columns),
+                                           data)) {
+                ui->statusBar->showMessage ("Невдалось виконати операцію! Проблема з підключеням до бази даних");
+            }
+            else {
+                sdb->DeleteRow (AVAILABLE_GOODS_TABLE, GOODS_ID, data[3].toString ());
+            }
+        }
+        Update (main_table_view->currentIndex ().row ());
+        ui->statusBar->showMessage ("Продано модель " + sale_goods->GetModel () + " в кількості " + QString::number (sale_goods->GetCount ()) +
+                                    " шт., розмір " + sale_goods->GetSize ());
     }
 }
 
