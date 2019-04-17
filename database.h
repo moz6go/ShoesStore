@@ -21,9 +21,12 @@ public:
                               const QStringList& bind_values_list,
                               const QVariantList& data);
 
+    int SelectCount(const QString& from);
+
     int SelectCount(const QString& from,
                     const QString& where,
                     const QString& equal);
+
 
     int SelectCount(const QString& from,
                     const QString& where1,

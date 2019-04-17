@@ -32,6 +32,13 @@ bool DataBase::InsertDataIntoTable (const QString& query_str, const QStringList&
     }
 }
 
+int DataBase::SelectCount(const QString &from) {
+    QSqlQuery sel_query;
+    sel_query.exec ("SELECT COUNT(*) FROM " + from);
+    sel_query.next ();
+    return sel_query.value (0).toInt ();
+}
+
 
 int DataBase::SelectCount(const QString &from, const QString &where, const QString &equal) {
     QSqlQuery sel_query;

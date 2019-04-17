@@ -44,7 +44,6 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     h_main_layout->addLayout (rv_layout);
     wgt->setLayout (h_main_layout);
     setCentralWidget (wgt);
-    SetState(DEFAULT);
     setMinimumSize(1050, 600);
 
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
@@ -77,6 +76,8 @@ void StoreMainWindow::MainTableInit() {
     main_table_view->setStyleSheet ("QTableView { font-size: 10pt; }");
     main_table_view->setMinimumWidth (700);
     main_table_view->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
+    main_table_view->setSortingEnabled (true);
+
 }
 
 void StoreMainWindow::GoodsInfoTableInit() {
@@ -100,13 +101,15 @@ void StoreMainWindow::GoodsInfoTableInit() {
 }
 
 void StoreMainWindow::BuildToolBar() {
-    action_add_goods = toolbar->addAction(QPixmap(":/pics/pics/add_goods.png"), "Прийняти товар", this, SLOT(onActionAddGoods()));
-    action_sale_goods = toolbar->addAction(QPixmap(":/pics/pics/sale_goods.png"), "Продати товар", this, SLOT(onActionSaleGoods()));
+    action_add_goods = toolbar->addAction(QPixmap(":/pics/add_goods.png"), "Прийняти товар", this, SLOT(onActionAddGoods()));
+    action_sale_goods = toolbar->addAction(QPixmap(":/pics/sale_goods.png"), "Продати товар", this, SLOT(onActionSaleGoods()));
     toolbar->addSeparator ();
-    action_add_new_model = toolbar->addAction(QPixmap(":/pics/pics/add_model.png"), "Додати нову модель", this, SLOT(onActionAddModel()));
-    action_del_model = toolbar->addAction(QPixmap(":/pics/pics/delete.png"), "Видалити модель", this, SLOT(onActionDelModel()));
+    action_add_new_model = toolbar->addAction(QPixmap(":/pics/add_model.png"), "Додати нову модель", this, SLOT(onActionAddModel()));
+    action_del_model = toolbar->addAction(QPixmap(":/pics/delete.png"), "Видалити модель", this, SLOT(onActionDelModel()));
     toolbar->addSeparator ();
-    action_report = toolbar->addAction(QPixmap(":/pics/pics/report.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
+    action_report = toolbar->addAction(QPixmap(":/pics/report.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
+    toolbar->addSeparator ();
+    action_update = toolbar->addAction(QPixmap(":/pics/update.png"), "Оновити", this, SLOT(onActionUpdate()));
 
     toolbar->setMovable (false);
     toolbar->setIconSize (QSize(SIZE_WID, SIZE_WID));
@@ -116,49 +119,36 @@ void StoreMainWindow::BuildToolBar() {
 void StoreMainWindow::AddGoodsThread() {
 }
 
-void StoreMainWindow::SetState(State state) {
+void StoreMainWindow::SwitchButtons(State state) {
     switch (state) {
-    case DEFAULT:
+    case ENABLED_ALL:
         action_sale_goods->setEnabled (true);
         action_add_goods->setEnabled (true);
         action_del_model->setEnabled (true);
         action_add_new_model->setEnabled (true);
         action_report->setEnabled (true);
         break;
-    case ADD_GOODS:
+    case DISABLED_ALL:
         action_sale_goods->setDisabled (true);
         action_add_goods->setDisabled (true);
         action_del_model->setDisabled (true);
         action_add_new_model->setDisabled (true);
         action_report->setDisabled (true);
         break;
-    case SALE_GOODS:
-        action_sale_goods->setEnabled (true);
+    case MODEL_TABLE_EMPTY:
+        action_sale_goods->setDisabled (true);
+        action_add_goods->setDisabled (true);
+        action_del_model->setDisabled (true);
+        action_add_new_model->setEnabled (true);
+        action_report->setDisabled (true);
+        break;
+    case GOODS_TABLE_EMPTY:
+        action_sale_goods->setDisabled (true);
         action_add_goods->setEnabled (true);
         action_del_model->setEnabled (true);
         action_add_new_model->setEnabled (true);
         action_report->setEnabled (true);
         break;
-    case ADD_MODEL:
-        action_sale_goods->setEnabled (true);
-        action_add_goods->setEnabled (true);
-        action_del_model->setEnabled (true);
-        action_add_new_model->setEnabled (true);
-        action_report->setEnabled (true);
-        break;
-    case DELETE_MODEL:
-        action_sale_goods->setEnabled (true);
-        action_add_goods->setEnabled (true);
-        action_del_model->setEnabled (true);
-        action_add_new_model->setEnabled (true);
-        action_report->setEnabled (true);
-        break;
-    case REPORT:
-        action_sale_goods->setEnabled (true);
-        action_add_goods->setEnabled (true);
-        action_del_model->setEnabled (true);
-        action_add_new_model->setEnabled (true);
-        action_report->setEnabled (true);
     }
 }
 
@@ -166,7 +156,7 @@ void StoreMainWindow::SetState(State state) {
 void StoreMainWindow::onActionAddGoods() {
     add_goods = new AddGoodsDialog(sdb, this);
     if (add_goods->exec () == QDialog::Accepted) {
-        SetState(ADD_GOODS);
+        SwitchButtons(DISABLED_ALL);
         ui->statusBar->showMessage ("Зачекайте, додаю товар...");
 
         QList<QSpinBox*> sb_list = add_goods->GetSbList ();
@@ -182,15 +172,17 @@ void StoreMainWindow::onActionAddGoods() {
                                                        << brand
                                                        << size
                                                        << QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss");
-
-                    if (!sdb->InsertDataIntoTable(ADD_GOODS_QUERY, ADD_GOODS_BIND_VALUES, data)) {
+                    QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_SIZE, GOODS_DATE };
+                    if (!sdb->InsertDataIntoTable(sdb->GenerateInsertQuery (AVAILABLE_GOODS_TABLE, columns),
+                                                  sdb->GenerateBindValues (columns),
+                                                  data)) {
                         ui->statusBar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
                     }
                 }
             }
         }
         Update (main_table_view->currentIndex ().row ());
-        SetState(DEFAULT);
+        SwitchButtons(ENABLED_ALL);
         ui->statusBar->showMessage ("Додано " + QString::number(add_goods->GetGoodsCount ()) + " одиниць моделі " + add_goods->GetModelName ());
     }
 }
@@ -209,8 +201,8 @@ void StoreMainWindow::onActionSaleGoods() {
             data.append (sale_goods->GetPrice ());
             data.append (sale_goods->GetProfit ());
             data.append (QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss"));
-            QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_ID, GOODS_SIZE, GOODS_DATE, SALE_PRICE, PROFIT, SALE_DATE };
 
+            QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_ID, GOODS_SIZE, GOODS_DATE, SALE_PRICE, PROFIT, SALE_DATE };
             if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (SOLD_GOODS_TABLE, columns),
                                            sdb->GenerateBindValues (columns),
                                            data)) {
@@ -243,8 +235,10 @@ void StoreMainWindow::onActionAddModel() {
                                            << QString::number (add_model->getRetailpr ())
                                            << pic_byte_arr
                                            << QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss");
-
-        if (!sdb->InsertDataIntoTable (ADD_MODEL_QUERY, ADD_MODEL_BIND_VALUES, data)) {
+        QStringList columns = {MODEL_NAME, SEASON, CATEGORY, BRAND, WHOLESALE_PRICE, RETAIL_PRICE, PIC, DATE };
+        if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (MODELS_TABLE, columns),
+                                       sdb->GenerateBindValues (columns),
+                                       data)) {
             ui->statusBar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
         }
         Update(model->rowCount ());
@@ -278,6 +272,10 @@ void StoreMainWindow::onActionReport() {
 
 }
 
+void StoreMainWindow::onActionUpdate() {
+    Update(main_table_view->currentIndex ().row ());
+}
+
 void StoreMainWindow::ShowPic() {
     QPixmap pic;
     pic.loadFromData (model->data(model->index (main_table_view->currentIndex ().row (), 7)).toByteArray ());
@@ -293,37 +291,50 @@ void StoreMainWindow::ShowPic() {
 }
 
 void StoreMainWindow::ShowGoodsInfo() {
-    GoodsInfoTableInit();
-    int sum_count(0);
-    int model_id = model->data (model->index (main_table_view->currentIndex ().row (), 0)).toInt ();
-    for (int size = 36; size <= 46; ++size) {
-        int count = sdb->SelectCount (
-                AVAILABLE_GOODS_TABLE,
-                MODEL_ID,
-                GOODS_SIZE,
-                QString::number (model_id),
-                QString::number (size));
-        sum_count += count;
-        if(count) {
-            goods_info_table->insertRow (goods_info_table->rowCount ());
-            for(int col = 0; col < 2; ++col) {
-                QTableWidgetItem* item = new QTableWidgetItem (col == 0 ? QString::number (size) : QString::number (count));
-                goods_info_table->setItem(goods_info_table->rowCount() - 1, col, item);
+    if(model->rowCount ()){
+        GoodsInfoTableInit();
+        int sum_count(0);
+        int model_id = model->data (model->index (main_table_view->currentIndex ().row (), 0)).toInt ();
+        for (int size = 36; size <= 46; ++size) {
+            int count = sdb->SelectCount (
+                    AVAILABLE_GOODS_TABLE,
+                    MODEL_ID,
+                    GOODS_SIZE,
+                    QString::number (model_id),
+                    QString::number (size));
+            sum_count += count;
+            if(count) {
+                goods_info_table->insertRow (goods_info_table->rowCount ());
+                for(int col = 0; col < 2; ++col) {
+                    QTableWidgetItem* item = new QTableWidgetItem (col == 0 ? QString::number (size) : QString::number (count));
+                    goods_info_table->setItem(goods_info_table->rowCount() - 1, col, item);
+                }
             }
         }
-    }
-    goods_info_table->insertRow (goods_info_table->rowCount ());
-    for(int col = 0; col < 2; ++col) {
-        QTableWidgetItem* item = new QTableWidgetItem (col == 0 ? "ВСЬОГО" : QString::number (sum_count));
-        goods_info_table->setItem(goods_info_table->rowCount() - 1, col, item);
+        goods_info_table->insertRow (goods_info_table->rowCount ());
+        for(int col = 0; col < 2; ++col) {
+            QTableWidgetItem* item = new QTableWidgetItem (col == 0 ? "ВСЬОГО" : QString::number (sum_count));
+            goods_info_table->setItem(goods_info_table->rowCount() - 1, col, item);
+        }
     }
 }
 
 void StoreMainWindow::Update(int row) {
     model->select ();
+    main_table_view->model ()->sort (0, Qt::AscendingOrder);
     main_table_view->selectRow (row);
     ShowPic ();
     ShowGoodsInfo ();
+
+    if(!model->rowCount ()){
+        SwitchButtons (MODEL_TABLE_EMPTY);
+    }
+    else if (!sdb->SelectCount (AVAILABLE_GOODS_TABLE)){
+        SwitchButtons (GOODS_TABLE_EMPTY);
+    }
+    else {
+        SwitchButtons (ENABLED_ALL);
+    }
 }
 
 StoreMainWindow::~StoreMainWindow() {

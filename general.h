@@ -39,7 +39,7 @@
 #include <QSqlRelationalTableModel>
 #include <QSqlError>
 
-const int SIZE_WID = 32;
+const int SIZE_WID = 48;
 
 #if defined(_WIN32)
 const QString DB_PATH = "D:\\MyProjects\\Qt\\ShoesStore\\db";
@@ -58,6 +58,7 @@ const QString SOLD_GOODS_TABLE = "sold_goods";
 //count of columns
 const int MODELS_COL_COUNT = 9;
 const int GOODS_COL_COUNT = 6;
+const int SOLD_COL_COUNT = 9;
 
 //columns
 const QString MODEL_ID = "model_id";
@@ -78,86 +79,6 @@ const QString SALE_PRICE = "sale_price";
 const QString SALE_DATE = "sale_date";
 const QString PROFIT = "profit";
 
-/*const QStringList MODELS_TABLE_HEADERS = {
-    MODEL_ID,
-    MODEL_NAME,
-    SEASON,
-    CATEGORY,
-    BRAND,
-    WHOLESALE_PRICE,
-    RETAIL_PRICE,
-    PIC,
-    DATE
-};
-const QStringList AVAILABLE_GOODS_TABLE_HEADERS = {
-    MODEL_ID,
-    BRAND,
-    GOODS_ID,
-    GOODS_SIZE,
-    GOODS_DATE
-};
-const QStringList SOLD_GOODS_TABLE_HEADERS = {
-    MODEL_ID,
-    GOODS_ID,
-    GOODS_SIZE,
-    GOODS_DATE,
-    SALE_PRICE,
-    SALE_DATE,
-    PROFIT
-};*/
-
-const QString ADD_MODEL_QUERY = "INSERT INTO "+ MODELS_TABLE +" ("
-        + MODEL_NAME + ", "
-        + SEASON + ", "
-        + CATEGORY + ", "
-        + BRAND + ", "
-        + WHOLESALE_PRICE + ", "
-        + RETAIL_PRICE + ", "
-        + PIC + ", "
-        + DATE + ")"
-    "VALUES ("
-        ":" + MODEL_NAME + ", "
-        ":" + SEASON + ", "
-        ":" + CATEGORY + ", "
-        ":" + BRAND + ", "
-        ":" + WHOLESALE_PRICE + ", "
-        ":" + RETAIL_PRICE + ", "
-        ":" + PIC + ", "
-        ":" + DATE + ");";
-
-
-const QStringList ADD_MODEL_BIND_VALUES = {
-    ":" + MODEL_NAME,
-    ":" + SEASON,
-    ":" + CATEGORY,
-    ":" + BRAND,
-    ":" + WHOLESALE_PRICE,
-    ":" + RETAIL_PRICE,
-    ":" + PIC,
-    ":" + DATE
-};
-
-const QString ADD_GOODS_QUERY = "INSERT INTO " + AVAILABLE_GOODS_TABLE + " ("
-        + MODEL_ID + ", "
-        + MODEL_NAME + ", "
-        + BRAND + ", "
-        + GOODS_SIZE + ", "
-        + GOODS_DATE + ")"
-    "VALUES ("
-        ":" + MODEL_ID + ", "
-        ":" + MODEL_NAME + ", "
-        ":" + BRAND + ", "
-        ":" + GOODS_SIZE + ", "
-        ":" + GOODS_DATE + ");";
-
-const QStringList ADD_GOODS_BIND_VALUES = {
-    ":" + MODEL_ID,
-    ":" + MODEL_NAME,
-    ":" + BRAND,
-    ":" + GOODS_SIZE,
-    ":" + GOODS_DATE
-};
-
 const QStringList MAIN_TABLE_HEADERS_LIST = {
     "!id",
     "Назва моделі",
@@ -170,12 +91,10 @@ const QStringList MAIN_TABLE_HEADERS_LIST = {
     "!date"
 };
 enum State {
-    DEFAULT = 1,
-    ADD_GOODS,
-    SALE_GOODS,
-    ADD_MODEL,
-    DELETE_MODEL,
-    REPORT
+    ENABLED_ALL = 1,
+    DISABLED_ALL,
+    MODEL_TABLE_EMPTY,
+    GOODS_TABLE_EMPTY
 };
 
 struct Model {

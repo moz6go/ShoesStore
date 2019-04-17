@@ -25,6 +25,8 @@ class StoreMainWindow : public QMainWindow
     QAction* action_add_new_model;
     QAction* action_del_model;
     QAction* action_report;
+    QAction* action_update;
+
     QHBoxLayout* h_main_layout;
     QVBoxLayout* rv_layout;
     QVBoxLayout* lv_layout;
@@ -39,7 +41,7 @@ class StoreMainWindow : public QMainWindow
     void GoodsInfoTableInit();
     void BuildToolBar();
     void AddGoodsThread();
-    void SetState(State state);
+    void SwitchButtons(State state);
 public:
     explicit StoreMainWindow(QWidget *parent = nullptr);
     ~StoreMainWindow();
@@ -49,6 +51,8 @@ private slots:
     void onActionAddModel();
     void onActionDelModel();
     void onActionReport();
+    void onActionUpdate();
+
     void ShowPic();
     void ShowGoodsInfo();
     void Update(int row);
