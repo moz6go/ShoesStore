@@ -8,5 +8,6 @@
         <file>pics/update.png</file>
         <file>pics/add_model.png</file>
         <file>pics/sale_goods.png</file>
+        <file>pics/search.png</file>
     </qresource>
 </RCC>

@@ -20,8 +20,9 @@
 #include <QSpinBox>
 #include <QTextEdit>
 #include <QLineEdit>
-#include <QFileSystemModel>
-#include <QPushButton>
+#include <QStackedWidget>
+#include <QComboBox>
+#include <QDateEdit>
 #include <QFileDialog>
 #include <QDate>
 #include <QBuffer>
@@ -39,7 +40,7 @@
 #include <QSqlRelationalTableModel>
 #include <QSqlError>
 
-const int SIZE_WID = 48;
+const int SIZE_WID = 32;
 
 #if defined(_WIN32)
 const QString DB_PATH = "D:\\MyProjects\\Qt\\ShoesStore\\db";
@@ -79,6 +80,40 @@ const QString SALE_PRICE = "sale_price";
 const QString SALE_DATE = "sale_date";
 const QString PROFIT = "profit";
 
+enum SearchType {
+    BY_MODEL_NAME = 1,
+    BY_SEASON,
+    BY_CATEGORY,
+    BY_BRAND,
+    BY_WPRICE,
+    BY_RPRICE
+};
+
+enum CompareType {
+    EQUAL = 1,
+    NOT_EQUAL,
+    CONTAINS,
+    LESS,
+    GREATER,
+    LESS_EQUAL,
+    GREATER_EQUAL
+};
+const QStringList COMPARE_OPTIONS1 = {
+    "=",
+    "містить",
+    "не дорівнює"
+};
+
+const QStringList COMPARE_OPTIONS2 = {
+    "=",
+    "не дорівнює",
+    "<",
+    ">",
+    "<=",
+    ">="
+};
+
+
 const QStringList MAIN_TABLE_HEADERS_LIST = {
     "!id",
     "Назва моделі",
@@ -93,6 +128,7 @@ const QStringList MAIN_TABLE_HEADERS_LIST = {
 enum State {
     ENABLED_ALL = 1,
     DISABLED_ALL,
+    DATA_BASE_ISNT_INIT,
     MODEL_TABLE_EMPTY,
     GOODS_TABLE_EMPTY
 };

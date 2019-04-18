@@ -7,6 +7,7 @@
 #include "database.h"
 #include "saledialog.h"
 
+
 namespace Ui {
     class StoreMainWindow;
 }
@@ -26,6 +27,13 @@ class StoreMainWindow : public QMainWindow
     QAction* action_del_model;
     QAction* action_report;
     QAction* action_update;
+    QAction* action_search;
+
+    SearchType search_type;
+    CompareType comp_type;
+    QLineEdit* search_line;
+    QComboBox* search_combo;
+    QComboBox* search_combo_comp;
 
     QHBoxLayout* h_main_layout;
     QVBoxLayout* rv_layout;
@@ -35,6 +43,7 @@ class StoreMainWindow : public QMainWindow
     QTableWidget* goods_info_table;
     QLabel* pic_label;
     QSplitter* splitter;
+    bool isDbInit;
 
     void resizeEvent(QResizeEvent *event);
     void MainTableInit();
@@ -42,6 +51,7 @@ class StoreMainWindow : public QMainWindow
     void BuildToolBar();
     void AddGoodsThread();
     void SwitchButtons(State state);
+    bool InitDataBase();
 public:
     explicit StoreMainWindow(QWidget *parent = nullptr);
     ~StoreMainWindow();
@@ -52,6 +62,10 @@ private slots:
     void onActionDelModel();
     void onActionReport();
     void onActionUpdate();
+    void onActionSearch();
+    void CheckSearchLine(QString text);
+    void SetCompareType(QString type);
+    void SetSearchType(QString type);
 
     void ShowPic();
     void ShowGoodsInfo();

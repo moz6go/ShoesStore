@@ -6,12 +6,7 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     QWidget* wgt = new QWidget(this);
 
     sdb = new DataBase(this);
-    if (sdb->ConnectToDataBase ()) {
-        ui->statusBar->showMessage ("З'єднано з базою даних успішно!");
-    }
-    else {
-        QMessageBox::critical (this, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
-    }
+    isDbInit = InitDataBase();
 
     model = new QSqlTableModel(this);
     model->setTable (MODELS_TABLE);
@@ -19,12 +14,14 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     for(int col = 0; col < model->columnCount(); ++col) {
         model->setHeaderData(col, Qt::Horizontal, MAIN_TABLE_HEADERS_LIST[col]);
     }
-    model->setSort (0, Qt::AscendingOrder);
 
     main_table_view = new QTableView(this);
     MainTableInit ();
 
     toolbar = new QToolBar(this);
+    search_line = new QLineEdit(this);
+    search_combo = new QComboBox(this);
+    search_combo_comp = new QComboBox(this);
     BuildToolBar ();
 
     pic_label = new QLabel(this);
@@ -44,10 +41,14 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     h_main_layout->addLayout (rv_layout);
     wgt->setLayout (h_main_layout);
     setCentralWidget (wgt);
+
     setMinimumSize(1050, 600);
 
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowGoodsInfo);
+    QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetSearchType);
+    QObject::connect (search_combo_comp, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetCompareType);
+    QObject::connect (search_line, &QLineEdit::textChanged, this, &StoreMainWindow::CheckSearchLine);
     Update(0);
 }
 
@@ -101,6 +102,17 @@ void StoreMainWindow::GoodsInfoTableInit() {
 }
 
 void StoreMainWindow::BuildToolBar() {
+    search_line->setFixedSize (150, SIZE_WID);
+    search_line->setPlaceholderText ("Пошук...");
+
+    search_combo->setMaximumHeight (SIZE_WID);
+    for (int col = 1; col < 7; ++col){
+        search_combo->addItem(MAIN_TABLE_HEADERS_LIST.at (col));
+    }
+    search_combo->setMaximumHeight (SIZE_WID);
+    search_combo_comp->setMaximumHeight (SIZE_WID);
+    search_combo_comp->addItems(COMPARE_OPTIONS1);
+
     action_add_goods = toolbar->addAction(QPixmap(":/pics/add_goods.png"), "Прийняти товар", this, SLOT(onActionAddGoods()));
     action_sale_goods = toolbar->addAction(QPixmap(":/pics/sale_goods.png"), "Продати товар", this, SLOT(onActionSaleGoods()));
     toolbar->addSeparator ();
@@ -110,6 +122,13 @@ void StoreMainWindow::BuildToolBar() {
     action_report = toolbar->addAction(QPixmap(":/pics/report.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
     toolbar->addSeparator ();
     action_update = toolbar->addAction(QPixmap(":/pics/update.png"), "Оновити", this, SLOT(onActionUpdate()));
+    toolbar->addSeparator ();
+    toolbar->addWidget (search_combo);
+    toolbar->addSeparator ();
+    toolbar->addWidget (search_combo_comp);
+    toolbar->addSeparator ();
+    toolbar->addWidget (search_line);
+    action_search = toolbar->addAction(QPixmap(":/pics/search.png"), "Пошук", this, SLOT(onActionSearch()));
 
     toolbar->setMovable (false);
     toolbar->setIconSize (QSize(SIZE_WID, SIZE_WID));
@@ -127,6 +146,7 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_del_model->setEnabled (true);
         action_add_new_model->setEnabled (true);
         action_report->setEnabled (true);
+        action_update->setEnabled (true);
         break;
     case DISABLED_ALL:
         action_sale_goods->setDisabled (true);
@@ -134,13 +154,24 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_del_model->setDisabled (true);
         action_add_new_model->setDisabled (true);
         action_report->setDisabled (true);
+        action_update->setDisabled (true);
         break;
+    case DATA_BASE_ISNT_INIT:
+        action_sale_goods->setDisabled (true);
+        action_add_goods->setDisabled (true);
+        action_del_model->setDisabled (true);
+        action_add_new_model->setDisabled (true);
+        action_report->setDisabled (true);
+        action_update->setDisabled (true);
+        break;
+
     case MODEL_TABLE_EMPTY:
         action_sale_goods->setDisabled (true);
         action_add_goods->setDisabled (true);
         action_del_model->setDisabled (true);
         action_add_new_model->setEnabled (true);
         action_report->setDisabled (true);
+        action_update->setEnabled (true);
         break;
     case GOODS_TABLE_EMPTY:
         action_sale_goods->setDisabled (true);
@@ -148,8 +179,22 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_del_model->setEnabled (true);
         action_add_new_model->setEnabled (true);
         action_report->setEnabled (true);
+        action_update->setEnabled (true);
         break;
     }
+}
+
+bool StoreMainWindow::InitDataBase() {
+    if (sdb->ConnectToDataBase ()) {
+        ui->statusBar->showMessage ("З'єднано з базою даних успішно!");
+        return true;
+
+    }
+    else {
+        QMessageBox::critical (this, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
+        return false;
+    }
+
 }
 
 
@@ -273,7 +318,70 @@ void StoreMainWindow::onActionReport() {
 }
 
 void StoreMainWindow::onActionUpdate() {
+    isDbInit = !isDbInit ? InitDataBase() : true;
     Update(main_table_view->currentIndex ().row ());
+}
+
+void StoreMainWindow::onActionSearch() {
+
+}
+
+void StoreMainWindow::CheckSearchLine(QString text) {
+    if(!text.size ()) {
+        action_search->setDisabled (true);
+    }
+    else {
+        action_search->setEnabled (true);
+    }
+}
+
+void StoreMainWindow::SetCompareType(QString type) {
+    if(type == COMPARE_OPTIONS2[0]) comp_type = EQUAL;
+    if(type == COMPARE_OPTIONS2[1]) comp_type = NOT_EQUAL;
+    if(type == COMPARE_OPTIONS1[1]) comp_type = CONTAINS;
+    if(type == COMPARE_OPTIONS2[2]) comp_type = LESS;
+    if(type == COMPARE_OPTIONS2[3]) comp_type = GREATER;
+    if(type == COMPARE_OPTIONS2[4]) comp_type = LESS_EQUAL;
+    if(type == COMPARE_OPTIONS2[5]) comp_type = GREATER_EQUAL;
+}
+
+void StoreMainWindow::SetSearchType(QString type) {
+    if(type == MAIN_TABLE_HEADERS_LIST[1]) {
+        search_type = BY_MODEL_NAME;
+        search_combo_comp->clear ();
+        search_combo_comp->addItems (COMPARE_OPTIONS1);
+        CheckSearchLine (search_line->text ());
+    }
+    else if(type == MAIN_TABLE_HEADERS_LIST[2]){
+        search_type = BY_SEASON;
+        search_combo_comp->clear ();
+        search_combo_comp->addItems (COMPARE_OPTIONS1);
+        CheckSearchLine (search_line->text ());
+    }
+    else if(type == MAIN_TABLE_HEADERS_LIST[3]){
+        search_type = BY_CATEGORY;
+        search_combo_comp->clear ();
+        search_combo_comp->addItems (COMPARE_OPTIONS1);
+        CheckSearchLine (search_line->text ());
+    }
+    else if(type == MAIN_TABLE_HEADERS_LIST[4]){
+        search_type = BY_BRAND;
+        search_combo_comp->clear ();
+        search_combo_comp->addItems (COMPARE_OPTIONS1);
+        CheckSearchLine (search_line->text ());
+    }
+    else if(type == MAIN_TABLE_HEADERS_LIST[5]){
+        search_type = BY_CATEGORY;
+        search_combo_comp->clear ();
+        search_combo_comp->addItems (COMPARE_OPTIONS2);
+        CheckSearchLine (search_line->text ());
+    }
+    else if(type == MAIN_TABLE_HEADERS_LIST[6]){
+        search_type = BY_BRAND;
+        search_combo_comp->clear ();
+        search_combo_comp->addItems (COMPARE_OPTIONS2);
+        CheckSearchLine (search_line->text ());
+    }
 }
 
 void StoreMainWindow::ShowPic() {
@@ -321,12 +429,16 @@ void StoreMainWindow::ShowGoodsInfo() {
 
 void StoreMainWindow::Update(int row) {
     model->select ();
-    main_table_view->model ()->sort (0, Qt::AscendingOrder);
+    model->sort (0, Qt::AscendingOrder);
     main_table_view->selectRow (row);
     ShowPic ();
     ShowGoodsInfo ();
+    CheckSearchLine (search_line->text ());
 
-    if(!model->rowCount ()){
+    if(!isDbInit){
+        SwitchButtons (DATA_BASE_ISNT_INIT);
+    }
+    else if(!model->rowCount ()){
         SwitchButtons (MODEL_TABLE_EMPTY);
     }
     else if (!sdb->SelectCount (AVAILABLE_GOODS_TABLE)){
