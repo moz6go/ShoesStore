@@ -36,11 +36,13 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlTableModel>
+#include <QSortFilterProxyModel>
 #include <QSqlQueryModel>
 #include <QSqlRelationalTableModel>
 #include <QSqlError>
 
-const int SIZE_WID = 32;
+const int SIZE_WID_1 = 40;
+const int SIZE_WID_2 = 24;
 
 #if defined(_WIN32)
 const QString DB_PATH = "D:\\MyProjects\\Qt\\ShoesStore\\db";

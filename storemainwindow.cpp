@@ -11,23 +11,30 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     model = new QSqlTableModel(this);
     model->setTable (MODELS_TABLE);
 
+    main_table_view = new QTableView(this);
+    filter_model = new QSortFilterProxyModel(this);
+    filter_model->setSourceModel (model);
+    filter_model ->setFilterCaseSensitivity (Qt::CaseInsensitive);
+    filter_model->setFilterKeyColumn (BY_MODEL_NAME);
+    main_table_view->setModel (filter_model);
+
     for(int col = 0; col < model->columnCount(); ++col) {
         model->setHeaderData(col, Qt::Horizontal, MAIN_TABLE_HEADERS_LIST[col]);
     }
 
-    main_table_view = new QTableView(this);
     MainTableInit ();
 
     toolbar = new QToolBar(this);
     search_line = new QLineEdit(this);
     search_combo = new QComboBox(this);
-    search_combo_comp = new QComboBox(this);
+//    search_combo_comp = new QComboBox(this);
     BuildToolBar ();
 
     pic_label = new QLabel(this);
 
     goods_info_table = new QTableWidget(this);
     GoodsInfoTableInit();
+
 
     h_main_layout = new QHBoxLayout();
     rv_layout = new QVBoxLayout();
@@ -47,8 +54,8 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowGoodsInfo);
     QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetSearchType);
-    QObject::connect (search_combo_comp, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetCompareType);
-    QObject::connect (search_line, &QLineEdit::textChanged, this, &StoreMainWindow::CheckSearchLine);
+//    QObject::connect (search_combo_comp, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetCompareType);
+    QObject::connect (search_line, &QLineEdit::textChanged, this, &StoreMainWindow::SearchTextChanged);
     Update(0);
 }
 
@@ -60,7 +67,6 @@ void StoreMainWindow::resizeEvent(QResizeEvent *event) {
 }
 
 void StoreMainWindow::MainTableInit() {
-    main_table_view->setModel (model);
     main_table_view->setColumnHidden(0, true);
     main_table_view->setColumnHidden(7, true);
     main_table_view->setColumnHidden(8, true);
@@ -102,16 +108,16 @@ void StoreMainWindow::GoodsInfoTableInit() {
 }
 
 void StoreMainWindow::BuildToolBar() {
-    search_line->setFixedSize (150, SIZE_WID);
+    search_line->setFixedSize (150, SIZE_WID_2);
     search_line->setPlaceholderText ("Пошук...");
 
-    search_combo->setMaximumHeight (SIZE_WID);
+    search_combo->setMaximumHeight (SIZE_WID_2);
     for (int col = 1; col < 7; ++col){
         search_combo->addItem(MAIN_TABLE_HEADERS_LIST.at (col));
     }
-    search_combo->setMaximumHeight (SIZE_WID);
-    search_combo_comp->setMaximumHeight (SIZE_WID);
-    search_combo_comp->addItems(COMPARE_OPTIONS1);
+    search_combo->setMaximumHeight (SIZE_WID_2);
+//    search_combo_comp->setMaximumHeight (SIZE_WID_2);
+//    search_combo_comp->addItems(COMPARE_OPTIONS1);
 
     action_add_goods = toolbar->addAction(QPixmap(":/pics/add_goods.png"), "Прийняти товар", this, SLOT(onActionAddGoods()));
     action_sale_goods = toolbar->addAction(QPixmap(":/pics/sale_goods.png"), "Продати товар", this, SLOT(onActionSaleGoods()));
@@ -124,18 +130,11 @@ void StoreMainWindow::BuildToolBar() {
     action_update = toolbar->addAction(QPixmap(":/pics/update.png"), "Оновити", this, SLOT(onActionUpdate()));
     toolbar->addSeparator ();
     toolbar->addWidget (search_combo);
-    toolbar->addSeparator ();
-    toolbar->addWidget (search_combo_comp);
-    toolbar->addSeparator ();
     toolbar->addWidget (search_line);
-    action_search = toolbar->addAction(QPixmap(":/pics/search.png"), "Пошук", this, SLOT(onActionSearch()));
 
     toolbar->setMovable (false);
-    toolbar->setIconSize (QSize(SIZE_WID, SIZE_WID));
+    toolbar->setIconSize (QSize(SIZE_WID_1, SIZE_WID_1));
     addToolBar(Qt::TopToolBarArea, toolbar);
-}
-
-void StoreMainWindow::AddGoodsThread() {
 }
 
 void StoreMainWindow::SwitchButtons(State state) {
@@ -326,61 +325,28 @@ void StoreMainWindow::onActionSearch() {
 
 }
 
-void StoreMainWindow::CheckSearchLine(QString text) {
-    if(!text.size ()) {
-        action_search->setDisabled (true);
-    }
-    else {
-        action_search->setEnabled (true);
-    }
-}
-
-void StoreMainWindow::SetCompareType(QString type) {
-    if(type == COMPARE_OPTIONS2[0]) comp_type = EQUAL;
-    if(type == COMPARE_OPTIONS2[1]) comp_type = NOT_EQUAL;
-    if(type == COMPARE_OPTIONS1[1]) comp_type = CONTAINS;
-    if(type == COMPARE_OPTIONS2[2]) comp_type = LESS;
-    if(type == COMPARE_OPTIONS2[3]) comp_type = GREATER;
-    if(type == COMPARE_OPTIONS2[4]) comp_type = LESS_EQUAL;
-    if(type == COMPARE_OPTIONS2[5]) comp_type = GREATER_EQUAL;
+void StoreMainWindow::SearchTextChanged(QString text) {
+    filter_model->setFilterFixedString (text);
 }
 
 void StoreMainWindow::SetSearchType(QString type) {
     if(type == MAIN_TABLE_HEADERS_LIST[1]) {
-        search_type = BY_MODEL_NAME;
-        search_combo_comp->clear ();
-        search_combo_comp->addItems (COMPARE_OPTIONS1);
-        CheckSearchLine (search_line->text ());
+        filter_model->setFilterKeyColumn (BY_MODEL_NAME);
     }
     else if(type == MAIN_TABLE_HEADERS_LIST[2]){
-        search_type = BY_SEASON;
-        search_combo_comp->clear ();
-        search_combo_comp->addItems (COMPARE_OPTIONS1);
-        CheckSearchLine (search_line->text ());
+        filter_model->setFilterKeyColumn (BY_SEASON);
     }
     else if(type == MAIN_TABLE_HEADERS_LIST[3]){
-        search_type = BY_CATEGORY;
-        search_combo_comp->clear ();
-        search_combo_comp->addItems (COMPARE_OPTIONS1);
-        CheckSearchLine (search_line->text ());
+        filter_model->setFilterKeyColumn (BY_CATEGORY);
     }
     else if(type == MAIN_TABLE_HEADERS_LIST[4]){
-        search_type = BY_BRAND;
-        search_combo_comp->clear ();
-        search_combo_comp->addItems (COMPARE_OPTIONS1);
-        CheckSearchLine (search_line->text ());
+        filter_model->setFilterKeyColumn (BY_BRAND);
     }
     else if(type == MAIN_TABLE_HEADERS_LIST[5]){
-        search_type = BY_CATEGORY;
-        search_combo_comp->clear ();
-        search_combo_comp->addItems (COMPARE_OPTIONS2);
-        CheckSearchLine (search_line->text ());
+        filter_model->setFilterKeyColumn (BY_WPRICE);
     }
     else if(type == MAIN_TABLE_HEADERS_LIST[6]){
-        search_type = BY_BRAND;
-        search_combo_comp->clear ();
-        search_combo_comp->addItems (COMPARE_OPTIONS2);
-        CheckSearchLine (search_line->text ());
+        filter_model->setFilterKeyColumn (BY_RPRICE);
     }
 }
 
@@ -433,7 +399,6 @@ void StoreMainWindow::Update(int row) {
     main_table_view->selectRow (row);
     ShowPic ();
     ShowGoodsInfo ();
-    CheckSearchLine (search_line->text ());
 
     if(!isDbInit){
         SwitchButtons (DATA_BASE_ISNT_INIT);

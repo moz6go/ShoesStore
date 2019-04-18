@@ -17,6 +17,7 @@ class StoreMainWindow : public QMainWindow
     Q_OBJECT
     Ui::StoreMainWindow *ui;
     QSqlTableModel* model;
+    QSortFilterProxyModel* filter_model;
     DataBase* sdb;
     AddGoodsDialog* add_goods;
     SaleDialog* sale_goods;
@@ -30,7 +31,7 @@ class StoreMainWindow : public QMainWindow
     QAction* action_search;
 
     SearchType search_type;
-    CompareType comp_type;
+//    CompareType comp_type;
     QLineEdit* search_line;
     QComboBox* search_combo;
     QComboBox* search_combo_comp;
@@ -49,7 +50,6 @@ class StoreMainWindow : public QMainWindow
     void MainTableInit();
     void GoodsInfoTableInit();
     void BuildToolBar();
-    void AddGoodsThread();
     void SwitchButtons(State state);
     bool InitDataBase();
 public:
@@ -63,8 +63,8 @@ private slots:
     void onActionReport();
     void onActionUpdate();
     void onActionSearch();
-    void CheckSearchLine(QString text);
-    void SetCompareType(QString type);
+    void SearchTextChanged(QString text);
+//    void SetCompareType(QString type);
     void SetSearchType(QString type);
 
     void ShowPic();
