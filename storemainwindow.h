@@ -62,9 +62,7 @@ private slots:
     void onActionDelModel();
     void onActionReport();
     void onActionUpdate();
-    void onActionSearch();
     void SearchTextChanged(QString text);
-//    void SetCompareType(QString type);
     void SetSearchType(QString type);
 
     void ShowPic();

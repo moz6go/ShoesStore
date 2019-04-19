@@ -27,7 +27,6 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     toolbar = new QToolBar(this);
     search_line = new QLineEdit(this);
     search_combo = new QComboBox(this);
-//    search_combo_comp = new QComboBox(this);
     BuildToolBar ();
 
     pic_label = new QLabel(this);
@@ -54,7 +53,6 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowGoodsInfo);
     QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetSearchType);
-//    QObject::connect (search_combo_comp, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetCompareType);
     QObject::connect (search_line, &QLineEdit::textChanged, this, &StoreMainWindow::SearchTextChanged);
     Update(0);
 }
@@ -116,8 +114,6 @@ void StoreMainWindow::BuildToolBar() {
         search_combo->addItem(MAIN_TABLE_HEADERS_LIST.at (col));
     }
     search_combo->setMaximumHeight (SIZE_WID_2);
-//    search_combo_comp->setMaximumHeight (SIZE_WID_2);
-//    search_combo_comp->addItems(COMPARE_OPTIONS1);
 
     action_add_goods = toolbar->addAction(QPixmap(":/pics/add_goods.png"), "Прийняти товар", this, SLOT(onActionAddGoods()));
     action_sale_goods = toolbar->addAction(QPixmap(":/pics/sale_goods.png"), "Продати товар", this, SLOT(onActionSaleGoods()));
@@ -193,7 +189,6 @@ bool StoreMainWindow::InitDataBase() {
         QMessageBox::critical (this, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
         return false;
     }
-
 }
 
 
@@ -272,8 +267,8 @@ void StoreMainWindow::onActionAddModel() {
         pic.save (&buff, "JPG");
 
         QVariantList data = QVariantList() << add_model->getModel ()
-                                           << add_model->getCategory ()
                                            << add_model->getSeason ()
+                                           << add_model->getCategory ()
                                            << add_model->getBrand ()
                                            << QString::number (add_model->getWholesalepr ())
                                            << QString::number (add_model->getRetailpr ())
@@ -321,12 +316,9 @@ void StoreMainWindow::onActionUpdate() {
     Update(main_table_view->currentIndex ().row ());
 }
 
-void StoreMainWindow::onActionSearch() {
-
-}
-
 void StoreMainWindow::SearchTextChanged(QString text) {
     filter_model->setFilterFixedString (text);
+    Update(main_table_view->currentIndex ().row ());
 }
 
 void StoreMainWindow::SetSearchType(QString type) {
@@ -352,7 +344,7 @@ void StoreMainWindow::SetSearchType(QString type) {
 
 void StoreMainWindow::ShowPic() {
     QPixmap pic;
-    pic.loadFromData (model->data(model->index (main_table_view->currentIndex ().row (), 7)).toByteArray ());
+    pic.loadFromData (filter_model->data(filter_model->index (main_table_view->currentIndex ().row (), 7)).toByteArray ());
     if (!pic.isNull ()){
         pic_label->setPixmap (pic.scaledToWidth (300));
         if(pic.width () > pic.height ()){
@@ -394,6 +386,7 @@ void StoreMainWindow::ShowGoodsInfo() {
 }
 
 void StoreMainWindow::Update(int row) {
+    //qDebug() << row;
     model->select ();
     model->sort (0, Qt::AscendingOrder);
     main_table_view->selectRow (row);
