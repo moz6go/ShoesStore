@@ -14,7 +14,7 @@ class DataBase : public QObject
     void CloseDataBase();
 
 public:
-    DataBase (QObject *parent = 0);
+    DataBase (QObject *parent = nullptr);
     ~DataBase ();
     bool ConnectToDataBase();
     bool InsertDataIntoTable (const QString& query_str,
@@ -22,6 +22,9 @@ public:
                               const QVariantList& data);
 
     int SelectCount(const QString& from);
+    double SelectSum(const QString& from, const QString& column);
+    double SelectSum(const QString& from, const QString& column, const QString& where, const QString& equal);
+    double SelectGoodsSum();
 
     int SelectCount(const QString& from,
                     const QString& where,

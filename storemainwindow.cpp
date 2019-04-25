@@ -14,7 +14,7 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     main_table_view = new QTableView(this);
     filter_model = new QSortFilterProxyModel(this);
     filter_model->setSourceModel (model);
-    filter_model ->setFilterCaseSensitivity (Qt::CaseInsensitive);
+    filter_model->setFilterCaseSensitivity (Qt::CaseInsensitive);
     filter_model->setFilterKeyColumn (BY_MODEL_NAME);
     main_table_view->setModel (filter_model);
 
@@ -32,8 +32,10 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     pic_label = new QLabel(this);
 
     goods_info_table = new QTableWidget(this);
-    GoodsInfoTableInit();
+    TableInit(goods_info_table, QStringList() << "Розмір" << "Кількість");
 
+    summary_table = new QTableWidget(this);
+    TableInit(summary_table, QStringList() << "Показник" << "Значення");
 
     h_main_layout = new QHBoxLayout();
     rv_layout = new QVBoxLayout();
@@ -41,6 +43,7 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
 
     lv_layout->addWidget (main_table_view);
     rv_layout->addWidget (pic_label);
+    rv_layout->addWidget (summary_table);
     rv_layout->addWidget (goods_info_table);
 
     h_main_layout->addLayout (lv_layout);
@@ -55,6 +58,8 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetSearchType);
     QObject::connect (search_line, &QLineEdit::textChanged, this, &StoreMainWindow::SearchTextChanged);
     Update(0);
+
+
 }
 
 void StoreMainWindow::resizeEvent(QResizeEvent *event) {
@@ -85,24 +90,35 @@ void StoreMainWindow::MainTableInit() {
 
 }
 
-void StoreMainWindow::GoodsInfoTableInit() {
-    goods_info_table->clear ();
-    goods_info_table->setRowCount (0);
-    goods_info_table->setColumnCount(2);
-    goods_info_table->setHorizontalHeaderLabels (QStringList() << "Розмір" << "Кількість");
-    goods_info_table->setMaximumSize(300, 250);
-    goods_info_table->setMinimumSize(300, 250);
-    goods_info_table->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
-    goods_info_table->verticalHeader ()->setDefaultSectionSize (20);
-    goods_info_table->verticalHeader ()->setVisible(false);
-    goods_info_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    goods_info_table->setSelectionMode(QAbstractItemView::SingleSelection);
-    goods_info_table->resizeColumnsToContents();
-    goods_info_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    goods_info_table->horizontalHeader()->setStretchLastSection(true);
-    goods_info_table->setColumnWidth (0, 100);
-    goods_info_table->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 10pt; }");
-    goods_info_table->setStyleSheet ("QTableWidget { font-size: 10pt; }");
+void StoreMainWindow::TableInit(QTableWidget* table, QStringList headers) {
+    table->clear ();
+    table->setRowCount (0);
+    table->setColumnCount(2);
+    table->setHorizontalHeaderLabels (headers);
+    table->setFixedSize(300, 160);
+    table->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
+    table->verticalHeader ()->setDefaultSectionSize (20);
+    table->verticalHeader ()->setVisible(false);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    table->resizeColumnsToContents();
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->horizontalHeader()->setStretchLastSection(true);
+    table->setColumnWidth (0, 150);
+    table->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 10pt; }");
+    table->setStyleSheet ("QTableWidget { font-size: 10pt; }");
+}
+
+void StoreMainWindow::SetSummary() {
+    TableInit(summary_table, QStringList() << "Показник" << "Значення");
+    for (int row = 0; row < SUMMARY_ROWS.size (); ++row) {
+        summary_table->insertRow (row);
+        summary_table->setItem(row, 0, new QTableWidgetItem (SUMMARY_ROWS[row]));
+    }
+
+    summary_table->setItem(1, 1, new QTableWidgetItem(QString::number (sdb->SelectCount (AVAILABLE_GOODS_TABLE))));
+    summary_table->setItem(2, 1, new QTableWidgetItem(QString::number (sdb->SelectGoodsSum ())));
+    summary_table->setItem(3, 1, new QTableWidgetItem(QString::number (sdb->SelectSum (SOLD_GOODS_TABLE, SALE_PRICE))));
 }
 
 void StoreMainWindow::BuildToolBar() {
@@ -280,7 +296,7 @@ void StoreMainWindow::onActionAddModel() {
                                        data)) {
             ui->statusBar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
         }
-        Update(model->rowCount ());
+        Update(filter_model->rowCount ());
         ui->statusBar->showMessage ("Додано модель " + add_model->getModel () + ", виробник " + add_model->getBrand ());
     }
 }
@@ -288,11 +304,11 @@ void StoreMainWindow::onActionAddModel() {
 void StoreMainWindow::onActionDelModel() {
     if(sdb->SelectCount (AVAILABLE_GOODS_TABLE,
                          MODEL_ID,
-                         model->data (model->index (main_table_view->currentIndex ().row (), 0)).toString ())) {
+                         filter_model->data (filter_model->index (main_table_view->currentIndex ().row (), 0)).toString ())) {
         QMessageBox::warning (this, "Помилка!", "Неможливо видалити модель, є наявні товари!");
     }
     else{
-        QString model_name = model->data (model->index (main_table_view->currentIndex ().row (), 1)).toString ();
+        QString model_name = filter_model->data (filter_model->index (main_table_view->currentIndex ().row (), 1)).toString ();
         QMessageBox* msgbox = new QMessageBox(QMessageBox::Question,
                                               "Видалити модель",
                                               "Ви дійсно бажаєте видалити з бази даних модель " + model_name +"?",
@@ -308,7 +324,6 @@ void StoreMainWindow::onActionDelModel() {
 }
 
 void StoreMainWindow::onActionReport() {
-
 }
 
 void StoreMainWindow::onActionUpdate() {
@@ -357,10 +372,10 @@ void StoreMainWindow::ShowPic() {
 }
 
 void StoreMainWindow::ShowGoodsInfo() {
-    if(model->rowCount ()){
-        GoodsInfoTableInit();
+    if(filter_model->rowCount ()){
+        TableInit(goods_info_table, QStringList() << "Розмір" << "Кількість");
         int sum_count(0);
-        int model_id = model->data (model->index (main_table_view->currentIndex ().row (), 0)).toInt ();
+        int model_id = filter_model->data (filter_model->index (main_table_view->currentIndex ().row (), 0)).toInt ();
         for (int size = 36; size <= 46; ++size) {
             int count = sdb->SelectCount (
                     AVAILABLE_GOODS_TABLE,
@@ -391,12 +406,13 @@ void StoreMainWindow::Update(int row) {
     model->sort (0, Qt::AscendingOrder);
     main_table_view->selectRow (row);
     ShowPic ();
+    SetSummary();
     ShowGoodsInfo ();
 
     if(!isDbInit){
         SwitchButtons (DATA_BASE_ISNT_INIT);
     }
-    else if(!model->rowCount ()){
+    else if(!filter_model->rowCount ()){
         SwitchButtons (MODEL_TABLE_EMPTY);
     }
     else if (!sdb->SelectCount (AVAILABLE_GOODS_TABLE)){

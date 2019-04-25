@@ -39,6 +39,23 @@ int DataBase::SelectCount(const QString &from) {
     return sel_query.value (0).toInt ();
 }
 
+double DataBase::SelectSum(const QString &from, const QString &column) {
+    QSqlQuery sel_query;
+    sel_query.exec ("SELECT SUM("+ column +") FROM " + from);
+    sel_query.next ();
+    return sel_query.value (0).toDouble ();
+}
+
+double DataBase::SelectGoodsSum() {
+    QSqlQuery sel_query;
+    sel_query.exec ("SELECT SUM(" + WHOLESALE_PRICE + ") FROM ("
+                        " SELECT " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + ", " + MODELS_TABLE + "." + WHOLESALE_PRICE + ""
+                        " FROM " + AVAILABLE_GOODS_TABLE +
+                        " INNER JOIN " + MODELS_TABLE + " ON " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID + ")");
+    sel_query.next ();
+    return sel_query.value (0).toDouble ();
+}
+
 
 int DataBase::SelectCount(const QString &from, const QString &where, const QString &equal) {
     QSqlQuery sel_query;

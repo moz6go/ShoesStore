@@ -31,7 +31,6 @@ class StoreMainWindow : public QMainWindow
     QAction* action_search;
 
     SearchType search_type;
-//    CompareType comp_type;
     QLineEdit* search_line;
     QComboBox* search_combo;
     QComboBox* search_combo_comp;
@@ -42,13 +41,16 @@ class StoreMainWindow : public QMainWindow
 
     QTableView* main_table_view;
     QTableWidget* goods_info_table;
+    QTableWidget* summary_table;
+
     QLabel* pic_label;
     QSplitter* splitter;
     bool isDbInit;
 
     void resizeEvent(QResizeEvent *event);
     void MainTableInit();
-    void GoodsInfoTableInit();
+    void TableInit(QTableWidget* table, QStringList headers);
+    void SetSummary();
     void BuildToolBar();
     void SwitchButtons(State state);
     bool InitDataBase();

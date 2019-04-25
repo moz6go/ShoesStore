@@ -82,6 +82,15 @@ const QString SALE_PRICE = "sale_price";
 const QString SALE_DATE = "sale_date";
 const QString PROFIT = "profit";
 
+const QStringList SUMMARY_ROWS = {
+    "Всього товару:",
+    " - шт.",
+    " - грн",
+    "Всього продано, грн",
+    " - в поточному місяці",
+    " - в поточному році"
+};
+
 enum SearchType {
     BY_MODEL_NAME = 1,
     BY_SEASON,
