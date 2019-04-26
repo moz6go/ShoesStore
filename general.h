@@ -45,9 +45,13 @@ const int SIZE_WID_1 = 40;
 const int SIZE_WID_2 = 24;
 
 #if defined(_WIN32)
-const QString DB_PATH = "D:\\MyProjects\\Qt\\ShoesStore\\db";
+    #if defined(QT_DEBUG)
+    const QString DB_PATH = "D:\\MyProjects\\Qt\\ShoesStore\\db";
+    #else
+    const QString DB_PATH = "D:\\ShoesStore\\db";
+    #endif
 #else
-const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/db";
+    const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/db";
 #endif
 
 //tables
@@ -124,6 +128,12 @@ const QStringList SUMMARY_ROWS = {
     "Прибуток, грн",
     " - в поточному році",
     " - в поточному місяці",
+};
+
+const QStringList REPORT_TYPES = {
+    "Продані товари в поточному місяці",
+    "Отримані товари в поточному місяці",
+    "Залишок товарів"
 };
 
 enum SearchType {

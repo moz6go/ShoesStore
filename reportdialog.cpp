@@ -14,9 +14,9 @@ ReportDialog::ReportDialog(DataBase* data_base, QWidget *parent) :
     report_cb = new QComboBox(this);
     tool_bar->addWidget (new QLabel("Виберіть тип звіту  ",this));
     tool_bar->addWidget (report_cb);
-    report_action = tool_bar->addAction(QPixmap(":/pics/report.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
+    report_action = tool_bar->addAction(QPixmap(":/pics/report_dialog.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
     tool_bar->setMovable (false);
-    tool_bar->setIconSize (QSize(SIZE_WID_1, SIZE_WID_1));
+    tool_bar->setIconSize (QSize(SIZE_WID_2, SIZE_WID_2));
     main_window->addToolBar(Qt::TopToolBarArea, tool_bar);
     main_table = new QTableView(this);
     main_window->setCentralWidget (main_table);

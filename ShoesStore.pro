@@ -38,3 +38,5 @@ FORMS    +=    storemainwindow.ui \
 
 RESOURCES += \
     pics.qrc
+
+RC_ICONS = main_icon.ico
