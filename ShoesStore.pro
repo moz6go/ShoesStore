@@ -19,19 +19,22 @@ SOURCES += main.cpp\
     addmodeldialog.cpp \
     addgoodsdialog.cpp \
     database.cpp \
-    saledialog.cpp
+    saledialog.cpp \
+    reportdialog.cpp
 
 HEADERS  +=    storemainwindow.h \
     general.h \
     addmodeldialog.h \
     addgoodsdialog.h \
     database.h \
-    saledialog.h
+    saledialog.h \
+    reportdialog.h
 
 FORMS    +=    storemainwindow.ui \
     addmodeldialog.ui \
     addgoodsdialog.ui \
-    saledialog.ui
+    saledialog.ui \
+    reportdialog.ui
 
 RESOURCES += \
     pics.qrc

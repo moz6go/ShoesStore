@@ -6,7 +6,7 @@
 #include "addgoodsdialog.h"
 #include "database.h"
 #include "saledialog.h"
-
+#include "reportdialog.h"
 
 namespace Ui {
     class StoreMainWindow;
@@ -66,7 +66,6 @@ private slots:
     void onActionUpdate();
     void SearchTextChanged(QString text);
     void SetSearchType(QString type);
-
     void ShowPic();
     void ShowGoodsInfo();
     void Update(int row);

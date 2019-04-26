@@ -82,13 +82,48 @@ const QString SALE_PRICE = "sale_price";
 const QString SALE_DATE = "sale_date";
 const QString PROFIT = "profit";
 
+const QString AVAILABLE_GOODS_WPRICE_SUM_QUERY = "SELECT SUM(" + WHOLESALE_PRICE + ")"
+                                          " FROM ("
+                                            " SELECT " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + ", " + MODELS_TABLE + "." + WHOLESALE_PRICE + ""
+                                            " FROM " + AVAILABLE_GOODS_TABLE +
+                                            " INNER JOIN " + MODELS_TABLE + " ON " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID + ")";
+
+const QString SOLD_GOODS_SUM_QUERY = "SELECT SUM("+ SALE_PRICE +")"
+                                    " FROM " + SOLD_GOODS_TABLE ;
+
+
+const QString SOLD_GOODS_SUM_BY_MONTH_QUERY = "SELECT SUM("+ SALE_PRICE +")"
+                                             " FROM " + SOLD_GOODS_TABLE +
+                                             " WHERE " + SALE_DATE + ">= datetime('now', 'start of month')";
+
+const QString SOLD_GOODS_SUM_BY_YEAR_QUERY = "SELECT SUM("+ SALE_PRICE +")"
+                                             " FROM " + SOLD_GOODS_TABLE +
+                                             " WHERE " + SALE_DATE + ">= datetime('now', 'start of year')";
+
+const QString PROFIT_QUERY = "SELECT SUM("+ PROFIT +")"
+                            " FROM " + SOLD_GOODS_TABLE ;
+
+
+const QString PROFIT_BY_MONTH_QUERY = "SELECT SUM("+ PROFIT +")"
+                                    " FROM " + SOLD_GOODS_TABLE +
+                                    " WHERE " + SALE_DATE + ">= datetime('now', 'start of month')";
+
+const QString PROFIT_BY_YEAR_QUERY = "SELECT SUM("+ PROFIT +")"
+                                    " FROM " + SOLD_GOODS_TABLE +
+                                    " WHERE " + SALE_DATE + ">= datetime('now', 'start of year')";
+
+
+
 const QStringList SUMMARY_ROWS = {
     "Всього товару:",
     " - шт.",
     " - грн",
-    "Всього продано, грн",
+    "Оборот, грн",
+    " - в поточному році",
     " - в поточному місяці",
-    " - в поточному році"
+    "Прибуток, грн",
+    " - в поточному році",
+    " - в поточному місяці",
 };
 
 enum SearchType {
@@ -109,21 +144,6 @@ enum CompareType {
     LESS_EQUAL,
     GREATER_EQUAL
 };
-const QStringList COMPARE_OPTIONS1 = {
-    "=",
-    "містить",
-    "не дорівнює"
-};
-
-const QStringList COMPARE_OPTIONS2 = {
-    "=",
-    "не дорівнює",
-    "<",
-    ">",
-    "<=",
-    ">="
-};
-
 
 const QStringList MAIN_TABLE_HEADERS_LIST = {
     "!id",

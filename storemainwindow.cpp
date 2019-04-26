@@ -30,6 +30,7 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     BuildToolBar ();
 
     pic_label = new QLabel(this);
+    //pic_label->setFixedSize (300, 190);
 
     goods_info_table = new QTableWidget(this);
     TableInit(goods_info_table, QStringList() << "Розмір" << "Кількість");
@@ -51,15 +52,13 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     wgt->setLayout (h_main_layout);
     setCentralWidget (wgt);
 
-    setMinimumSize(1050, 600);
+    setMinimumSize(1024, 600);
 
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowGoodsInfo);
     QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetSearchType);
     QObject::connect (search_line, &QLineEdit::textChanged, this, &StoreMainWindow::SearchTextChanged);
     Update(0);
-
-
 }
 
 void StoreMainWindow::resizeEvent(QResizeEvent *event) {
@@ -74,7 +73,7 @@ void StoreMainWindow::MainTableInit() {
     main_table_view->setColumnHidden(7, true);
     main_table_view->setColumnHidden(8, true);
     main_table_view->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
-    main_table_view->verticalHeader ()->setDefaultSectionSize (20);
+    main_table_view->verticalHeader ()->setDefaultSectionSize (18);
     main_table_view->verticalHeader()->setVisible(false);
     main_table_view->setSelectionBehavior(QAbstractItemView::SelectRows);
     main_table_view->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -82,8 +81,8 @@ void StoreMainWindow::MainTableInit() {
     main_table_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
     main_table_view->horizontalHeader()->setStretchLastSection(true);
     main_table_view->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
-    main_table_view->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 10pt; }");
-    main_table_view->setStyleSheet ("QTableView { font-size: 10pt; }");
+    main_table_view->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 9pt; }");
+    main_table_view->setStyleSheet ("QTableView { font-size: 9pt; }");
     main_table_view->setMinimumWidth (700);
     main_table_view->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
     main_table_view->setSortingEnabled (true);
@@ -97,7 +96,7 @@ void StoreMainWindow::TableInit(QTableWidget* table, QStringList headers) {
     table->setHorizontalHeaderLabels (headers);
     table->setFixedSize(300, 160);
     table->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
-    table->verticalHeader ()->setDefaultSectionSize (20);
+    table->verticalHeader ()->setDefaultSectionSize (18);
     table->verticalHeader ()->setVisible(false);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -105,8 +104,8 @@ void StoreMainWindow::TableInit(QTableWidget* table, QStringList headers) {
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->horizontalHeader()->setStretchLastSection(true);
     table->setColumnWidth (0, 150);
-    table->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 10pt; }");
-    table->setStyleSheet ("QTableWidget { font-size: 10pt; }");
+    table->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 9pt; }");
+    table->setStyleSheet ("QTableWidget { font-size: 9pt; }");
 }
 
 void StoreMainWindow::SetSummary() {
@@ -117,8 +116,13 @@ void StoreMainWindow::SetSummary() {
     }
 
     summary_table->setItem(1, 1, new QTableWidgetItem(QString::number (sdb->SelectCount (AVAILABLE_GOODS_TABLE))));
-    summary_table->setItem(2, 1, new QTableWidgetItem(QString::number (sdb->SelectGoodsSum ())));
-    summary_table->setItem(3, 1, new QTableWidgetItem(QString::number (sdb->SelectSum (SOLD_GOODS_TABLE, SALE_PRICE))));
+    summary_table->setItem(2, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (AVAILABLE_GOODS_WPRICE_SUM_QUERY), 0, 'f', 2)));
+    summary_table->setItem(3, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (SOLD_GOODS_SUM_QUERY), 0, 'f', 2)));
+    summary_table->setItem(4, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (SOLD_GOODS_SUM_BY_YEAR_QUERY), 0, 'f', 2)));
+    summary_table->setItem(5, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (SOLD_GOODS_SUM_BY_MONTH_QUERY), 0, 'f', 2)));
+    summary_table->setItem(6, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (PROFIT_QUERY), 0, 'f', 2)));
+    summary_table->setItem(7, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (PROFIT_BY_YEAR_QUERY), 0, 'f', 2)));
+    summary_table->setItem(8, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (PROFIT_BY_MONTH_QUERY), 0, 'f', 2)));
 }
 
 void StoreMainWindow::BuildToolBar() {
@@ -226,7 +230,7 @@ void StoreMainWindow::onActionAddGoods() {
                                                        << model_name
                                                        << brand
                                                        << size
-                                                       << QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss");
+                                                       << QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh:mm:ss");
                     QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_SIZE, GOODS_DATE };
                     if (!sdb->InsertDataIntoTable(sdb->GenerateInsertQuery (AVAILABLE_GOODS_TABLE, columns),
                                                   sdb->GenerateBindValues (columns),
@@ -255,13 +259,14 @@ void StoreMainWindow::onActionSaleGoods() {
                                                 GOODS_COL_COUNT);
             data.append (sale_goods->GetPrice ());
             data.append (sale_goods->GetProfit ());
-            data.append (QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss"));
+            data.append (QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh:mm:ss"));
 
             QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_ID, GOODS_SIZE, GOODS_DATE, SALE_PRICE, PROFIT, SALE_DATE };
             if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (SOLD_GOODS_TABLE, columns),
                                            sdb->GenerateBindValues (columns),
                                            data)) {
                 ui->statusBar->showMessage ("Невдалось виконати операцію! Проблема з підключеням до бази даних");
+                return;
             }
             else {
                 sdb->DeleteRow (AVAILABLE_GOODS_TABLE, GOODS_ID, data[3].toString ());
@@ -289,12 +294,13 @@ void StoreMainWindow::onActionAddModel() {
                                            << QString::number (add_model->getWholesalepr ())
                                            << QString::number (add_model->getRetailpr ())
                                            << pic_byte_arr
-                                           << QDateTime::currentDateTime ().toString ("dd.MM.yyyy hh:mm:ss");
+                                           << QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh:mm:ss");
         QStringList columns = {MODEL_NAME, SEASON, CATEGORY, BRAND, WHOLESALE_PRICE, RETAIL_PRICE, PIC, DATE };
         if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (MODELS_TABLE, columns),
                                        sdb->GenerateBindValues (columns),
                                        data)) {
             ui->statusBar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
+            return;
         }
         Update(filter_model->rowCount ());
         ui->statusBar->showMessage ("Додано модель " + add_model->getModel () + ", виробник " + add_model->getBrand ());
@@ -324,6 +330,8 @@ void StoreMainWindow::onActionDelModel() {
 }
 
 void StoreMainWindow::onActionReport() {
+    ReportDialog* report_dialog = new ReportDialog(sdb, this);
+    report_dialog->exec ();
 }
 
 void StoreMainWindow::onActionUpdate() {

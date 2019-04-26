@@ -22,9 +22,7 @@ public:
                               const QVariantList& data);
 
     int SelectCount(const QString& from);
-    double SelectSum(const QString& from, const QString& column);
-    double SelectSum(const QString& from, const QString& column, const QString& where, const QString& equal);
-    double SelectGoodsSum();
+    double SelectSum(const QString& qeury);
 
     int SelectCount(const QString& from,
                     const QString& where,
