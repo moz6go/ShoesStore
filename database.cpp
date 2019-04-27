@@ -46,6 +46,20 @@ double DataBase::SelectSum(const QString &query) {
     return sel_query.value (0).toDouble ();
 }
 
+QVector<QVariantList> DataBase::SelectTable(const QString &query, const int& col_count) {
+    QVector<QVariantList> table;
+    QSqlQuery sel_query;
+    sel_query.exec (query);
+    while(sel_query.next ()){
+        QVariantList row;
+        for(int col = 0; col < col_count; ++col){
+            row.append (sel_query.value (col));
+        }
+        table.append (row);
+    }
+    return table;
+}
+
 int DataBase::SelectCount(const QString &from, const QString &where, const QString &equal) {
     QSqlQuery sel_query;
     sel_query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where + " = '" + equal + "'");

@@ -23,6 +23,7 @@ public:
 
     int SelectCount(const QString& from);
     double SelectSum(const QString& qeury);
+    QVector<QVariantList> SelectTable(const QString& query, const int& col_count);
 
     int SelectCount(const QString& from,
                     const QString& where,

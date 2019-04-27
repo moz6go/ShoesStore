@@ -4,32 +4,30 @@
 
 ReportDialog::ReportDialog(DataBase* data_base, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ReportDialog)
+    ui_report(new Ui::ReportDialog)
 {
-    ui->setupUi(this);
+    ui_report->setupUi(this);
+    setModal (true);
     sdb = data_base;
-    QMainWindow* main_window = new QMainWindow();
 
-    tool_bar = new QToolBar(this);
-    report_cb = new QComboBox(this);
-    tool_bar->addWidget (new QLabel("Виберіть тип звіту  ",this));
-    tool_bar->addWidget (report_cb);
-    report_action = tool_bar->addAction(QPixmap(":/pics/report_dialog.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
-    tool_bar->setMovable (false);
-    tool_bar->setIconSize (QSize(SIZE_WID_2, SIZE_WID_2));
-    main_window->addToolBar(Qt::TopToolBarArea, tool_bar);
-    main_table = new QTableView(this);
-    main_window->setCentralWidget (main_table);
+    ui_report->report_cb->addItems (REPORTS_TYPES);
 
-    QHBoxLayout* layout = new QHBoxLayout();
-    layout->addWidget (main_window);
-    setLayout (layout);
+    ui_report->date_from->setCalendarPopup (true);
+    ui_report->date_from->setDisplayFormat ("dd.MM.yyyy");
+    ui_report->date_from->setDate (QDate::currentDate ().addMonths (-1));
+
+    ui_report->date_to->setCalendarPopup (true);
+    ui_report->date_to->setDisplayFormat ("dd.MM.yyyy");
+    ui_report->date_to->setDate (QDate::currentDate ());
+
+    QObject::connect (ui_report->ok_pb, &QPushButton::clicked, this, &ReportDialog::accept);
+    QObject::connect (ui_report->cancel_pb, &QPushButton::clicked, this, &ReportDialog::reject);
 }
 
-void ReportDialog::onActionReport() {
-
+int ReportDialog::GetReportType() {
+    return ui_report->report_cb->currentIndex ();
 }
 
 ReportDialog::~ReportDialog() {
-    delete ui;
+    delete ui_report;
 }

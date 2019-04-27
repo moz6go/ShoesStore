@@ -52,7 +52,7 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     wgt->setLayout (h_main_layout);
     setCentralWidget (wgt);
 
-    setMinimumSize(1024, 600);
+    setMinimumSize(1000, 580);
 
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowGoodsInfo);
@@ -83,7 +83,7 @@ void StoreMainWindow::MainTableInit() {
     main_table_view->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
     main_table_view->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 9pt; }");
     main_table_view->setStyleSheet ("QTableView { font-size: 9pt; }");
-    main_table_view->setMinimumWidth (700);
+    main_table_view->setMinimumWidth (660);
     main_table_view->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
     main_table_view->setSortingEnabled (true);
 
@@ -94,7 +94,7 @@ void StoreMainWindow::TableInit(QTableWidget* table, QStringList headers) {
     table->setRowCount (0);
     table->setColumnCount(2);
     table->setHorizontalHeaderLabels (headers);
-    table->setFixedSize(300, 160);
+    table->setFixedSize(300, 150);
     table->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
     table->verticalHeader ()->setDefaultSectionSize (18);
     table->verticalHeader ()->setVisible(false);
@@ -114,15 +114,19 @@ void StoreMainWindow::SetSummary() {
         summary_table->insertRow (row);
         summary_table->setItem(row, 0, new QTableWidgetItem (SUMMARY_ROWS[row]));
     }
+    double month_income(sdb->SelectSum (INCOME_BY_MONTH_QUERY)),
+            month_costs(sdb->SelectSum (COSTS_BY_MONTH_QUERY)),
+            year_income(sdb->SelectSum (INCOME_BY_YEAR_QUERY)),
+            year_costs(sdb->SelectSum (COSTS_BY_YEAR_QUERY));
 
     summary_table->setItem(1, 1, new QTableWidgetItem(QString::number (sdb->SelectCount (AVAILABLE_GOODS_TABLE))));
     summary_table->setItem(2, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (AVAILABLE_GOODS_WPRICE_SUM_QUERY), 0, 'f', 2)));
-    summary_table->setItem(3, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (SOLD_GOODS_SUM_QUERY), 0, 'f', 2)));
-    summary_table->setItem(4, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (SOLD_GOODS_SUM_BY_YEAR_QUERY), 0, 'f', 2)));
-    summary_table->setItem(5, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (SOLD_GOODS_SUM_BY_MONTH_QUERY), 0, 'f', 2)));
-    summary_table->setItem(6, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (PROFIT_QUERY), 0, 'f', 2)));
-    summary_table->setItem(7, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (PROFIT_BY_YEAR_QUERY), 0, 'f', 2)));
-    summary_table->setItem(8, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (PROFIT_BY_MONTH_QUERY), 0, 'f', 2)));
+    summary_table->setItem(4, 1, new QTableWidgetItem(QString("%L1").arg(month_income, 0, 'f', 2)));
+    summary_table->setItem(5, 1, new QTableWidgetItem(QString("%L1").arg(month_costs, 0, 'f', 2)));
+    summary_table->setItem(6, 1, new QTableWidgetItem(QString("%L1").arg((month_income - month_costs), 0, 'f', 2)));
+    summary_table->setItem(8, 1, new QTableWidgetItem(QString("%L1").arg(year_income, 0, 'f', 2)));
+    summary_table->setItem(9, 1, new QTableWidgetItem(QString("%L1").arg(year_costs, 0, 'f', 2)));
+    summary_table->setItem(10, 1, new QTableWidgetItem(QString("%L1").arg((year_income - year_costs), 0, 'f', 2)));
 }
 
 void StoreMainWindow::BuildToolBar() {
@@ -208,6 +212,20 @@ bool StoreMainWindow::InitDataBase() {
     else {
         QMessageBox::critical (this, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
         return false;
+    }
+}
+
+void StoreMainWindow::CreateReportCSV(const QVector<QVariantList>& table, const QString& path) {
+    QFile report_csv(path + "/report.csv");
+    if(report_csv.open(QIODevice::WriteOnly)){
+        QTextStream fout(&report_csv);
+        for (auto& row : table) {
+            for(const QVariant& cell : row ){
+                fout << "\"" + cell.toString () + "\",";
+            }
+            fout << '\n';
+        }
+        report_csv.close ();
     }
 }
 
@@ -331,7 +349,23 @@ void StoreMainWindow::onActionDelModel() {
 
 void StoreMainWindow::onActionReport() {
     ReportDialog* report_dialog = new ReportDialog(sdb, this);
-    report_dialog->exec ();
+    if(report_dialog->exec () == QDialog::Accepted) {
+        QString path = QFileDialog::getExistingDirectory(this, tr("Зберегти звіт в ..."),
+                                                        QDir::homePath (),
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        if(!path.isEmpty ()){
+            QVector<QVariantList> table;
+            switch (report_dialog->GetReportType ()) {
+            case SOLD_GOODS_REPORT:
+                table = sdb->SelectTable (SOLD_GOODS_QUERY, SOLD_COL_COUNT);
+                break;
+            case AVAILABLE_GOODS_REPORT:
+                table = sdb->SelectTable (AVAILABLE_GOODS_QUERY, GOODS_COL_COUNT);
+                break;
+            }
+            CreateReportCSV (table, path);
+        }
+    }
 }
 
 void StoreMainWindow::onActionUpdate() {
@@ -409,7 +443,6 @@ void StoreMainWindow::ShowGoodsInfo() {
 }
 
 void StoreMainWindow::Update(int row) {
-    //qDebug() << row;
     model->select ();
     model->sort (0, Qt::AscendingOrder);
     main_table_view->selectRow (row);

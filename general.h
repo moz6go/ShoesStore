@@ -92,48 +92,53 @@ const QString AVAILABLE_GOODS_WPRICE_SUM_QUERY = "SELECT SUM(" + WHOLESALE_PRICE
                                             " FROM " + AVAILABLE_GOODS_TABLE +
                                             " INNER JOIN " + MODELS_TABLE + " ON " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID + ")";
 
-const QString SOLD_GOODS_SUM_QUERY = "SELECT SUM("+ SALE_PRICE +")"
-                                    " FROM " + SOLD_GOODS_TABLE ;
+const QString COSTS_BY_MONTH_QUERY = "SELECT SUM(" + WHOLESALE_PRICE + ")"
+                                          " FROM ("
+                                            " SELECT " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + ", " + MODELS_TABLE + "." + WHOLESALE_PRICE + ""
+                                            " FROM " + AVAILABLE_GOODS_TABLE +
+                                            " INNER JOIN " + MODELS_TABLE + " ON " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID +
+                                            " WHERE " + GOODS_DATE + " >= datetime('now', 'start of month'))";
 
+const QString COSTS_BY_YEAR_QUERY = "SELECT SUM(" + WHOLESALE_PRICE + ")"
+                                          " FROM ("
+                                            " SELECT " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + ", " + MODELS_TABLE + "." + WHOLESALE_PRICE + ""
+                                            " FROM " + AVAILABLE_GOODS_TABLE +
+                                            " INNER JOIN " + MODELS_TABLE + " ON " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID +
+                                            " WHERE " + GOODS_DATE + " >= datetime('now', 'start of year'))";
 
-const QString SOLD_GOODS_SUM_BY_MONTH_QUERY = "SELECT SUM("+ SALE_PRICE +")"
+const QString INCOME_BY_MONTH_QUERY = "SELECT SUM("+ SALE_PRICE +")"
                                              " FROM " + SOLD_GOODS_TABLE +
                                              " WHERE " + SALE_DATE + ">= datetime('now', 'start of month')";
 
-const QString SOLD_GOODS_SUM_BY_YEAR_QUERY = "SELECT SUM("+ SALE_PRICE +")"
+const QString INCOME_BY_YEAR_QUERY = "SELECT SUM("+ SALE_PRICE +")"
                                              " FROM " + SOLD_GOODS_TABLE +
                                              " WHERE " + SALE_DATE + ">= datetime('now', 'start of year')";
 
-const QString PROFIT_QUERY = "SELECT SUM("+ PROFIT +")"
-                            " FROM " + SOLD_GOODS_TABLE ;
-
-
-const QString PROFIT_BY_MONTH_QUERY = "SELECT SUM("+ PROFIT +")"
-                                    " FROM " + SOLD_GOODS_TABLE +
-                                    " WHERE " + SALE_DATE + ">= datetime('now', 'start of month')";
-
-const QString PROFIT_BY_YEAR_QUERY = "SELECT SUM("+ PROFIT +")"
-                                    " FROM " + SOLD_GOODS_TABLE +
-                                    " WHERE " + SALE_DATE + ">= datetime('now', 'start of year')";
-
-
+const QString AVAILABLE_GOODS_QUERY = "SELECT * FROM " + AVAILABLE_GOODS_TABLE;
+const QString SOLD_GOODS_QUERY = "SELECT * FROM " + SOLD_GOODS_TABLE;
 
 const QStringList SUMMARY_ROWS = {
     "Всього товару:",
     " - шт.",
     " - грн",
-    "Оборот, грн",
-    " - в поточному році",
-    " - в поточному місяці",
-    "Прибуток, грн",
-    " - в поточному році",
-    " - в поточному місяці",
+    "Поточний місяць, грн:",
+    " - Дохід",
+    " - Витрати",
+    " - Чистий прибуток",
+    "Поточний рік, грн:",
+    " - Дохід",
+    " - Витрати",
+    " - Чистий прибуток",
 };
 
-const QStringList REPORT_TYPES = {
-    "Продані товари в поточному місяці",
-    "Отримані товари в поточному місяці",
-    "Залишок товарів"
+const QStringList REPORTS_TYPES = {
+    "Продані товари за період",
+    "Отримані товари за період"
+};
+
+enum ReportsTypes {
+    SOLD_GOODS_REPORT,
+    AVAILABLE_GOODS_REPORT
 };
 
 enum SearchType {

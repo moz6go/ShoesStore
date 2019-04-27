@@ -12,18 +12,13 @@ class ReportDialog;
 class ReportDialog : public QDialog
 {
     Q_OBJECT
-    Ui::ReportDialog *ui;
+    Ui::ReportDialog *ui_report;
 
-    QComboBox* report_cb;
-    QAction* report_action;
-    QToolBar* tool_bar;
-    QTableView* main_table;
     DataBase* sdb;
-private slots:
-    void onActionReport();
 
 public:
     explicit ReportDialog(DataBase* data_base, QWidget *parent = nullptr);
+    int GetReportType();
     ~ReportDialog();
 
 };
