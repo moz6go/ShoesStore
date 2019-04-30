@@ -128,7 +128,7 @@ const QStringList SUMMARY_ROWS = {
     "Поточний рік, грн:",
     " - Дохід",
     " - Витрати",
-    " - Чистий прибуток",
+    " - Чистий прибуток"
 };
 
 const QStringList REPORTS_TYPES = {

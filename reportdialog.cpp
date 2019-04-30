@@ -24,6 +24,14 @@ ReportDialog::ReportDialog(DataBase* data_base, QWidget *parent) :
     QObject::connect (ui_report->cancel_pb, &QPushButton::clicked, this, &ReportDialog::reject);
 }
 
+QString ReportDialog::GetDateFrom() {
+    return ui_report->date_from->date ().toString ("yyyy-MM-dd");
+}
+
+QString ReportDialog::GetDateTo() {
+    return ui_report->date_to->date ().toString ("yyyy-MM-dd");
+}
+
 int ReportDialog::GetReportType() {
     return ui_report->report_cb->currentIndex ();
 }

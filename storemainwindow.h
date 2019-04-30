@@ -54,7 +54,7 @@ class StoreMainWindow : public QMainWindow
     void BuildToolBar();
     void SwitchButtons(State state);
     bool InitDataBase();
-    void CreateReportCSV(const QVector<QVariantList>& table, const QString& path);
+    void CreateReportCSV(const QVector<QVariantList>& table, const QString& path, const QString& table_name);
 public:
     explicit StoreMainWindow(QWidget *parent = nullptr);
     ~StoreMainWindow();

@@ -18,6 +18,8 @@ class ReportDialog : public QDialog
 
 public:
     explicit ReportDialog(DataBase* data_base, QWidget *parent = nullptr);
+    QString GetDateFrom();
+    QString GetDateTo();
     int GetReportType();
     ~ReportDialog();
 

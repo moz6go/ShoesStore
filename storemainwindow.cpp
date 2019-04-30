@@ -215,20 +215,28 @@ bool StoreMainWindow::InitDataBase() {
     }
 }
 
-void StoreMainWindow::CreateReportCSV(const QVector<QVariantList>& table, const QString& path) {
+void StoreMainWindow::CreateReportCSV(const QVector<QVariantList>& table, const QString& path, const QString& table_name) {
     QFile report_csv(path + "/report.csv");
     if(report_csv.open(QIODevice::WriteOnly)){
         QTextStream fout(&report_csv);
+#if defined(_WIN32)
+        fout << "sep =,\n";
+#endif
+        QVariantList header_list = sdb->GetHeaders (table_name);
+        for (auto& header : header_list) {
+            fout << "\"" + header.toString () + "\",";
+        }
+        fout << '\n';
         for (auto& row : table) {
-            for(const QVariant& cell : row ){
+            for(const QVariant& cell : row ) {
                 fout << "\"" + cell.toString () + "\",";
             }
             fout << '\n';
         }
         report_csv.close ();
+        ui->statusBar->showMessage ("Звіт сформовано і збережено в папці " + path);
     }
 }
-
 
 void StoreMainWindow::onActionAddGoods() {
     add_goods = new AddGoodsDialog(sdb, this);
@@ -353,17 +361,20 @@ void StoreMainWindow::onActionReport() {
         QString path = QFileDialog::getExistingDirectory(this, tr("Зберегти звіт в ..."),
                                                         QDir::homePath (),
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-        if(!path.isEmpty ()){
+        if(!path.isEmpty ()) {
             QVector<QVariantList> table;
+            QString table_name;
             switch (report_dialog->GetReportType ()) {
             case SOLD_GOODS_REPORT:
-                table = sdb->SelectTable (SOLD_GOODS_QUERY, SOLD_COL_COUNT);
+                table = sdb->SelectTable (SOLD_GOODS_TABLE, SOLD_COL_COUNT, SALE_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ());
+                table_name = SOLD_GOODS_TABLE;
                 break;
             case AVAILABLE_GOODS_REPORT:
-                table = sdb->SelectTable (AVAILABLE_GOODS_QUERY, GOODS_COL_COUNT);
+                table = sdb->SelectTable (AVAILABLE_GOODS_TABLE, GOODS_COL_COUNT, GOODS_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ());
+                table_name = AVAILABLE_GOODS_TABLE;
                 break;
             }
-            CreateReportCSV (table, path);
+            CreateReportCSV (table, path, table_name);
         }
     }
 }

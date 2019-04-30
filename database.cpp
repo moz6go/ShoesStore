@@ -46,14 +46,32 @@ double DataBase::SelectSum(const QString &query) {
     return sel_query.value (0).toDouble ();
 }
 
-QVector<QVariantList> DataBase::SelectTable(const QString &query, const int& col_count) {
+QVariantList DataBase::GetHeaders(const QString &table) {
+    QSqlQuery query;
+    QVariantList headers_list;
+    query.exec ("PRAGMA table_info(" + table + ")");
+    QSqlRecord rec = query.record ();
+    while(query.next ()){
+        headers_list.append (query.value (rec.indexOf ("name")));
+    }
+    return headers_list;
+}
+
+QVector<QVariantList> DataBase::SelectTable(const QString &table_name, const int& col_count, const QString& where, const QString& date_from, const QString& date_to) {
     QVector<QVariantList> table;
-    QSqlQuery sel_query;
-    sel_query.exec (query);
-    while(sel_query.next ()){
+    QLocale loc(QLocale::Ukrainian, QLocale::Ukraine);
+    QSqlQuery query;
+    query.exec ("SELECT * FROM " + table_name + " WHERE " + where + " BETWEEN '" + date_from + "' AND '" + date_to + "'");
+    QSqlRecord rec = query.record ();
+    while(query.next ()){
         QVariantList row;
         for(int col = 0; col < col_count; ++col){
-            row.append (sel_query.value (col));
+            if(rec.indexOf (WHOLESALE_PRICE) == col || rec.indexOf (RETAIL_PRICE) == col || rec.indexOf (SALE_PRICE) == col || rec.indexOf (PROFIT) == col) {
+                row.append (QVariant(loc.toString (query.value (col).toDouble ())));
+            }
+            else {
+                row.append (query.value (col));
+            }
         }
         table.append (row);
     }
@@ -61,17 +79,17 @@ QVector<QVariantList> DataBase::SelectTable(const QString &query, const int& col
 }
 
 int DataBase::SelectCount(const QString &from, const QString &where, const QString &equal) {
-    QSqlQuery sel_query;
-    sel_query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where + " = '" + equal + "'");
-    sel_query.next ();
-    return sel_query.value (0).toInt ();
+    QSqlQuery query;
+    query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where + " = '" + equal + "'");
+    query.next ();
+    return query.value (0).toInt ();
 }
 
 int DataBase::SelectCount(const QString& from, const QString& where1, const QString& where2, const QString& equal1, const QString& equal2) {
-    QSqlQuery sel_query;
-    sel_query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where1 + " = '" + equal1 + "' AND " + where2 + " = '" + equal2 + "'");
-    sel_query.next ();
-    return sel_query.value (0).toInt ();
+    QSqlQuery query;
+    query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where1 + " = '" + equal1 + "' AND " + where2 + " = '" + equal2 + "'");
+    query.next ();
+    return query.value (0).toInt ();
 }
 
 bool DataBase::DeleteRow(const QString &from, const QString &where, const QString &equal) {
@@ -93,11 +111,11 @@ QByteArray DataBase::SelectPic(const QString &from, const QString &where, const 
 }
 
 QString DataBase::Select(const QString &select, const QString &from, const QString &where, const QString &equal) {
-    QSqlQuery sel_query;
-    sel_query.exec ("SELECT " + select + " FROM "+ from +" WHERE "+ where +" = '" + equal + "'");
-    QSqlRecord rec = sel_query.record ();
-    sel_query.next ();
-    return  sel_query.value(rec.indexOf(select)).toString ();
+    QSqlQuery query;
+    query.exec ("SELECT " + select + " FROM "+ from +" WHERE "+ where +" = '" + equal + "'");
+    QSqlRecord rec = query.record ();
+    query.next ();
+    return  query.value(rec.indexOf(select)).toString ();
 }
 
 QVariantList DataBase::SelectRow(const QString &select,
@@ -107,12 +125,12 @@ QVariantList DataBase::SelectRow(const QString &select,
                                  const QString &equal1,
                                  const QString &equal2,
                                  const int& col_count) {
-    QSqlQuery sel_query;
-    sel_query.exec ("SELECT " + select + " FROM "+ from + " WHERE " + where1 + " = '" + equal1 + "' AND " + where2 + " = '" + equal2 + "'");
+    QSqlQuery query;
+    query.exec ("SELECT " + select + " FROM "+ from + " WHERE " + where1 + " = '" + equal1 + "' AND " + where2 + " = '" + equal2 + "'");
     QVariantList data;
-    sel_query.next ();
+    query.next ();
     for (int i = 0; i < col_count; ++ i) {
-        data.append (sel_query.value (i));
+        data.append (query.value (i));
     }
     return data;
 }
