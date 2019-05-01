@@ -46,27 +46,31 @@ double DataBase::SelectSum(const QString &query) {
     return sel_query.value (0).toDouble ();
 }
 
-QVariantList DataBase::GetHeaders(const QString &table) {
-    QSqlQuery query;
-    QVariantList headers_list;
-    query.exec ("PRAGMA table_info(" + table + ")");
-    QSqlRecord rec = query.record ();
-    while(query.next ()){
-        headers_list.append (query.value (rec.indexOf ("name")));
-    }
-    return headers_list;
-}
-
-QVector<QVariantList> DataBase::SelectTable(const QString &table_name, const int& col_count, const QString& where, const QString& date_from, const QString& date_to) {
+QVector<QVariantList> DataBase::SelectTable(const QString &table_name, const QString& where, const QString& date_from, const QString& date_to) {
     QVector<QVariantList> table;
     QLocale loc(QLocale::Ukrainian, QLocale::Ukraine);
     QSqlQuery query;
-    query.exec ("SELECT * FROM " + table_name + " WHERE " + where + " BETWEEN '" + date_from + "' AND '" + date_to + "'");
+    query.exec ("SELECT " + table_name + ".*, " + MODELS_TABLE + "." + CATEGORY + ", "
+                                                + MODELS_TABLE + "." + SEASON + ", "
+                                                + MODELS_TABLE + "." + WHOLESALE_PRICE + ", "
+                                                + MODELS_TABLE + "." + RETAIL_PRICE +
+                " FROM " + table_name +
+                " INNER JOIN " + MODELS_TABLE + " ON " + table_name + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID +
+                " WHERE " + where + " BETWEEN '" + date_from + "' AND '" + date_to + "'");
     QSqlRecord rec = query.record ();
+
+    QVariantList header;
+    for(int col = 0; col < rec.count(); ++col){
+        QSqlField field = rec.field(col);
+        header.append (field.name());
+    }
+    table.append (header);
+
     while(query.next ()){
         QVariantList row;
-        for(int col = 0; col < col_count; ++col){
-            if(rec.indexOf (WHOLESALE_PRICE) == col || rec.indexOf (RETAIL_PRICE) == col || rec.indexOf (SALE_PRICE) == col || rec.indexOf (PROFIT) == col) {
+        for(int col = 0; col < rec.count(); ++col) {
+            if (rec.field(col).type () == QVariant::Double){
+                qDebug() << rec.field(col).name ();
                 row.append (QVariant(loc.toString (query.value (col).toDouble ())));
             }
             else {

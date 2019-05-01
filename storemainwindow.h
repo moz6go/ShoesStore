@@ -7,6 +7,7 @@
 #include "database.h"
 #include "saledialog.h"
 #include "reportdialog.h"
+#include "dictionarydialog.h"
 
 namespace Ui {
     class StoreMainWindow;
@@ -27,6 +28,7 @@ class StoreMainWindow : public QMainWindow
     QAction* action_add_new_model;
     QAction* action_del_model;
     QAction* action_report;
+    QAction* action_dictionary;
     QAction* action_update;
     QAction* action_search;
 
@@ -54,7 +56,7 @@ class StoreMainWindow : public QMainWindow
     void BuildToolBar();
     void SwitchButtons(State state);
     bool InitDataBase();
-    void CreateReportCSV(const QVector<QVariantList>& table, const QString& path, const QString& table_name);
+    void CreateReportCSV(const QVector<QVariantList>& table, const QString& path);
 public:
     explicit StoreMainWindow(QWidget *parent = nullptr);
     ~StoreMainWindow();
@@ -65,6 +67,7 @@ private slots:
     void onActionDelModel();
     void onActionReport();
     void onActionUpdate();
+    void onActionDictionary();
     void SearchTextChanged(QString text);
     void SetSearchType(QString type);
     void ShowPic();

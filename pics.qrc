@@ -10,5 +10,6 @@
         <file>pics/sale_goods.png</file>
         <file>pics/search.png</file>
         <file>pics/report_dialog.png</file>
+        <file>pics/dictionary.png</file>
     </qresource>
 </RCC>

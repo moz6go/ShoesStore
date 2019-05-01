@@ -40,6 +40,7 @@
 #include <QSqlQueryModel>
 #include <QSqlRelationalTableModel>
 #include <QSqlError>
+#include <QSqlField>
 
 const int SIZE_WID_1 = 40;
 const int SIZE_WID_2 = 24;
@@ -129,6 +130,18 @@ const QStringList SUMMARY_ROWS = {
     " - Дохід",
     " - Витрати",
     " - Чистий прибуток"
+};
+
+const QStringList DICTIONARIES = {
+    "Бренди",
+    "Категорії",
+    "Сезони"
+};
+
+enum DictTypes {
+    BRANDS,
+    CATEGORIES,
+    SEASONS
 };
 
 const QStringList REPORTS_TYPES = {

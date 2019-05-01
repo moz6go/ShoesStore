@@ -86,7 +86,6 @@ void StoreMainWindow::MainTableInit() {
     main_table_view->setMinimumWidth (660);
     main_table_view->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
     main_table_view->setSortingEnabled (true);
-
 }
 
 void StoreMainWindow::TableInit(QTableWidget* table, QStringList headers) {
@@ -146,6 +145,7 @@ void StoreMainWindow::BuildToolBar() {
     action_del_model = toolbar->addAction(QPixmap(":/pics/delete.png"), "Видалити модель", this, SLOT(onActionDelModel()));
     toolbar->addSeparator ();
     action_report = toolbar->addAction(QPixmap(":/pics/report.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
+    action_dictionary = toolbar->addAction (QPixmap(":/pics/dictionary.png"), "Змінити довідники", this, SLOT(onActionDictionary()));
     toolbar->addSeparator ();
     action_update = toolbar->addAction(QPixmap(":/pics/update.png"), "Оновити", this, SLOT(onActionUpdate()));
     toolbar->addSeparator ();
@@ -215,18 +215,13 @@ bool StoreMainWindow::InitDataBase() {
     }
 }
 
-void StoreMainWindow::CreateReportCSV(const QVector<QVariantList>& table, const QString& path, const QString& table_name) {
+void StoreMainWindow::CreateReportCSV(const QVector<QVariantList>& table, const QString& path) {
     QFile report_csv(path + "/report.csv");
     if(report_csv.open(QIODevice::WriteOnly)){
         QTextStream fout(&report_csv);
 #if defined(_WIN32)
         fout << "sep =,\n";
 #endif
-        QVariantList header_list = sdb->GetHeaders (table_name);
-        for (auto& header : header_list) {
-            fout << "\"" + header.toString () + "\",";
-        }
-        fout << '\n';
         for (auto& row : table) {
             for(const QVariant& cell : row ) {
                 fout << "\"" + cell.toString () + "\",";
@@ -366,15 +361,15 @@ void StoreMainWindow::onActionReport() {
             QString table_name;
             switch (report_dialog->GetReportType ()) {
             case SOLD_GOODS_REPORT:
-                table = sdb->SelectTable (SOLD_GOODS_TABLE, SOLD_COL_COUNT, SALE_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ());
+                table = sdb->SelectTable (SOLD_GOODS_TABLE, SALE_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ());
                 table_name = SOLD_GOODS_TABLE;
                 break;
             case AVAILABLE_GOODS_REPORT:
-                table = sdb->SelectTable (AVAILABLE_GOODS_TABLE, GOODS_COL_COUNT, GOODS_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ());
+                table = sdb->SelectTable (AVAILABLE_GOODS_TABLE, GOODS_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ());
                 table_name = AVAILABLE_GOODS_TABLE;
                 break;
             }
-            CreateReportCSV (table, path, table_name);
+            CreateReportCSV (table, path);
         }
     }
 }
@@ -382,6 +377,11 @@ void StoreMainWindow::onActionReport() {
 void StoreMainWindow::onActionUpdate() {
     isDbInit = !isDbInit ? InitDataBase() : true;
     Update(main_table_view->currentIndex ().row ());
+}
+
+void StoreMainWindow::onActionDictionary() {
+    DictionaryDialog* dict_dialog = new DictionaryDialog(sdb, this);
+    dict_dialog->exec ();
 }
 
 void StoreMainWindow::SearchTextChanged(QString text) {

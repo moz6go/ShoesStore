@@ -51,7 +51,7 @@
     <string>Скасувати</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -80,12 +80,12 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>210</x>
      <y>60</y>
-     <width>131</width>
+     <width>111</width>
      <height>64</height>
     </rect>
    </property>

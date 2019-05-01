@@ -23,10 +23,8 @@ public:
 
     int SelectCount(const QString& from);
     double SelectSum(const QString& qeury);
-    QVariantList GetHeaders(const QString& table);
 
     QVector<QVariantList> SelectTable(const QString& query,
-                                      const int& col_count,
                                       const QString& where,
                                       const QString& date_from,
                                       const QString& date_to);
