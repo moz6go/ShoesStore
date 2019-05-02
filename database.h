@@ -20,6 +20,8 @@ public:
     bool InsertDataIntoTable (const QString& query_str,
                               const QStringList& bind_values_list,
                               const QVariantList& data);
+    QString GenerateInsertQuery(QString table, QStringList columns);
+    QStringList GenerateBindValues(QStringList columns);
 
     int SelectCount(const QString& from);
     double SelectSum(const QString& qeury);
@@ -60,8 +62,6 @@ public:
                            const QString& equal1,
                            const QString& equal2,
                            const int& col_count);
-    QString GenerateInsertQuery(QString table, QStringList columns);
-    QStringList GenerateBindValues(QStringList columns);
 };
 
 #endif // DATABASE_H

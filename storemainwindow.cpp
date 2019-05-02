@@ -316,7 +316,7 @@ void StoreMainWindow::onActionAddModel() {
                                            << QString::number (add_model->getRetailpr ())
                                            << pic_byte_arr
                                            << QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh:mm:ss");
-        QStringList columns = {MODEL_NAME, SEASON, CATEGORY, BRAND, WHOLESALE_PRICE, RETAIL_PRICE, PIC, DATE };
+        QStringList columns = { MODEL_NAME, SEASON, CATEGORY, BRAND, WHOLESALE_PRICE, RETAIL_PRICE, PIC, DATE };
         if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (MODELS_TABLE, columns),
                                        sdb->GenerateBindValues (columns),
                                        data)) {

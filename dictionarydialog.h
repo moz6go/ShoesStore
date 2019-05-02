@@ -19,7 +19,9 @@ class DictionaryDialog : public QDialog
     QSqlQueryModel* query_model;
 private slots:
     void EnableAddButton();
+    void EnableDelButton ();
     void AddButtonClicked();
+    void DelButtonClicked();
     void DictTypeChanged(int indx);
     void UpdateDictView(QString text);
 public:

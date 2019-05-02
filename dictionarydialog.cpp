@@ -10,9 +10,11 @@ DictionaryDialog::DictionaryDialog(DataBase* data_base, QWidget *parent) :
     setModal (true);
     sdb = data_base;
     dict_table = BRANDS_TABLE;
+    col = BRAND;
 
     query_model = new QSqlQueryModel(this);
     ui_dict->add_pb->setDisabled (true);
+    ui_dict->del_pb->setDisabled (true);
     ui_dict->warning_lbl->setVisible (false);
     ui_dict->dict_cb->addItems (DICTIONARIES);
     UpdateDictView(DICTIONARIES[0]);
@@ -22,7 +24,8 @@ DictionaryDialog::DictionaryDialog(DataBase* data_base, QWidget *parent) :
     QObject::connect (ui_dict->new_value_le, &QLineEdit::textChanged, this, &DictionaryDialog::EnableAddButton);
     QObject::connect (ui_dict->add_pb, &QPushButton::clicked, this, &DictionaryDialog::AddButtonClicked);
     QObject::connect (ui_dict->cancel_pb, &QPushButton::clicked, this, &DictionaryDialog::reject);
-
+    QObject::connect (ui_dict->del_pb, &QPushButton::clicked, this, &DictionaryDialog::DelButtonClicked);
+    QObject::connect (ui_dict->dict_view, &QTableView::activated, this, &DictionaryDialog::EnableDelButton);
 }
 
 void DictionaryDialog::EnableAddButton() {
@@ -43,8 +46,33 @@ void DictionaryDialog::EnableAddButton() {
     }
 }
 
-void DictionaryDialog::AddButtonClicked() {
+void DictionaryDialog::EnableDelButton() {
+    ui_dict->del_pb->setEnabled (true);
+}
 
+void DictionaryDialog::AddButtonClicked() {
+    QVariantList data = QVariantList() << ui_dict->new_value_le->text ();
+    QStringList columns = QStringList() << col;
+    sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (dict_table, columns),
+                            sdb->GenerateBindValues (columns),
+                            data);
+    UpdateDictView(ui_dict->dict_cb->currentText ());
+    ui_dict->new_value_le->clear ();
+}
+
+void DictionaryDialog::DelButtonClicked() {
+    if(sdb->SelectCount (MODELS_TABLE,
+                         col,
+                         query_model->data (query_model->index (ui_dict->dict_view->currentIndex ().row (), 0)).toString ())) {
+        QMessageBox::warning (this, "Помилка!", "Неможливо видалити, є наявні моделі зв'язані з цим записом!");
+    }
+    else{
+        QString to_delete =  query_model->data (query_model->index (ui_dict->dict_view->currentIndex ().row (), 0)).toString ();
+
+        sdb->DeleteRow (dict_table, col, to_delete);
+        UpdateDictView(ui_dict->dict_cb->currentText ());
+        ui_dict->new_value_le->clear ();
+    }
 }
 
 void DictionaryDialog::DictTypeChanged(int indx){
