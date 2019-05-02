@@ -9,14 +9,15 @@ class DataBase : public QObject
     QSqlDatabase sdb;
     QString last_error;
 
-    bool OpenDataBase();
+    bool OpenDataBase(QString db_path);
     bool RestoreDataBase();
     void CloseDataBase();
 
 public:
     DataBase (QObject *parent = nullptr);
     ~DataBase ();
-    bool ConnectToDataBase();
+    bool ConnectToDataBase(QString db_path);
+    bool CreateDataBase();
     bool InsertDataIntoTable (const QString& query_str,
                               const QStringList& bind_values_list,
                               const QVariantList& data);

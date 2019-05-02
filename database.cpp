@@ -6,16 +6,31 @@ DataBase::~DataBase() {
     sdb.close();
 }
 
-bool DataBase::ConnectToDataBase () {
-    if(!QFile(DB_PATH).exists()){
+bool DataBase::ConnectToDataBase (QString db_path) {
+    if(!QFile(db_path).exists()){
         return false;
     }
     else {
-        if (!OpenDataBase()){
+        if (!OpenDataBase(db_path)){
             return false;
         }
         return true;
     }
+}
+
+bool DataBase::OpenDataBase(QString db_path) {
+    sdb = QSqlDatabase::addDatabase("QSQLITE");
+    sdb.setDatabaseName(db_path);
+    if(sdb.open()){
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+bool DataBase::CreateDataBase() {
+
+    return true;
 }
 
 bool DataBase::InsertDataIntoTable (const QString& query_str, const QStringList& bind_values_list, const QVariantList& data) {
@@ -171,13 +186,3 @@ QStringList DataBase::GenerateBindValues(QStringList columns) {
     return bind_val;
 }
 
-bool DataBase::OpenDataBase() {
-    sdb = QSqlDatabase::addDatabase("QSQLITE");
-    sdb.setDatabaseName(DB_PATH);
-    if(sdb.open()){
-        return true;
-    }
-    else {
-        return false;
-    }
-}

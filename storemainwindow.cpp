@@ -1,9 +1,13 @@
 #include "storemainwindow.h"
 #include "ui_storemainwindow.h"
 
-StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::StoreMainWindow) {
+StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), my_conf("MZ", "ShoesStore"), ui(new Ui::StoreMainWindow) {
     ui->setupUi(this);
-    QWidget* wgt = new QWidget(this);
+
+    ReadSettings();
+    if(db_path.isEmpty ()) {
+        db_path = QFileDialog::getOpenFileName (this, "Виберіть базу даних", QDir::homePath (), "*.*");
+    }
 
     sdb = new DataBase(this);
     isDbInit = InitDataBase();
@@ -49,6 +53,8 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
 
     h_main_layout->addLayout (lv_layout);
     h_main_layout->addLayout (rv_layout);
+
+    QWidget* wgt = new QWidget(this);
     wgt->setLayout (h_main_layout);
     setCentralWidget (wgt);
 
@@ -61,6 +67,29 @@ StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), ui(new 
     Update(0);
 }
 
+bool StoreMainWindow::InitDataBase() {
+    if (sdb->ConnectToDataBase (db_path)) {
+        ui->statusBar->showMessage ("З'єднано з базою даних успішно!");
+        return true;
+    }
+    else {
+        // ??? створити базу даних ???
+        QMessageBox::critical (this, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
+        return false;
+    }
+}
+
+void StoreMainWindow::ReadSettings() {
+    my_conf.beginGroup ("/Settings");
+    db_path = my_conf.value ("/path", "").toString ();
+    my_conf.endGroup ();
+}
+
+void StoreMainWindow::WriteSettings() {
+    my_conf.beginGroup ("/Settings");
+    my_conf.setValue ("/path", db_path);
+    my_conf.endGroup ();
+}
 void StoreMainWindow::resizeEvent(QResizeEvent *event) {
     for(int i = 0; i < model->columnCount(); ++i) {
         main_table_view->setColumnWidth(i, this->width() / model->columnCount());
@@ -166,6 +195,7 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_add_new_model->setEnabled (true);
         action_report->setEnabled (true);
         action_update->setEnabled (true);
+        action_dictionary->setEnabled (true);
         break;
     case DISABLED_ALL:
         action_sale_goods->setDisabled (true);
@@ -174,6 +204,7 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_add_new_model->setDisabled (true);
         action_report->setDisabled (true);
         action_update->setDisabled (true);
+        action_dictionary->setDisabled (true);
         break;
     case DATA_BASE_ISNT_INIT:
         action_sale_goods->setDisabled (true);
@@ -182,8 +213,8 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_add_new_model->setDisabled (true);
         action_report->setDisabled (true);
         action_update->setDisabled (true);
+        action_dictionary->setDisabled (true);
         break;
-
     case MODEL_TABLE_EMPTY:
         action_sale_goods->setDisabled (true);
         action_add_goods->setDisabled (true);
@@ -191,6 +222,7 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_add_new_model->setEnabled (true);
         action_report->setDisabled (true);
         action_update->setEnabled (true);
+        action_dictionary->setEnabled (true);
         break;
     case GOODS_TABLE_EMPTY:
         action_sale_goods->setDisabled (true);
@@ -199,19 +231,8 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_add_new_model->setEnabled (true);
         action_report->setEnabled (true);
         action_update->setEnabled (true);
+        action_dictionary->setEnabled (true);
         break;
-    }
-}
-
-bool StoreMainWindow::InitDataBase() {
-    if (sdb->ConnectToDataBase ()) {
-        ui->statusBar->showMessage ("З'єднано з базою даних успішно!");
-        return true;
-
-    }
-    else {
-        QMessageBox::critical (this, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
-        return false;
     }
 }
 
@@ -476,5 +497,6 @@ void StoreMainWindow::Update(int row) {
 }
 
 StoreMainWindow::~StoreMainWindow() {
+    WriteSettings();
     delete ui;
 }

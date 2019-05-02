@@ -16,7 +16,9 @@ namespace Ui {
 class StoreMainWindow : public QMainWindow
 {
     Q_OBJECT
+    QSettings my_conf;
     Ui::StoreMainWindow *ui;
+    QString db_path;
     QSqlTableModel* model;
     QSortFilterProxyModel* filter_model;
     DataBase* sdb;
@@ -57,6 +59,8 @@ class StoreMainWindow : public QMainWindow
     void SwitchButtons(State state);
     bool InitDataBase();
     void CreateReportCSV(const QVector<QVariantList>& table, const QString& path);
+    void ReadSettings();
+    void WriteSettings();
 public:
     explicit StoreMainWindow(QWidget *parent = nullptr);
     ~StoreMainWindow();

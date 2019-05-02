@@ -25,7 +25,7 @@ DictionaryDialog::DictionaryDialog(DataBase* data_base, QWidget *parent) :
     QObject::connect (ui_dict->add_pb, &QPushButton::clicked, this, &DictionaryDialog::AddButtonClicked);
     QObject::connect (ui_dict->cancel_pb, &QPushButton::clicked, this, &DictionaryDialog::reject);
     QObject::connect (ui_dict->del_pb, &QPushButton::clicked, this, &DictionaryDialog::DelButtonClicked);
-    QObject::connect (ui_dict->dict_view, &QTableView::activated, this, &DictionaryDialog::EnableDelButton);
+    QObject::connect (ui_dict->dict_view, &QTableView::clicked, this, &DictionaryDialog::EnableDelButton);
 }
 
 void DictionaryDialog::EnableAddButton() {

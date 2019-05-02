@@ -30,6 +30,7 @@
 #include <QStyleFactory>
 #include <QThread>
 #include <QDataWidgetMapper>
+#include <QSettings>
 
 #include <QtSql/QSql>
 #include <QSqlDatabase>
