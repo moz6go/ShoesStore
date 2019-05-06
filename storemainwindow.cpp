@@ -4,9 +4,10 @@
 StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), my_conf("MZ", "ShoesStore"), ui(new Ui::StoreMainWindow) {
     ui->setupUi(this);
 
+    db_path = QDir::currentPath ();
     ReadSettings();
-    if(db_path.isEmpty ()) {
-        db_path = QFileDialog::getOpenFileName (this, "Виберіть базу даних", QDir::homePath (), "*.*");
+    if(db_path.isEmpty () || !QFile::exists(db_path)) {
+        db_path = QFileDialog::getOpenFileName (this, "Виберіть базу даних", QDir::currentPath ());
     }
 
     sdb = new DataBase(this);
