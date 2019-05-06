@@ -206,4 +206,6 @@ struct Product : public Model {
     unsigned size;
 };
 
+
+
 #endif // GENERAL

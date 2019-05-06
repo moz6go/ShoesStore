@@ -59,10 +59,8 @@ class StoreMainWindow : public QMainWindow
     void SwitchButtons(State state);
     bool InitDataBase();
     void CreateReportCSV(const QVector<QVariantList>& table, const QString& path);
-    void ReadSettings();
-    void WriteSettings();
 public:
-    explicit StoreMainWindow(QWidget *parent = nullptr);
+    explicit StoreMainWindow(DataBase* data_base, QWidget *parent = nullptr);
     ~StoreMainWindow();
 private slots:
     void onActionAddGoods();

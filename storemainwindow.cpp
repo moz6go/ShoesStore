@@ -1,16 +1,10 @@
 #include "storemainwindow.h"
 #include "ui_storemainwindow.h"
 
-StoreMainWindow::StoreMainWindow(QWidget *parent) : QMainWindow(parent), my_conf("MZ", "ShoesStore"), ui(new Ui::StoreMainWindow) {
+StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) : QMainWindow(parent), my_conf("MZ", "ShoesStore"), ui(new Ui::StoreMainWindow) {
     ui->setupUi(this);
 
-    db_path = QDir::currentPath ();
-    ReadSettings();
-    if(db_path.isEmpty () || !QFile::exists(db_path)) {
-        db_path = QFileDialog::getOpenFileName (this, "Виберіть базу даних", QDir::currentPath ());
-    }
-
-    sdb = new DataBase(this);
+    sdb = data_base;
     isDbInit = InitDataBase();
 
     model = new QSqlTableModel(this);
@@ -80,17 +74,6 @@ bool StoreMainWindow::InitDataBase() {
     }
 }
 
-void StoreMainWindow::ReadSettings() {
-    my_conf.beginGroup ("/Settings");
-    db_path = my_conf.value ("/path", "").toString ();
-    my_conf.endGroup ();
-}
-
-void StoreMainWindow::WriteSettings() {
-    my_conf.beginGroup ("/Settings");
-    my_conf.setValue ("/path", db_path);
-    my_conf.endGroup ();
-}
 void StoreMainWindow::resizeEvent(QResizeEvent *event) {
     for(int i = 0; i < model->columnCount(); ++i) {
         main_table_view->setColumnWidth(i, this->width() / model->columnCount());
@@ -498,6 +481,5 @@ void StoreMainWindow::Update(int row) {
 }
 
 StoreMainWindow::~StoreMainWindow() {
-    WriteSettings();
     delete ui;
 }
