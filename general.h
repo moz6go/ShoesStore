@@ -156,23 +156,13 @@ enum ReportsTypes {
 };
 
 enum SearchType {
-    BY_MODEL_NAME,
+    BY_MODEL_NAME = 1,
     BY_SEASON,
     BY_CATEGORY,
     BY_BRAND,
     BY_WPRICE,
     BY_RPRICE
 };
-
-//enum CompareType {
-//    EQUAL,
-//    NOT_EQUAL,
-//    CONTAINS,
-//    LESS,
-//    GREATER,
-//    LESS_EQUAL,
-//    GREATER_EQUAL
-//};
 
 const QStringList MAIN_TABLE_HEADERS_LIST = {
     "!id",
@@ -185,11 +175,12 @@ const QStringList MAIN_TABLE_HEADERS_LIST = {
     "!pic",
     "!date"
 };
+
 enum State {
     ENABLED_ALL,
     DISABLED_ALL,
     MODEL_TABLE_EMPTY,
-    GOODS_TABLE_EMPTY
+    NO_GOODS_FOR_SALE
 };
 
 struct Model {

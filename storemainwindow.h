@@ -72,6 +72,7 @@ private slots:
     void ShowPic();
     void ShowGoodsInfo();
     void Update(int row);
+    void UpdateButtons();
 signals:
     void finishAddGoods();
 };

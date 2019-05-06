@@ -13,9 +13,11 @@ class SaleDialog : public QDialog
 {
     Q_OBJECT
     DataBase* sdb;
+    QSortFilterProxyModel* f_model;
+    int current_row;
     Ui::SaleDialog *ui_sale;
 public:
-    explicit SaleDialog(DataBase* data_base, QWidget *parent = nullptr);
+    explicit SaleDialog(DataBase* data_base, int row, QSortFilterProxyModel* model, QWidget *parent = nullptr);
     QString GetModel();
     QString GetSize();
     double GetPrice();

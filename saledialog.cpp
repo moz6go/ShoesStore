@@ -1,7 +1,7 @@
 #include "saledialog.h"
 #include "ui_saledialog.h"
 
-SaleDialog::SaleDialog(DataBase* data_base, QWidget *parent) :
+SaleDialog::SaleDialog(DataBase* data_base, int row, QSortFilterProxyModel* model, QWidget *parent) :
     QDialog(parent),
     ui_sale(new Ui::SaleDialog)
 {
@@ -9,9 +9,12 @@ SaleDialog::SaleDialog(DataBase* data_base, QWidget *parent) :
     setModal (true);
 
     sdb = data_base;
+    f_model = model;
+    current_row = row;
     QSqlQueryModel* brand_model = new QSqlQueryModel(this);
     brand_model->setQuery ("SELECT DISTINCT " + BRAND + " FROM " + AVAILABLE_GOODS_TABLE);
     ui_sale->brand_cb->setModel (brand_model);
+    ui_sale->brand_cb->setCurrentText (f_model->data (f_model->index (current_row, 4)).toString ());
     UpdateModelList (ui_sale->brand_cb->currentText ());
 
     QObject::connect (ui_sale->model_cb, &QComboBox::currentTextChanged, this, &SaleDialog::ShowInfo);
@@ -59,7 +62,6 @@ void SaleDialog::ShowInfo(QString text) {
     }
     UpdatePrices ();
     UpdateSizes (ui_sale->model_cb->currentText ());
-
 }
 
 void SaleDialog::UpdateModelList(QString brand) {
@@ -68,6 +70,7 @@ void SaleDialog::UpdateModelList(QString brand) {
                      " FROM " + AVAILABLE_GOODS_TABLE +
                      " WHERE " + BRAND + " = '" + brand + "'");
     ui_sale->model_cb->setModel (model);
+    ui_sale->model_cb->setCurrentText(f_model->data (f_model->index (current_row, 1)).toString ());
 }
 
 void SaleDialog::UpdateSizes(QString model) {

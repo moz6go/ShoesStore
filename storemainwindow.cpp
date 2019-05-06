@@ -60,6 +60,8 @@ StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) :
 
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowGoodsInfo);
+    QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::UpdateButtons);
+
     QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetSearchType);
     QObject::connect (search_line, &QLineEdit::textChanged, this, &StoreMainWindow::SearchTextChanged);
     Update(0);
@@ -190,7 +192,7 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_update->setEnabled (true);
         action_dictionary->setEnabled (true);
         break;
-    case GOODS_TABLE_EMPTY:
+    case NO_GOODS_FOR_SALE:
         action_sale_goods->setDisabled (true);
         action_add_goods->setEnabled (true);
         action_del_model->setEnabled (true);
@@ -221,7 +223,7 @@ void StoreMainWindow::CreateReportCSV(const QVector<QVariantList>& table, const 
 }
 
 void StoreMainWindow::onActionAddGoods() {
-    add_goods = new AddGoodsDialog(sdb, this);
+    add_goods = new AddGoodsDialog(sdb, main_table_view->currentIndex ().row (), filter_model, this);
     if (add_goods->exec () == QDialog::Accepted) {
         SwitchButtons(DISABLED_ALL);
         ui->statusBar->showMessage ("Зачекайте, додаю товар...");
@@ -255,7 +257,7 @@ void StoreMainWindow::onActionAddGoods() {
 }
 
 void StoreMainWindow::onActionSaleGoods() {
-    sale_goods = new SaleDialog(sdb, this);
+    sale_goods = new SaleDialog(sdb, main_table_view->currentIndex ().row (), filter_model, this);
     if (sale_goods->exec () == QDialog::Accepted) {
         for (int count = 0; count < sale_goods->GetCount (); ++count) {
             QVariantList data = sdb->SelectRow ("*",
@@ -446,12 +448,15 @@ void StoreMainWindow::Update(int row) {
     ShowPic ();
     SetSummary();
     ShowGoodsInfo ();
+    UpdateButtons ();
+}
 
-  if(!filter_model->rowCount ()){
+void StoreMainWindow::UpdateButtons() {
+    if(!filter_model->rowCount ()){
         SwitchButtons (MODEL_TABLE_EMPTY);
     }
-    else if (!sdb->SelectCount (AVAILABLE_GOODS_TABLE)){
-        SwitchButtons (GOODS_TABLE_EMPTY);
+    else if (!sdb->SelectCount (AVAILABLE_GOODS_TABLE) || goods_info_table->rowCount () == 1) {
+        SwitchButtons (NO_GOODS_FOR_SALE);
     }
     else {
         SwitchButtons (ENABLED_ALL);
