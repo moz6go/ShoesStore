@@ -48,12 +48,12 @@ const int SIZE_WID_2 = 24;
 
 #if defined(_WIN32)
     #if defined(QT_DEBUG)
-    const QString DB_PATH = "D:\\MyProjects\\Qt\\ShoesStore\\db";
+        const QString DB_PATH  = "D:\\MyProjects\\Qt\\ShoesStore\\shoes_strore_db.sqlite3";
     #else
-    const QString DB_PATH = "D:\\ShoesStore\\db";
+        const QString DB_PATH = QDir::currentPath () + "/shoes_strore_db.sqlite3";
     #endif
 #else
-    const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/db";
+    const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/shoes_strore_db.sqlite3";
 #endif
 
 //tables
@@ -156,7 +156,7 @@ enum ReportsTypes {
 };
 
 enum SearchType {
-    BY_MODEL_NAME = 1,
+    BY_MODEL_NAME,
     BY_SEASON,
     BY_CATEGORY,
     BY_BRAND,
@@ -164,15 +164,15 @@ enum SearchType {
     BY_RPRICE
 };
 
-enum CompareType {
-    EQUAL = 1,
-    NOT_EQUAL,
-    CONTAINS,
-    LESS,
-    GREATER,
-    LESS_EQUAL,
-    GREATER_EQUAL
-};
+//enum CompareType {
+//    EQUAL,
+//    NOT_EQUAL,
+//    CONTAINS,
+//    LESS,
+//    GREATER,
+//    LESS_EQUAL,
+//    GREATER_EQUAL
+//};
 
 const QStringList MAIN_TABLE_HEADERS_LIST = {
     "!id",
@@ -186,9 +186,8 @@ const QStringList MAIN_TABLE_HEADERS_LIST = {
     "!date"
 };
 enum State {
-    ENABLED_ALL = 1,
+    ENABLED_ALL,
     DISABLED_ALL,
-    DATA_BASE_ISNT_INIT,
     MODEL_TABLE_EMPTY,
     GOODS_TABLE_EMPTY
 };

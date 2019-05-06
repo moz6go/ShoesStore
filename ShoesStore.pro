@@ -21,8 +21,7 @@ SOURCES += main.cpp\
     database.cpp \
     saledialog.cpp \
     reportdialog.cpp \
-    dictionarydialog.cpp \
-    settings.cpp
+    dictionarydialog.cpp
 
 HEADERS  +=    storemainwindow.h \
     general.h \
@@ -31,8 +30,7 @@ HEADERS  +=    storemainwindow.h \
     database.h \
     saledialog.h \
     reportdialog.h \
-    dictionarydialog.h \
-    settings.h
+    dictionarydialog.h
 
 FORMS    +=    storemainwindow.ui \
     addmodeldialog.ui \

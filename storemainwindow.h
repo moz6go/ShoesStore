@@ -34,7 +34,7 @@ class StoreMainWindow : public QMainWindow
     QAction* action_update;
     QAction* action_search;
 
-    SearchType search_type;
+//    SearchType search_type;
     QLineEdit* search_line;
     QComboBox* search_combo;
     QComboBox* search_combo_comp;
@@ -48,8 +48,6 @@ class StoreMainWindow : public QMainWindow
     QTableWidget* summary_table;
 
     QLabel* pic_label;
-    QSplitter* splitter;
-    bool isDbInit;
 
     void resizeEvent(QResizeEvent *event);
     void MainTableInit();
@@ -57,7 +55,6 @@ class StoreMainWindow : public QMainWindow
     void SetSummary();
     void BuildToolBar();
     void SwitchButtons(State state);
-    bool InitDataBase();
     void CreateReportCSV(const QVector<QVariantList>& table, const QString& path);
 public:
     explicit StoreMainWindow(DataBase* data_base, QWidget *parent = nullptr);

@@ -1,11 +1,14 @@
 #include "storemainwindow.h"
 #include "ui_storemainwindow.h"
 
-StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) : QMainWindow(parent), my_conf("MZ", "ShoesStore"), ui(new Ui::StoreMainWindow) {
+StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::StoreMainWindow)
+{
     ui->setupUi(this);
 
     sdb = data_base;
-    isDbInit = InitDataBase();
+//    isDbInit = InitDataBase();
 
     model = new QSqlTableModel(this);
     model->setTable (MODELS_TABLE);
@@ -60,18 +63,6 @@ StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) : QMainWi
     QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetSearchType);
     QObject::connect (search_line, &QLineEdit::textChanged, this, &StoreMainWindow::SearchTextChanged);
     Update(0);
-}
-
-bool StoreMainWindow::InitDataBase() {
-    if (sdb->ConnectToDataBase (db_path)) {
-        ui->statusBar->showMessage ("З'єднано з базою даних успішно!");
-        return true;
-    }
-    else {
-        // ??? створити базу даних ???
-        QMessageBox::critical (this, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
-        return false;
-    }
 }
 
 void StoreMainWindow::resizeEvent(QResizeEvent *event) {
@@ -182,15 +173,6 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_dictionary->setEnabled (true);
         break;
     case DISABLED_ALL:
-        action_sale_goods->setDisabled (true);
-        action_add_goods->setDisabled (true);
-        action_del_model->setDisabled (true);
-        action_add_new_model->setDisabled (true);
-        action_report->setDisabled (true);
-        action_update->setDisabled (true);
-        action_dictionary->setDisabled (true);
-        break;
-    case DATA_BASE_ISNT_INIT:
         action_sale_goods->setDisabled (true);
         action_add_goods->setDisabled (true);
         action_del_model->setDisabled (true);
@@ -380,7 +362,6 @@ void StoreMainWindow::onActionReport() {
 }
 
 void StoreMainWindow::onActionUpdate() {
-    isDbInit = !isDbInit ? InitDataBase() : true;
     Update(main_table_view->currentIndex ().row ());
 }
 
@@ -466,10 +447,7 @@ void StoreMainWindow::Update(int row) {
     SetSummary();
     ShowGoodsInfo ();
 
-    if(!isDbInit){
-        SwitchButtons (DATA_BASE_ISNT_INIT);
-    }
-    else if(!filter_model->rowCount ()){
+  if(!filter_model->rowCount ()){
         SwitchButtons (MODEL_TABLE_EMPTY);
     }
     else if (!sdb->SelectCount (AVAILABLE_GOODS_TABLE)){
