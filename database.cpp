@@ -85,7 +85,6 @@ QVector<QVariantList> DataBase::SelectTable(const QString &table_name, const QSt
         QVariantList row;
         for(int col = 0; col < rec.count(); ++col) {
             if (rec.field(col).type () == QVariant::Double){
-                qDebug() << rec.field(col).name ();
                 row.append (QVariant(loc.toString (query.value (col).toDouble ())));
             }
             else {

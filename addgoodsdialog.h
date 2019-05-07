@@ -13,11 +13,12 @@ class AddGoodsDialog : public QDialog
 {
     Q_OBJECT
     DataBase* sdb;
+    QSortFilterProxyModel* f_model;
+    int current_row;
     QList<QSpinBox*> sb_list;
-    QDataWidgetMapper* mapper;
     Ui::AddGoodsDialog *ui_add_goods_dialog;
 public:
-    explicit AddGoodsDialog(DataBase* data_base, int row, QSortFilterProxyModel* filter_model, QWidget *parent = nullptr);
+    explicit AddGoodsDialog(DataBase* data_base, int row, QSortFilterProxyModel* model, QWidget *parent = nullptr);
     QList<QSpinBox*>& GetSbList();
     int GetGoodsCount();
     QString GetModelName();
@@ -26,6 +27,7 @@ public:
 
 private slots:
     void ShowPic(QString text);
+    void UpdateModelList(QString brand);
     void SetRes(int i);
     void EnableAddButton();
 };

@@ -8,7 +8,6 @@ StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) :
     ui->setupUi(this);
 
     sdb = data_base;
-//    isDbInit = InitDataBase();
 
     model = new QSqlTableModel(this);
     model->setTable (MODELS_TABLE);
