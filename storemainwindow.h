@@ -8,6 +8,7 @@
 #include "saledialog.h"
 #include "reportdialog.h"
 #include "dictionarydialog.h"
+#include "returngoodsdialog.h"
 
 namespace Ui {
     class StoreMainWindow;
@@ -27,7 +28,9 @@ class StoreMainWindow : public QMainWindow
     QToolBar* toolbar;
     QAction* action_add_goods;
     QAction* action_sale_goods;
+    QAction* action_return_goods;
     QAction* action_add_new_model;
+    QAction* action_mass_load_models;
     QAction* action_del_model;
     QAction* action_report;
     QAction* action_dictionary;
@@ -62,7 +65,9 @@ public:
 private slots:
     void onActionAddGoods();
     void onActionSaleGoods();
+    void onActionReturnGoods();
     void onActionAddModel();
+    void onActionMassLoadModels();
     void onActionDelModel();
     void onActionReport();
     void onActionUpdate();

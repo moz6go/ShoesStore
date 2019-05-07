@@ -138,11 +138,28 @@ QString DataBase::Select(const QString &select, const QString &from, const QStri
 
 QVariantList DataBase::SelectRow(const QString &select,
                                  const QString &from,
+                                 const QString &where,
+                                 const QString &equal,
+                                 const int& col_count)
+{
+    QSqlQuery query;
+    query.exec ("SELECT " + select + " FROM "+ from + " WHERE " + where + " = '" + equal + "'");
+    QVariantList data;
+    query.next ();
+    for (int i = 0; i < col_count; ++ i) {
+        data.append (query.value (i));
+    }
+    return data;
+}
+
+QVariantList DataBase::SelectRow(const QString &select,
+                                 const QString &from,
                                  const QString &where1,
                                  const QString &where2,
                                  const QString &equal1,
                                  const QString &equal2,
-                                 const int& col_count) {
+                                 const int& col_count)
+{
     QSqlQuery query;
     query.exec ("SELECT " + select + " FROM "+ from + " WHERE " + where1 + " = '" + equal1 + "' AND " + where2 + " = '" + equal2 + "'");
     QVariantList data;

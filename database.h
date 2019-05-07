@@ -56,7 +56,13 @@ public:
                    const QString& where,
                    const QString& equal);
 
-    QVariantList SelectRow(const QString &select,
+    QVariantList SelectRow(const QString& select,
+                           const QString& from,
+                           const QString& where,
+                           const QString& equal,
+                           const int& col_count);
+
+    QVariantList SelectRow(const QString& select,
                            const QString& from,
                            const QString& where1,
                            const QString& where2,

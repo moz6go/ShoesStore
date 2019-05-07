@@ -20,7 +20,7 @@ StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) :
     main_table_view->setModel (filter_model);
 
     for(int col = 0; col < model->columnCount(); ++col) {
-        model->setHeaderData(col, Qt::Horizontal, MAIN_TABLE_HEADERS_LIST[col]);
+        model->setHeaderData(col, Qt::Horizontal, MODELS_TABLE_HEADERS_LIST[col]);
     }
 
     MainTableInit ();
@@ -139,14 +139,16 @@ void StoreMainWindow::BuildToolBar() {
 
     search_combo->setMaximumHeight (SIZE_WID_2);
     for (int col = 1; col < 7; ++col){
-        search_combo->addItem(MAIN_TABLE_HEADERS_LIST.at (col));
+        search_combo->addItem(MODELS_TABLE_HEADERS_LIST.at (col));
     }
     search_combo->setMaximumHeight (SIZE_WID_2);
 
     action_add_goods = toolbar->addAction(QPixmap(":/pics/add_goods.png"), "Прийняти товар", this, SLOT(onActionAddGoods()));
     action_sale_goods = toolbar->addAction(QPixmap(":/pics/sale_goods.png"), "Продати товар", this, SLOT(onActionSaleGoods()));
+    action_return_goods = toolbar->addAction(QPixmap(":/pics/return_goods.png"), "Повернення товару", this, SLOT(onActionReturnGoods()));
     toolbar->addSeparator ();
     action_add_new_model = toolbar->addAction(QPixmap(":/pics/add_model.png"), "Додати нову модель", this, SLOT(onActionAddModel()));
+    action_mass_load_models = toolbar->addAction(QPixmap(":/pics/mass_load_csv.png"), "Масове завантаження моделей з csv-файлу", this, SLOT(onActionMassLoadModels()));
     action_del_model = toolbar->addAction(QPixmap(":/pics/delete.png"), "Видалити модель", this, SLOT(onActionDelModel()));
     toolbar->addSeparator ();
     action_report = toolbar->addAction(QPixmap(":/pics/report.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
@@ -165,37 +167,45 @@ void StoreMainWindow::BuildToolBar() {
 void StoreMainWindow::SwitchButtons(State state) {
     switch (state) {
     case ENABLED_ALL:
-        action_sale_goods->setEnabled (true);
         action_add_goods->setEnabled (true);
+        action_sale_goods->setEnabled (true);
+        action_return_goods->setEnabled (true);
         action_del_model->setEnabled (true);
         action_add_new_model->setEnabled (true);
+        action_mass_load_models->setEnabled (true);
         action_report->setEnabled (true);
         action_update->setEnabled (true);
         action_dictionary->setEnabled (true);
         break;
     case DISABLED_ALL:
-        action_sale_goods->setDisabled (true);
         action_add_goods->setDisabled (true);
+        action_sale_goods->setDisabled (true);
+        action_return_goods->setDisabled (true);
         action_del_model->setDisabled (true);
         action_add_new_model->setDisabled (true);
+        action_mass_load_models->setDisabled (true);
         action_report->setDisabled (true);
         action_update->setDisabled (true);
         action_dictionary->setDisabled (true);
         break;
     case MODEL_TABLE_EMPTY:
-        action_sale_goods->setDisabled (true);
         action_add_goods->setDisabled (true);
+        action_sale_goods->setDisabled (true);
+        action_return_goods->setDisabled (true);
         action_del_model->setDisabled (true);
         action_add_new_model->setEnabled (true);
+        action_mass_load_models->setDisabled (true);
         action_report->setDisabled (true);
         action_update->setEnabled (true);
         action_dictionary->setEnabled (true);
         break;
     case NO_GOODS_FOR_SALE:
-        action_sale_goods->setDisabled (true);
         action_add_goods->setEnabled (true);
+        action_sale_goods->setDisabled (true);
+        action_return_goods->setDisabled (true);
         action_del_model->setEnabled (true);
         action_add_new_model->setEnabled (true);
+        action_mass_load_models->setDisabled (true);
         action_report->setEnabled (true);
         action_update->setEnabled (true);
         action_dictionary->setEnabled (true);
@@ -273,17 +283,38 @@ void StoreMainWindow::onActionSaleGoods() {
             QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_ID, GOODS_SIZE, GOODS_DATE, SALE_PRICE, PROFIT, SALE_DATE };
             if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (SOLD_GOODS_TABLE, columns),
                                            sdb->GenerateBindValues (columns),
-                                           data)) {
+                                           data))
+            {
                 ui->statusBar->showMessage ("Невдалось виконати операцію! Проблема з підключеням до бази даних");
                 return;
             }
             else {
                 sdb->DeleteRow (AVAILABLE_GOODS_TABLE, GOODS_ID, data[3].toString ());
+                Update (main_table_view->currentIndex ().row ());
+                ui->statusBar->showMessage ("Продано модель " + sale_goods->GetModel () + " в кількості " + QString::number (sale_goods->GetCount ()) +
+                                            " шт., розмір " + sale_goods->GetSize ());
             }
         }
-        Update (main_table_view->currentIndex ().row ());
-        ui->statusBar->showMessage ("Продано модель " + sale_goods->GetModel () + " в кількості " + QString::number (sale_goods->GetCount ()) +
-                                    " шт., розмір " + sale_goods->GetSize ());
+    }
+}
+
+void StoreMainWindow::onActionReturnGoods() {
+    ReturnGoodsDialog* return_goods = new ReturnGoodsDialog(sdb, this);
+    if(return_goods->exec () == QDialog::Accepted){
+        QVariantList data = sdb->SelectRow ("*", SOLD_GOODS_TABLE, GOODS_ID, return_goods->GetGoodsId (), GOODS_COL_COUNT);
+        QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_ID, GOODS_SIZE, GOODS_DATE };
+        if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (AVAILABLE_GOODS_TABLE, columns),
+                                       sdb->GenerateBindValues (columns),
+                                       data))
+        {
+            ui->statusBar->showMessage ("Невдалось виконати операцію! Проблема з підключеням до бази даних");
+            return;
+        }
+        else {
+            sdb->DeleteRow (SOLD_GOODS_TABLE, GOODS_ID, return_goods->GetGoodsId ());
+            Update (main_table_view->currentIndex ().row ());
+            ui->statusBar->showMessage ("Повернено від покупця товар, модель " + return_goods->GetModelName ()+ " виробника " + return_goods->GetBrand ());
+        }
     }
 }
 
@@ -314,6 +345,10 @@ void StoreMainWindow::onActionAddModel() {
         Update(filter_model->rowCount ());
         ui->statusBar->showMessage ("Додано модель " + add_model->getModel () + ", виробник " + add_model->getBrand ());
     }
+}
+
+void StoreMainWindow::onActionMassLoadModels() {
+
 }
 
 void StoreMainWindow::onActionDelModel() {
@@ -377,22 +412,22 @@ void StoreMainWindow::SearchTextChanged(QString text) {
 }
 
 void StoreMainWindow::SetSearchType(QString type) {
-    if(type == MAIN_TABLE_HEADERS_LIST[1]) {
+    if(type == MODELS_TABLE_HEADERS_LIST[1]) {
         filter_model->setFilterKeyColumn (BY_MODEL_NAME);
     }
-    else if(type == MAIN_TABLE_HEADERS_LIST[2]){
+    else if(type == MODELS_TABLE_HEADERS_LIST[2]){
         filter_model->setFilterKeyColumn (BY_SEASON);
     }
-    else if(type == MAIN_TABLE_HEADERS_LIST[3]){
+    else if(type == MODELS_TABLE_HEADERS_LIST[3]){
         filter_model->setFilterKeyColumn (BY_CATEGORY);
     }
-    else if(type == MAIN_TABLE_HEADERS_LIST[4]){
+    else if(type == MODELS_TABLE_HEADERS_LIST[4]){
         filter_model->setFilterKeyColumn (BY_BRAND);
     }
-    else if(type == MAIN_TABLE_HEADERS_LIST[5]){
+    else if(type == MODELS_TABLE_HEADERS_LIST[5]){
         filter_model->setFilterKeyColumn (BY_WPRICE);
     }
-    else if(type == MAIN_TABLE_HEADERS_LIST[6]){
+    else if(type == MODELS_TABLE_HEADERS_LIST[6]){
         filter_model->setFilterKeyColumn (BY_RPRICE);
     }
 }

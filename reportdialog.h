@@ -13,9 +13,7 @@ class ReportDialog : public QDialog
 {
     Q_OBJECT
     Ui::ReportDialog *ui_report;
-
     DataBase* sdb;
-
 public:
     explicit ReportDialog(DataBase* data_base, QWidget *parent = nullptr);
     QString GetDateFrom();
