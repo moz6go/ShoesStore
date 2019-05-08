@@ -31,6 +31,10 @@
   <property name="windowTitle">
    <string>Продати товар</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="pics.qrc">
+    <normaloff>:/pics/sale_goods.png</normaloff>:/pics/sale_goods.png</iconset>
+  </property>
   <widget class="QPushButton" name="sale_pb">
    <property name="enabled">
     <bool>true</bool>
@@ -253,6 +257,8 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="pics.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -12,6 +12,5 @@
         <file>pics/report_dialog.png</file>
         <file>pics/dictionary.png</file>
         <file>pics/return_goods.png</file>
-        <file>pics/mass_load_csv.png</file>
     </qresource>
 </RCC>

@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>Прийняти товар</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="pics.qrc">
+    <normaloff>:/pics/add_goods.png</normaloff>:/pics/add_goods.png</iconset>
+  </property>
   <widget class="QPushButton" name="add_goods_pb">
    <property name="enabled">
     <bool>false</bool>
@@ -332,7 +336,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -381,6 +385,8 @@
   <tabstop>cancel_pb</tabstop>
   <tabstop>result_le</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="pics.qrc"/>
+ </resources>
  <connections/>
 </ui>

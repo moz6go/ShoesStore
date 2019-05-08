@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>Додати модель</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="pics.qrc">
+    <normaloff>:/pics/add_model.png</normaloff>:/pics/add_model.png</iconset>
+  </property>
   <widget class="QWidget" name="layoutWidget1">
    <property name="geometry">
     <rect>
@@ -348,6 +352,8 @@
   <tabstop>add_pb</tabstop>
   <tabstop>cancel_pb</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="pics.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Змінити довідники</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="pics.qrc">
+    <normaloff>:/pics/dictionary.png</normaloff>:/pics/dictionary.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -91,7 +95,7 @@ QTableView { font-size: 9pt; }</string>
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -125,6 +129,8 @@ QTableView { font-size: 9pt; }</string>
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="pics.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -22,6 +22,7 @@ public:
     QString GetGoodsId();
     QString GetModelName();
     QString GetBrand();
+    QString GetSize();
     ~ReturnGoodsDialog();
 };
 

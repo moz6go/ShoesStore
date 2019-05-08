@@ -55,7 +55,6 @@ const int SIZE_WID_2 = 24;
 #else
     const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/shoes_strore_db.sqlite3";
 #endif
-
 //tables
 const QString MODELS_TABLE = "models";
 const QString AVAILABLE_GOODS_TABLE = "available_goods";
@@ -190,9 +189,7 @@ const QStringList SOLD_GOODS_TABLE_HEADERS_LIST = {
 
 enum State {
     ENABLED_ALL,
-    DISABLED_ALL,
-    MODEL_TABLE_EMPTY,
-    NO_GOODS_FOR_SALE
+    DISABLED_ALL
 };
 
 struct Model {

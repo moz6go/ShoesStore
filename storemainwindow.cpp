@@ -9,6 +9,13 @@ StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) :
 
     sdb = data_base;
 
+    brand_table_count = 0;
+    season_table_count = 0;
+    category_table_count = 0;
+    models_table_count = 0;
+    available_goods_table_count = 0;
+    sold_goods_table_count = 0;
+
     model = new QSqlTableModel(this);
     model->setTable (MODELS_TABLE);
 
@@ -144,11 +151,11 @@ void StoreMainWindow::BuildToolBar() {
     search_combo->setMaximumHeight (SIZE_WID_2);
 
     action_add_goods = toolbar->addAction(QPixmap(":/pics/add_goods.png"), "Прийняти товар", this, SLOT(onActionAddGoods()));
+    toolbar->addSeparator ();
     action_sale_goods = toolbar->addAction(QPixmap(":/pics/sale_goods.png"), "Продати товар", this, SLOT(onActionSaleGoods()));
     action_return_goods = toolbar->addAction(QPixmap(":/pics/return_goods.png"), "Повернення товару", this, SLOT(onActionReturnGoods()));
     toolbar->addSeparator ();
     action_add_new_model = toolbar->addAction(QPixmap(":/pics/add_model.png"), "Додати нову модель", this, SLOT(onActionAddModel()));
-    action_mass_load_models = toolbar->addAction(QPixmap(":/pics/mass_load_csv.png"), "Масове завантаження моделей з csv-файлу", this, SLOT(onActionMassLoadModels()));
     action_del_model = toolbar->addAction(QPixmap(":/pics/delete.png"), "Видалити модель", this, SLOT(onActionDelModel()));
     toolbar->addSeparator ();
     action_report = toolbar->addAction(QPixmap(":/pics/report.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
@@ -172,7 +179,6 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_return_goods->setEnabled (true);
         action_del_model->setEnabled (true);
         action_add_new_model->setEnabled (true);
-        action_mass_load_models->setEnabled (true);
         action_report->setEnabled (true);
         action_update->setEnabled (true);
         action_dictionary->setEnabled (true);
@@ -183,32 +189,9 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_return_goods->setDisabled (true);
         action_del_model->setDisabled (true);
         action_add_new_model->setDisabled (true);
-        action_mass_load_models->setDisabled (true);
         action_report->setDisabled (true);
         action_update->setDisabled (true);
         action_dictionary->setDisabled (true);
-        break;
-    case MODEL_TABLE_EMPTY:
-        action_add_goods->setDisabled (true);
-        action_sale_goods->setDisabled (true);
-        action_return_goods->setDisabled (true);
-        action_del_model->setDisabled (true);
-        action_add_new_model->setEnabled (true);
-        action_mass_load_models->setDisabled (true);
-        action_report->setDisabled (true);
-        action_update->setEnabled (true);
-        action_dictionary->setEnabled (true);
-        break;
-    case NO_GOODS_FOR_SALE:
-        action_add_goods->setEnabled (true);
-        action_sale_goods->setDisabled (true);
-        action_return_goods->setDisabled (true);
-        action_del_model->setEnabled (true);
-        action_add_new_model->setEnabled (true);
-        action_mass_load_models->setDisabled (true);
-        action_report->setEnabled (true);
-        action_update->setEnabled (true);
-        action_dictionary->setEnabled (true);
         break;
     }
 }
@@ -260,7 +243,6 @@ void StoreMainWindow::onActionAddGoods() {
             }
         }
         Update (main_table_view->currentIndex ().row ());
-        SwitchButtons(ENABLED_ALL);
         ui->statusBar->showMessage ("Додано " + QString::number(add_goods->GetGoodsCount ()) + " одиниць моделі " + add_goods->GetModelName ());
     }
 }
@@ -313,7 +295,9 @@ void StoreMainWindow::onActionReturnGoods() {
         else {
             sdb->DeleteRow (SOLD_GOODS_TABLE, GOODS_ID, return_goods->GetGoodsId ());
             Update (main_table_view->currentIndex ().row ());
-            ui->statusBar->showMessage ("Повернено від покупця товар, модель " + return_goods->GetModelName ()+ " виробника " + return_goods->GetBrand ());
+            ui->statusBar->showMessage ("Повернено від покупця товар, модель " + return_goods->GetModelName () +
+                                        " виробника " + return_goods->GetBrand () +
+                                        ", розмір " + return_goods->GetSize ());
         }
     }
 }
@@ -345,10 +329,6 @@ void StoreMainWindow::onActionAddModel() {
         Update(filter_model->rowCount ());
         ui->statusBar->showMessage ("Додано модель " + add_model->getModel () + ", виробник " + add_model->getBrand ());
     }
-}
-
-void StoreMainWindow::onActionMassLoadModels() {
-
 }
 
 void StoreMainWindow::onActionDelModel() {
@@ -404,6 +384,7 @@ void StoreMainWindow::onActionUpdate() {
 void StoreMainWindow::onActionDictionary() {
     DictionaryDialog* dict_dialog = new DictionaryDialog(sdb, this);
     dict_dialog->exec ();
+    Update(0);
 }
 
 void StoreMainWindow::SearchTextChanged(QString text) {
@@ -482,19 +463,28 @@ void StoreMainWindow::Update(int row) {
     ShowPic ();
     SetSummary();
     ShowGoodsInfo ();
+    UpdateCounts ();
     UpdateButtons ();
 }
 
 void StoreMainWindow::UpdateButtons() {
-    if(!filter_model->rowCount ()){
-        SwitchButtons (MODEL_TABLE_EMPTY);
-    }
-    else if (!sdb->SelectCount (AVAILABLE_GOODS_TABLE) || goods_info_table->rowCount () == 1) {
-        SwitchButtons (NO_GOODS_FOR_SALE);
-    }
-    else {
-        SwitchButtons (ENABLED_ALL);
-    }
+    action_add_goods->setEnabled (models_table_count);
+    action_sale_goods->setEnabled (available_goods_table_count);
+    action_return_goods->setEnabled (sold_goods_table_count);
+    action_del_model->setEnabled (models_table_count);
+    action_add_new_model->setEnabled (brand_table_count && season_table_count && category_table_count);
+    action_report->setEnabled (available_goods_table_count || sold_goods_table_count);
+    action_update->setEnabled (true);
+    action_dictionary->setEnabled (true);
+}
+
+void StoreMainWindow::UpdateCounts() {
+    brand_table_count = sdb->SelectCount(BRANDS_TABLE);
+    season_table_count = sdb->SelectCount (SEASONS_TABLE);
+    category_table_count = sdb->SelectCount (CATEGORIES_TABLE);
+    models_table_count = sdb->SelectCount (MODELS_TABLE);
+    available_goods_table_count = sdb->SelectCount (AVAILABLE_GOODS_TABLE);
+    sold_goods_table_count = sdb->SelectCount(SOLD_GOODS_TABLE);
 }
 
 StoreMainWindow::~StoreMainWindow() {

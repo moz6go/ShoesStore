@@ -30,7 +30,6 @@ class StoreMainWindow : public QMainWindow
     QAction* action_sale_goods;
     QAction* action_return_goods;
     QAction* action_add_new_model;
-    QAction* action_mass_load_models;
     QAction* action_del_model;
     QAction* action_report;
     QAction* action_dictionary;
@@ -52,6 +51,13 @@ class StoreMainWindow : public QMainWindow
 
     QLabel* pic_label;
 
+    int brand_table_count;
+    int season_table_count;
+    int category_table_count;
+    int models_table_count;
+    int available_goods_table_count;
+    int sold_goods_table_count;
+
     void resizeEvent(QResizeEvent *event);
     void MainTableInit();
     void TableInit(QTableWidget* table, QStringList headers);
@@ -67,7 +73,6 @@ private slots:
     void onActionSaleGoods();
     void onActionReturnGoods();
     void onActionAddModel();
-    void onActionMassLoadModels();
     void onActionDelModel();
     void onActionReport();
     void onActionUpdate();
@@ -78,6 +83,8 @@ private slots:
     void ShowGoodsInfo();
     void Update(int row);
     void UpdateButtons();
+    void UpdateCounts();
+
 signals:
     void finishAddGoods();
 };

@@ -37,6 +37,10 @@ QString ReturnGoodsDialog::GetBrand() {
     return model->data (model->index (ui_return->sold_goods_table->currentIndex ().row (), 2)).toString ();
 }
 
+QString ReturnGoodsDialog::GetSize() {
+     return model->data (model->index (ui_return->sold_goods_table->currentIndex ().row (), 4)).toString ();
+}
+
 void ReturnGoodsDialog::SoldGoodsTableInit() {
     ui_return->sold_goods_table->setColumnHidden(0, true);
     ui_return->sold_goods_table->setColumnHidden(3, true);

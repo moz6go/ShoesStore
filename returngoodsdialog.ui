@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>Повернення товару</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="pics.qrc">
+    <normaloff>:/pics/return_goods.png</normaloff>:/pics/return_goods.png</iconset>
+  </property>
   <widget class="QPushButton" name="return_pb">
    <property name="geometry">
     <rect>
@@ -56,6 +60,8 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="pics.qrc"/>
+ </resources>
  <connections/>
 </ui>

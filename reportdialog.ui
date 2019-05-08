@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>Звіт</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="pics.qrc">
+    <normaloff>:/pics/report.png</normaloff>:/pics/report.png</iconset>
+  </property>
   <widget class="QPushButton" name="ok_pb">
    <property name="geometry">
     <rect>
@@ -121,6 +125,8 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="pics.qrc"/>
+ </resources>
  <connections/>
 </ui>
