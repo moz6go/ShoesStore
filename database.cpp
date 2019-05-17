@@ -8,14 +8,24 @@ DataBase::~DataBase() {
 
 bool DataBase::ConnectToDataBase (QString db_path) {
     if(!QFile(db_path).exists()){
-        return false;
+        qDebug() << "file ! exists, try to restore";
+        if(!RestoreDataBase()){
+            qDebug() << "can't restore";
+            return false;
+        }
+        else{
+            return true;
+        }
     }
     else {
+        qDebug() << "file exists, try to open";
         if (!OpenDataBase(db_path)){
+            qDebug() << "can't open";
             return false;
         }
         return true;
     }
+    return false;
 }
 
 bool DataBase::OpenDataBase(QString db_path) {
@@ -28,8 +38,32 @@ bool DataBase::OpenDataBase(QString db_path) {
         return false;
     }
 }
-bool DataBase::CreateDataBase() {
 
+bool DataBase::RestoreDataBase() {
+    if(OpenDataBase (DB_PATH)){
+        qDebug() << "try to create";
+        if(!CreateDataBase ()) {
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+    else{
+        return false;
+    }
+}
+
+bool DataBase::CreateDataBase() {
+    QSqlQuery query;
+
+    if(!query.exec (CREATE_MODELS_TABLE)) return false;
+    if(!query.exec (CREATE_AVAILABLE_GOODS_TABLE)) return false;
+    if(!query.exec (CREATE_BRANDS_TABLE)) return false;
+    if(!query.exec (CREATE_CATEGORIES_TABLE)) return false;
+    if(!query.exec (CREATE_SEASONS_TABLE)) return false;
+    if(!query.exec (CREATE_SOLD_GOODS_TABLE)) return false;
+    qDebug() << "create successful!";
     return true;
 }
 

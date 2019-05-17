@@ -7,10 +7,12 @@ int main(int argc, char *argv[]) {
     QApplication::setStyle(QStyleFactory::create("Fusion"));
     DataBase* sdb = new DataBase();
 
+    qDebug() << DB_PATH;
     if (!sdb->ConnectToDataBase (DB_PATH)) {
         QMessageBox::critical (nullptr, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
         return -1;
     }
+
     StoreMainWindow w(sdb);
     w.show();
     return a.exec();

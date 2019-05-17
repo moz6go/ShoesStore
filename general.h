@@ -46,15 +46,17 @@
 const int SIZE_WID_1 = 40;
 const int SIZE_WID_2 = 24;
 
-#if defined(_WIN32)
-    #if defined(QT_DEBUG)
-        const QString DB_PATH  = "D:\\MyProjects\\Qt\\ShoesStore\\shoes_strore_db.sqlite3";
-    #else
-        const QString DB_PATH = QDir::currentPath () + "/shoes_strore_db.sqlite3";
-    #endif
-#else
-    const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/shoes_strore_db.sqlite3";
-#endif
+//#if defined(_WIN32)
+//    #if defined(QT_DEBUG)
+//        const QString DB_PATH  = "D:\\MyProjects\\Qt\\ShoesStore\\shoes_strore_db.sqlite3";
+//    #else
+//        const QString DB_PATH = QDir::currentPath () + "/shoes_strore_db.sqlite3";
+//    #endif
+//#else
+    //const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/shoes_strore_db.sqlite3";
+    const QString DB_PATH = "shoes_strore_db.sqlite3";
+//#endif
+
 //tables
 const QString MODELS_TABLE = "models";
 const QString AVAILABLE_GOODS_TABLE = "available_goods";
@@ -62,11 +64,6 @@ const QString BRANDS_TABLE = "brands";
 const QString CATEGORIES_TABLE = "categories";
 const QString SEASONS_TABLE = "seasons";
 const QString SOLD_GOODS_TABLE = "sold_goods";
-
-//count of columns
-const int MODELS_COL_COUNT = 9;
-const int GOODS_COL_COUNT = 6;
-const int SOLD_COL_COUNT = 9;
 
 //columns
 const QString MODEL_ID = "model_id";
@@ -86,6 +83,46 @@ const QString GOODS_DATE = "goods_date";
 const QString SALE_PRICE = "sale_price";
 const QString SALE_DATE = "sale_date";
 const QString PROFIT = "profit";
+
+//create tables queries
+const QString CREATE_MODELS_TABLE = "CREATE TABLE " + MODELS_TABLE + " ("
+                                    + MODEL_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+                                    + MODEL_NAME + " TEXT NOT NULL, "
+                                    + SEASON + " TEXT NOT NULL, "
+                                    + CATEGORY + " TEXT NOT NULL, "
+                                    + BRAND + " TEXT NOT NULL, "
+                                    + WHOLESALE_PRICE + " REAL NOT NULL, "
+                                    + RETAIL_PRICE + " REAL NOT NULL, "
+                                    + PIC + " BLOB, "
+                                    + DATE + " TEXT NOT NULL)";
+
+const QString CREATE_AVAILABLE_GOODS_TABLE = "CREATE TABLE " + AVAILABLE_GOODS_TABLE + " ("
+                                             + MODEL_ID + "	INTEGER NOT NULL,"
+                                             + MODEL_NAME + " TEXT NOT NULL,"
+                                             + BRAND + " TEXT NOT NULL,"
+                                             + GOODS_ID + "	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,"
+                                             + GOODS_SIZE + " INTEGER NOT NULL,"
+                                             + GOODS_DATE + " TEXT NOT NULL)";
+
+const QString CREATE_BRANDS_TABLE = "CREATE TABLE " + BRANDS_TABLE + " ("+ BRAND +" TEXT)";
+const QString CREATE_CATEGORIES_TABLE = "CREATE TABLE " + CATEGORIES_TABLE + " (" + CATEGORY + "  TEXT)";
+const QString CREATE_SEASONS_TABLE = "CREATE TABLE " + SEASONS_TABLE + " ("+ SEASON + " TEXT)";
+const QString CREATE_SOLD_GOODS_TABLE = "CREATE TABLE sold_goods ("
+                                        + MODEL_ID + " INTEGER NOT NULL, "
+                                        + MODEL_NAME + " TEXT NOT NULL, "
+                                        + BRAND + " TEXT NOT NULL, "
+                                        + GOODS_ID + " INTEGER NOT NULL, "
+                                        + GOODS_SIZE + " INTEGER NOT NULL, "
+                                        + GOODS_DATE + " TEXT NOT NULL, "
+                                        + SALE_PRICE + " REAL NOT NULL, "
+                                        + PROFIT + " REAL NOT NULL, "
+                                        + SALE_DATE + " TEXT NOT NULL)";
+
+//count of columns
+const int MODELS_COL_COUNT = 9;
+const int GOODS_COL_COUNT = 6;
+const int SOLD_COL_COUNT = 9;
+
 
 const QString AVAILABLE_GOODS_WPRICE_SUM_QUERY = "SELECT SUM(" + WHOLESALE_PRICE + ")"
                                           " FROM ("
