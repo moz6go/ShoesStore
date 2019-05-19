@@ -89,7 +89,7 @@ void SaleDialog::UpdatePrices() {
 }
 
 void SaleDialog::UpdateCount() {
-    int count = sdb->SelectCount (AVAILABLE_GOODS_TABLE, MODEL_NAME, GOODS_SIZE, ui_sale->model_cb->currentText (), ui_sale->size_cb->currentText ());
+    int count = sdb->SelectCount (AVAILABLE_GOODS_TABLE, MODEL_NAME, GOODS_SIZE, "=", "=", ui_sale->model_cb->currentText (), ui_sale->size_cb->currentText ());
     ui_sale->count_sb->setValue (1);
     ui_sale->count_sb->setMaximum (count);
 }

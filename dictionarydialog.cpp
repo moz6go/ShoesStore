@@ -30,7 +30,7 @@ DictionaryDialog::DictionaryDialog(DataBase* data_base, QWidget *parent) :
 
 void DictionaryDialog::EnableAddButton() {
     bool text_ok = !ui_dict->new_value_le->text ().isEmpty ();
-    bool model_ok = !sdb->SelectCount (dict_table, col, ui_dict->new_value_le->text ());
+    bool model_ok = !sdb->SelectCount (dict_table, col, "=", ui_dict->new_value_le->text ());
 
     if(text_ok && model_ok) {
         ui_dict->warning_lbl->setVisible (false);
@@ -63,6 +63,7 @@ void DictionaryDialog::AddButtonClicked() {
 void DictionaryDialog::DelButtonClicked() {
     if(sdb->SelectCount (MODELS_TABLE,
                          col,
+                         "=",
                          query_model->data (query_model->index (ui_dict->dict_view->currentIndex ().row (), 0)).toString ())) {
         QMessageBox::warning (this, "Помилка!", "Неможливо видалити, є наявні моделі зв'язані з цим записом!");
     }

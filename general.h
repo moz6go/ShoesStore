@@ -13,24 +13,18 @@
 #include <QHeaderView>
 #include <QTableView>
 #include <QTableWidget>
-#include <QSplitter>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QCheckBox>
 #include <QSpinBox>
 #include <QTextEdit>
 #include <QLineEdit>
-#include <QStackedWidget>
 #include <QComboBox>
-#include <QDateEdit>
 #include <QFileDialog>
 #include <QDate>
 #include <QBuffer>
 #include <QMessageBox>
 #include <QStyleFactory>
-#include <QThread>
-#include <QDataWidgetMapper>
-#include <QSettings>
+#include <QStandardPaths>
 
 #include <QtSql/QSql>
 #include <QSqlDatabase>
@@ -39,23 +33,21 @@
 #include <QSqlTableModel>
 #include <QSortFilterProxyModel>
 #include <QSqlQueryModel>
-#include <QSqlRelationalTableModel>
 #include <QSqlError>
 #include <QSqlField>
 
 const int SIZE_WID_1 = 40;
 const int SIZE_WID_2 = 24;
 
-//#if defined(_WIN32)
-//    #if defined(QT_DEBUG)
-//        const QString DB_PATH  = "D:\\MyProjects\\Qt\\ShoesStore\\shoes_strore_db.sqlite3";
-//    #else
-//        const QString DB_PATH = QDir::currentPath () + "/shoes_strore_db.sqlite3";
-//    #endif
-//#else
-    //const QString DB_PATH = "/home/myroslav/Документи/Repos/ShoesStore/shoes_strore_db.sqlite3";
+#if defined(_WIN32)
+    #if defined(QT_DEBUG)
+        const QString DB_PATH = "shoes_strore_db.sqlite3";
+    #else
+        const QString DB_PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/ShoesStore/shoes_strore_db.sqlite3";
+    #endif
+#else
     const QString DB_PATH = "shoes_strore_db.sqlite3";
-//#endif
+#endif
 
 //tables
 const QString MODELS_TABLE = "models";
@@ -123,6 +115,10 @@ const int MODELS_COL_COUNT = 9;
 const int GOODS_COL_COUNT = 6;
 const int SOLD_COL_COUNT = 9;
 
+
+const QString COUNT_OF_SOLD_GOODS_BY_LAST_YEAR_QUERY = "SELECT COUNT(*)"
+                                                       " FROM (SELECT * FROM "+ SOLD_GOODS_TABLE +" WHERE " + MODEL_ID + " = 2)"
+                                                       " WHERE " + SALE_DATE + " >= datetime('now', '-1 year')";
 
 const QString AVAILABLE_GOODS_WPRICE_SUM_QUERY = "SELECT SUM(" + WHOLESALE_PRICE + ")"
                                           " FROM ("

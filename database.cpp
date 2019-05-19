@@ -8,30 +8,23 @@ DataBase::~DataBase() {
 
 bool DataBase::ConnectToDataBase (QString db_path) {
     if(!QFile(db_path).exists()){
-        qDebug() << "file ! exists, try to restore";
         if(!RestoreDataBase()){
-            qDebug() << "can't restore";
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
-    else {
-        qDebug() << "file exists, try to open";
-        if (!OpenDataBase(db_path)){
-            qDebug() << "can't open";
             return false;
         }
         return true;
     }
-    return false;
+    else {
+        if (!OpenDataBase(db_path)) {
+            return false;
+        }
+        return true;
+    }
 }
 
 bool DataBase::OpenDataBase(QString db_path) {
     sdb = QSqlDatabase::addDatabase("QSQLITE");
     sdb.setDatabaseName(db_path);
-    if(sdb.open()){
+    if(sdb.open()) {
         return true;
     }
     else {
@@ -41,15 +34,12 @@ bool DataBase::OpenDataBase(QString db_path) {
 
 bool DataBase::RestoreDataBase() {
     if(OpenDataBase (DB_PATH)){
-        qDebug() << "try to create";
         if(!CreateDataBase ()) {
             return false;
         }
-        else{
-            return true;
-        }
+        return true;
     }
-    else{
+    else {
         return false;
     }
 }
@@ -57,13 +47,12 @@ bool DataBase::RestoreDataBase() {
 bool DataBase::CreateDataBase() {
     QSqlQuery query;
 
-    if(!query.exec (CREATE_MODELS_TABLE)) return false;
+    if(!query.exec (CREATE_MODELS_TABLE))  return false;
     if(!query.exec (CREATE_AVAILABLE_GOODS_TABLE)) return false;
     if(!query.exec (CREATE_BRANDS_TABLE)) return false;
     if(!query.exec (CREATE_CATEGORIES_TABLE)) return false;
     if(!query.exec (CREATE_SEASONS_TABLE)) return false;
     if(!query.exec (CREATE_SOLD_GOODS_TABLE)) return false;
-    qDebug() << "create successful!";
     return true;
 }
 
@@ -130,16 +119,16 @@ QVector<QVariantList> DataBase::SelectTable(const QString &table_name, const QSt
     return table;
 }
 
-int DataBase::SelectCount(const QString &from, const QString &where, const QString &equal) {
+int DataBase::SelectCount(const QString &from, const QString &where, const QString& equal_sign, const QString &equal) {
     QSqlQuery query;
-    query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where + " = '" + equal + "'");
+    query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where + " " + equal_sign + " '" + equal + "'");
     query.next ();
     return query.value (0).toInt ();
 }
 
-int DataBase::SelectCount(const QString& from, const QString& where1, const QString& where2, const QString& equal1, const QString& equal2) {
+int DataBase::SelectCount(const QString& from, const QString& where1, const QString& where2, const QString& equal_sign1, const QString& equal_sign2, const QString& equal1, const QString& equal2) {
     QSqlQuery query;
-    query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where1 + " = '" + equal1 + "' AND " + where2 + " = '" + equal2 + "'");
+    query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where1 + " " + equal_sign1 + " '" + equal1 + "' AND " + where2 + " " + equal_sign2 + " " + equal2 );
     query.next ();
     return query.value (0).toInt ();
 }

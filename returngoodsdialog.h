@@ -13,7 +13,8 @@ class ReturnGoodsDialog : public QDialog
 {
     Q_OBJECT
     DataBase* sdb;
-    QSqlTableModel* model;
+//    QSqlTableModel* model;
+    QSqlQueryModel* query_model;
     Ui::ReturnGoodsDialog *ui_return;
     QString goods_id;
     void SoldGoodsTableInit();

@@ -79,7 +79,7 @@ void AddModelDialog::EnableAddButton() {
 
     bool photo_ok = !photo_path.isEmpty ();
     bool text_ok = !ui_add_model_dialog->model_le->text ().isEmpty ();
-    bool model_ok = !sdb->SelectCount (MODELS_TABLE, MODEL_NAME, ui_add_model_dialog->model_le->text ());
+    bool model_ok = !sdb->SelectCount (MODELS_TABLE, MODEL_NAME, "=", ui_add_model_dialog->model_le->text ());
 
     if(photo_ok && text_ok && model_ok) {
         ui_add_model_dialog->warning_lbl->setVisible (false);

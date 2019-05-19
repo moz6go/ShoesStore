@@ -15,19 +15,21 @@ StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) :
     models_table_count = 0;
     available_goods_table_count = 0;
     sold_goods_table_count = 0;
+    sold_goods_by_last_year_count = 0;
+    available_goods_curr_model_count = 0;
 
-    model = new QSqlTableModel(this);
-    model->setTable (MODELS_TABLE);
+    sql_model = new QSqlTableModel(this);
+    sql_model->setTable (MODELS_TABLE);
 
     main_table_view = new QTableView(this);
     filter_model = new QSortFilterProxyModel(this);
-    filter_model->setSourceModel (model);
+    filter_model->setSourceModel (sql_model);
     filter_model->setFilterCaseSensitivity (Qt::CaseInsensitive);
     filter_model->setFilterKeyColumn (BY_MODEL_NAME);
     main_table_view->setModel (filter_model);
 
-    for(int col = 0; col < model->columnCount(); ++col) {
-        model->setHeaderData(col, Qt::Horizontal, MODELS_TABLE_HEADERS_LIST[col]);
+    for(int col = 0; col < sql_model->columnCount(); ++col) {
+        sql_model->setHeaderData(col, Qt::Horizontal, MODELS_TABLE_HEADERS_LIST[col]);
     }
 
     MainTableInit ();
@@ -74,8 +76,8 @@ StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) :
 }
 
 void StoreMainWindow::resizeEvent(QResizeEvent *event) {
-    for(int i = 0; i < model->columnCount(); ++i) {
-        main_table_view->setColumnWidth(i, this->width() / model->columnCount());
+    for(int i = 0; i < sql_model->columnCount(); ++i) {
+        main_table_view->setColumnWidth(i, this->width() / sql_model->columnCount());
     }
     QMainWindow::resizeEvent(event);
 }
@@ -215,7 +217,7 @@ void StoreMainWindow::CreateReportCSV(const QVector<QVariantList>& table, const 
 }
 
 void StoreMainWindow::onActionAddGoods() {
-    add_goods = new AddGoodsDialog(sdb, main_table_view->currentIndex ().row (), filter_model, this);
+    AddGoodsDialog* add_goods = new AddGoodsDialog(sdb, main_table_view->currentIndex ().row (), filter_model, this);
     if (add_goods->exec () == QDialog::Accepted) {
         SwitchButtons(DISABLED_ALL);
         ui->statusBar->showMessage ("Зачекайте, додаю товар...");
@@ -248,7 +250,7 @@ void StoreMainWindow::onActionAddGoods() {
 }
 
 void StoreMainWindow::onActionSaleGoods() {
-    sale_goods = new SaleDialog(sdb, main_table_view->currentIndex ().row (), filter_model, this);
+    SaleDialog* sale_goods = new SaleDialog(sdb, main_table_view->currentIndex ().row (), filter_model, this);
     if (sale_goods->exec () == QDialog::Accepted) {
         for (int count = 0; count < sale_goods->GetCount (); ++count) {
             QVariantList data = sdb->SelectRow ("*",
@@ -332,24 +334,17 @@ void StoreMainWindow::onActionAddModel() {
 }
 
 void StoreMainWindow::onActionDelModel() {
-    if(sdb->SelectCount (AVAILABLE_GOODS_TABLE,
-                         MODEL_ID,
-                         filter_model->data (filter_model->index (main_table_view->currentIndex ().row (), 0)).toString ())) {
-        QMessageBox::warning (this, "Помилка!", "Неможливо видалити модель, є наявні товари!");
-    }
-    else{
-        QString model_name = filter_model->data (filter_model->index (main_table_view->currentIndex ().row (), 1)).toString ();
-        QMessageBox* msgbox = new QMessageBox(QMessageBox::Question,
-                                              "Видалити модель",
-                                              "Ви дійсно бажаєте видалити з бази даних модель " + model_name +"?",
-                                              QMessageBox::No | QMessageBox::Yes,
-                                              this);
-        if(msgbox->exec () == QMessageBox::Yes) {
-            if(sdb->DeleteRow (MODELS_TABLE, MODEL_NAME, model_name)){
-                ui->statusBar->showMessage ("Видалено модель " + model_name);
-            }
-            Update(main_table_view->currentIndex ().row () - 1);
+    QString model_name = filter_model->data (filter_model->index (main_table_view->currentIndex ().row (), 1)).toString ();
+    QMessageBox* msgbox = new QMessageBox(QMessageBox::Question,
+                                          "Видалити модель",
+                                          "Ви дійсно бажаєте видалити з бази даних модель " + model_name +"?",
+                                          QMessageBox::No | QMessageBox::Yes,
+                                          this);
+    if(msgbox->exec () == QMessageBox::Yes) {
+        if(sdb->DeleteRow (MODELS_TABLE, MODEL_NAME, model_name)){
+            ui->statusBar->showMessage ("Видалено модель " + model_name);
         }
+        Update(main_table_view->currentIndex ().row () - 1);
     }
 }
 
@@ -433,12 +428,10 @@ void StoreMainWindow::ShowGoodsInfo() {
         int sum_count(0);
         int model_id = filter_model->data (filter_model->index (main_table_view->currentIndex ().row (), 0)).toInt ();
         for (int size = 36; size <= 46; ++size) {
-            int count = sdb->SelectCount (
-                    AVAILABLE_GOODS_TABLE,
-                    MODEL_ID,
-                    GOODS_SIZE,
-                    QString::number (model_id),
-                    QString::number (size));
+            int count = sdb->SelectCount (AVAILABLE_GOODS_TABLE,
+                    MODEL_ID,                       GOODS_SIZE,
+                    "=",                            "=",
+                    QString::number (model_id),     QString::number (size));
             sum_count += count;
             if(count) {
                 goods_info_table->insertRow (goods_info_table->rowCount ());
@@ -457,21 +450,21 @@ void StoreMainWindow::ShowGoodsInfo() {
 }
 
 void StoreMainWindow::Update(int row) {
-    model->select ();
-    model->sort (0, Qt::AscendingOrder);
+    sql_model->select ();
+    sql_model->sort (0, Qt::AscendingOrder);
     main_table_view->selectRow (row);
     ShowPic ();
-    SetSummary();
+    SetSummary ();
     ShowGoodsInfo ();
-    UpdateCounts ();
     UpdateButtons ();
 }
 
 void StoreMainWindow::UpdateButtons() {
+    UpdateCounts ();
     action_add_goods->setEnabled (models_table_count);
     action_sale_goods->setEnabled (available_goods_table_count);
     action_return_goods->setEnabled (sold_goods_table_count);
-    action_del_model->setEnabled (models_table_count);
+    action_del_model->setEnabled (models_table_count && !sold_goods_by_last_year_count && !available_goods_curr_model_count);
     action_add_new_model->setEnabled (brand_table_count && season_table_count && category_table_count);
     action_report->setEnabled (available_goods_table_count || sold_goods_table_count);
     action_update->setEnabled (true);
@@ -479,12 +472,18 @@ void StoreMainWindow::UpdateButtons() {
 }
 
 void StoreMainWindow::UpdateCounts() {
+    QString model_id = filter_model->data (filter_model->index (main_table_view->currentIndex ().row (), 0)).toString ();
     brand_table_count = sdb->SelectCount(BRANDS_TABLE);
     season_table_count = sdb->SelectCount (SEASONS_TABLE);
     category_table_count = sdb->SelectCount (CATEGORIES_TABLE);
     models_table_count = sdb->SelectCount (MODELS_TABLE);
     available_goods_table_count = sdb->SelectCount (AVAILABLE_GOODS_TABLE);
     sold_goods_table_count = sdb->SelectCount(SOLD_GOODS_TABLE);
+    sold_goods_by_last_year_count = sdb->SelectCount (SOLD_GOODS_TABLE,
+                                                      MODEL_ID,     SALE_DATE,
+                                                      "=",          ">=",
+                                                      model_id,     "datetime('now', '-1 year')");
+    available_goods_curr_model_count = sdb->SelectCount(AVAILABLE_GOODS_TABLE, MODEL_ID, "=", model_id);
 }
 
 StoreMainWindow::~StoreMainWindow() {

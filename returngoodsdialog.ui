@@ -7,13 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>480</height>
+    <height>490</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>640</width>
-    <height>480</height>
+    <height>490</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>640</width>
+    <height>490</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -27,7 +33,7 @@
    <property name="geometry">
     <rect>
      <x>440</x>
-     <y>450</y>
+     <y>460</y>
      <width>89</width>
      <height>25</height>
     </rect>
@@ -40,7 +46,7 @@
    <property name="geometry">
     <rect>
      <x>540</x>
-     <y>450</y>
+     <y>460</y>
      <width>89</width>
      <height>25</height>
     </rect>
@@ -57,6 +63,24 @@
      <width>621</width>
      <height>431</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>440</y>
+     <width>311</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>* в таблиці відображаються товари продані за останній рік</string>
    </property>
   </widget>
  </widget>

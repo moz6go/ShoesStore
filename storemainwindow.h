@@ -17,14 +17,12 @@ namespace Ui {
 class StoreMainWindow : public QMainWindow
 {
     Q_OBJECT
-    QSettings my_conf;
     Ui::StoreMainWindow *ui;
-    QString db_path;
-    QSqlTableModel* model;
+    QSqlTableModel* sql_model;
     QSortFilterProxyModel* filter_model;
     DataBase* sdb;
-    AddGoodsDialog* add_goods;
-    SaleDialog* sale_goods;
+//    AddGoodsDialog* add_goods;
+//    SaleDialog* sale_goods;
     QToolBar* toolbar;
     QAction* action_add_goods;
     QAction* action_sale_goods;
@@ -36,10 +34,8 @@ class StoreMainWindow : public QMainWindow
     QAction* action_update;
     QAction* action_search;
 
-//    SearchType search_type;
     QLineEdit* search_line;
     QComboBox* search_combo;
-    QComboBox* search_combo_comp;
 
     QHBoxLayout* h_main_layout;
     QVBoxLayout* rv_layout;
@@ -57,6 +53,8 @@ class StoreMainWindow : public QMainWindow
     int models_table_count;
     int available_goods_table_count;
     int sold_goods_table_count;
+    int sold_goods_by_last_year_count;
+    int available_goods_curr_model_count;
 
     void resizeEvent(QResizeEvent *event);
     void MainTableInit();

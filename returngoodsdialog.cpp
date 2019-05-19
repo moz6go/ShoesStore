@@ -10,14 +10,16 @@ ReturnGoodsDialog::ReturnGoodsDialog(DataBase* data_base, QWidget *parent) :
     setModal (true);
     sdb = data_base;
 
-    model = new QSqlTableModel();
-    model->setTable (SOLD_GOODS_TABLE);
-    model->select ();
-    ui_return->sold_goods_table->setModel (model);
+    query_model = new QSqlQueryModel();
+    query_model->setQuery ("SELECT model_name, brand, goods_size, sale_price, sale_date, goods_id FROM sold_goods WHERE sale_date >= datetime('now', '-1 year')");
+    query_model->setHeaderData (0, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[1]);
+    query_model->setHeaderData (1, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[2]);
+    query_model->setHeaderData (2, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[4]);
+    query_model->setHeaderData (3, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[6]);
+    query_model->setHeaderData (4, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[8]);
+    query_model->setHeaderData (5, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[3]);
 
-    for(int col = 0; col < model->columnCount(); ++col) {
-        model->setHeaderData(col, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[col]);
-    }
+    ui_return->sold_goods_table->setModel (query_model);
 
     SoldGoodsTableInit();
 
@@ -26,26 +28,22 @@ ReturnGoodsDialog::ReturnGoodsDialog(DataBase* data_base, QWidget *parent) :
 }
 
 QString ReturnGoodsDialog::GetGoodsId() {
-    return model->data (model->index (ui_return->sold_goods_table->currentIndex ().row (), 3)).toString ();
+    return query_model->data (query_model->index (ui_return->sold_goods_table->currentIndex ().row (), 5)).toString ();
 }
 
 QString ReturnGoodsDialog::GetModelName() {
-    return model->data (model->index (ui_return->sold_goods_table->currentIndex ().row (), 1)).toString ();
+    return query_model->data (query_model->index (ui_return->sold_goods_table->currentIndex ().row (), 0)).toString ();
 }
 
 QString ReturnGoodsDialog::GetBrand() {
-    return model->data (model->index (ui_return->sold_goods_table->currentIndex ().row (), 2)).toString ();
+    return query_model->data (query_model->index (ui_return->sold_goods_table->currentIndex ().row (), 1)).toString ();
 }
 
 QString ReturnGoodsDialog::GetSize() {
-     return model->data (model->index (ui_return->sold_goods_table->currentIndex ().row (), 4)).toString ();
+     return query_model->data (query_model->index (ui_return->sold_goods_table->currentIndex ().row (), 2)).toString ();
 }
 
 void ReturnGoodsDialog::SoldGoodsTableInit() {
-    ui_return->sold_goods_table->setColumnHidden(0, true);
-    ui_return->sold_goods_table->setColumnHidden(3, true);
-    ui_return->sold_goods_table->setColumnHidden(5, true);
-    ui_return->sold_goods_table->setColumnHidden(7, true);
     ui_return->sold_goods_table->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
     ui_return->sold_goods_table->verticalHeader ()->setDefaultSectionSize (18);
     ui_return->sold_goods_table->verticalHeader()->setVisible(false);
