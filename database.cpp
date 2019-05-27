@@ -6,6 +6,10 @@ DataBase::~DataBase() {
     CloseDataBase();
 }
 
+QString DataBase::LastError() {
+    return last_error;
+}
+
 bool DataBase::ConnectToDataBase (QString db_path) {
     if(!QFile(db_path).exists()){
         if(!RestoreDataBase()){
@@ -28,6 +32,7 @@ bool DataBase::OpenDataBase(QString db_path) {
         return true;
     }
     else {
+        last_error = sdb.lastError ().text ();
         return false;
     }
 }
@@ -47,17 +52,38 @@ bool DataBase::RestoreDataBase() {
 bool DataBase::CreateDataBase() {
     QSqlQuery query;
 
-    if(!query.exec (CREATE_MODELS_TABLE))  return false;
-    if(!query.exec (CREATE_AVAILABLE_GOODS_TABLE)) return false;
-    if(!query.exec (CREATE_BRANDS_TABLE)) return false;
-    if(!query.exec (CREATE_CATEGORIES_TABLE)) return false;
-    if(!query.exec (CREATE_SEASONS_TABLE)) return false;
-    if(!query.exec (CREATE_SOLD_GOODS_TABLE)) return false;
+    if(!query.exec (CREATE_MODELS_TABLE))  {
+        last_error = sdb.lastError ().text ();
+        return false;
+    }
+    if(!query.exec (CREATE_AVAILABLE_GOODS_TABLE)){
+        last_error = sdb.lastError ().text ();
+        return false;
+    }
+    if(!query.exec (CREATE_BRANDS_TABLE)){
+        last_error = sdb.lastError ().text ();
+        return false;
+    }
+    if(!query.exec (CREATE_CATEGORIES_TABLE)) {
+        last_error = sdb.lastError ().text ();
+        return false;
+    }
+    if(!query.exec (CREATE_SEASONS_TABLE)) {
+        last_error = sdb.lastError ().text ();
+        return false;
+    }
+    if(!query.exec (CREATE_SOLD_GOODS_TABLE)){
+        last_error = sdb.lastError ().text ();
+        return false;
+    }
     return true;
 }
 
 void DataBase::CloseDataBase(){
+    QString connection = sdb.connectionName();
     sdb.close();
+    sdb = QSqlDatabase();
+    sdb.removeDatabase(connection);
 }
 
 bool DataBase::InsertDataIntoTable (const QString& query_str, const QStringList& bind_values_list, const QVariantList& data) {

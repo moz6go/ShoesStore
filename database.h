@@ -13,6 +13,7 @@ class DataBase : public QObject
 public:
     DataBase (QObject *parent = nullptr);
     ~DataBase ();
+    QString LastError();
     bool ConnectToDataBase(QString db_path);
     bool CreateDataBase();
     void CloseDataBase();

@@ -404,9 +404,7 @@ void StoreMainWindow::onActionReserveCopy() {
 
 void StoreMainWindow::onActionRestore() {
     QString path = QFileDialog::getOpenFileName (this, "Виберіть файл бази даних", QDir::homePath (), "*.sqlite3");
-
     sdb->CloseDataBase ();
-    qDebug() << sdb;
 
     if (QFile::remove (DB_PATH)) {
         if(QFile::copy (path, DB_PATH)){
