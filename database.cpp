@@ -3,7 +3,7 @@
 DataBase::DataBase(QObject *parent) : QObject(parent) {}
 
 DataBase::~DataBase() {
-    sdb.close();
+    CloseDataBase();
 }
 
 bool DataBase::ConnectToDataBase (QString db_path) {
@@ -54,6 +54,10 @@ bool DataBase::CreateDataBase() {
     if(!query.exec (CREATE_SEASONS_TABLE)) return false;
     if(!query.exec (CREATE_SOLD_GOODS_TABLE)) return false;
     return true;
+}
+
+void DataBase::CloseDataBase(){
+    sdb.close();
 }
 
 bool DataBase::InsertDataIntoTable (const QString& query_str, const QStringList& bind_values_list, const QVariantList& data) {

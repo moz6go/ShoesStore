@@ -46,7 +46,7 @@ const int SIZE_WID_2 = 24;
         const QString DB_PATH = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/ShoesStore/shoes_strore_db.sqlite3";
     #endif
 #else
-    const QString DB_PATH = "shoes_strore_db.sqlite3";
+    const QString DB_PATH = QDir::currentPath () + "/shoes_strore_db.sqlite3";
 #endif
 
 //tables

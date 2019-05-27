@@ -32,7 +32,8 @@ class StoreMainWindow : public QMainWindow
     QAction* action_report;
     QAction* action_dictionary;
     QAction* action_update;
-    QAction* action_search;
+    QAction* action_res_copy;
+    QAction* action_restore;
 
     QLineEdit* search_line;
     QComboBox* search_combo;
@@ -75,6 +76,8 @@ private slots:
     void onActionReport();
     void onActionUpdate();
     void onActionDictionary();
+    void onActionReserveCopy();
+    void onActionRestore();
     void SearchTextChanged(QString text);
     void SetSearchType(QString type);
     void ShowPic();

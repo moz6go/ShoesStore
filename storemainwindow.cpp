@@ -165,6 +165,9 @@ void StoreMainWindow::BuildToolBar() {
     toolbar->addSeparator ();
     action_update = toolbar->addAction(QPixmap(":/pics/update.png"), "Оновити", this, SLOT(onActionUpdate()));
     toolbar->addSeparator ();
+    action_res_copy = toolbar->addAction(QPixmap(":/pics/reserve_copy.png"), "Створити резервну копію бази даних", this, SLOT(onActionReserveCopy()));
+    action_restore = toolbar->addAction(QPixmap(":/pics/restore.png"), "Відновити базу даних", this, SLOT(onActionRestore()));
+    toolbar->addSeparator ();
     toolbar->addWidget (search_combo);
     toolbar->addWidget (search_line);
 
@@ -184,6 +187,9 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_report->setEnabled (true);
         action_update->setEnabled (true);
         action_dictionary->setEnabled (true);
+        action_res_copy->setEnabled (true);
+        action_restore ->setEnabled (true);
+
         break;
     case DISABLED_ALL:
         action_add_goods->setDisabled (true);
@@ -194,6 +200,8 @@ void StoreMainWindow::SwitchButtons(State state) {
         action_report->setDisabled (true);
         action_update->setDisabled (true);
         action_dictionary->setDisabled (true);
+        action_res_copy->setDisabled (true);
+        action_restore ->setDisabled (true);
         break;
     }
 }
@@ -382,6 +390,42 @@ void StoreMainWindow::onActionDictionary() {
     Update(0);
 }
 
+void StoreMainWindow::onActionReserveCopy() {
+    QString path = QFileDialog::getExistingDirectory(this, tr("Зберегти базу даних в ..."),
+                                                    QDir::homePath (),
+                                                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if(QFile::copy (DB_PATH, path + "/shoes_strore_db.sqlite3")){
+        ui->statusBar->showMessage ("Резервну копію бази даних збережено " + path + "/shoes_strore_db.sqlite3");
+    }
+    else {
+        ui->statusBar->showMessage ("Не вдалось зробити копію бази даних!");
+    }
+}
+
+void StoreMainWindow::onActionRestore() {
+    QString path = QFileDialog::getOpenFileName (this, "Виберіть файл бази даних", QDir::homePath (), "*.sqlite3");
+
+    sdb->CloseDataBase ();
+    qDebug() << sdb;
+
+    if (QFile::remove (DB_PATH)) {
+        if(QFile::copy (path, DB_PATH)){
+            sdb = new DataBase();
+            if (!sdb->ConnectToDataBase (DB_PATH)) {
+                QMessageBox::critical (nullptr, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
+            }
+            Update(0);
+            ui->statusBar->showMessage ("Базу даних відновлено!");
+        }
+        else {
+            ui->statusBar->showMessage ("Не вдалось відновити базу даних!");
+        }
+    }
+    else {
+        ui->statusBar->showMessage ("Не вдалось відновити базу даних!");
+    }
+}
+
 void StoreMainWindow::SearchTextChanged(QString text) {
     filter_model->setFilterFixedString (text);
     Update(main_table_view->currentIndex ().row ());
@@ -469,6 +513,8 @@ void StoreMainWindow::UpdateButtons() {
     action_report->setEnabled (available_goods_table_count || sold_goods_table_count);
     action_update->setEnabled (true);
     action_dictionary->setEnabled (true);
+    action_restore->setEnabled (true);
+    action_res_copy->setEnabled (QFile::exists (DB_PATH));
 }
 
 void StoreMainWindow::UpdateCounts() {

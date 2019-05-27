@@ -7,8 +7,8 @@ int main(int argc, char *argv[]) {
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
 #if defined _WIN32 && !defined QT_DEBUG
-    if (!QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation) ).exists ()){
-        QDir().mkdir(QStandardPaths::writableLocation(QStandardPaths::DataLocation) );
+    if (!QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).exists ()){
+        QDir().mkdir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
     }
 #endif
 

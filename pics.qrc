@@ -12,5 +12,7 @@
         <file>pics/report_dialog.png</file>
         <file>pics/dictionary.png</file>
         <file>pics/return_goods.png</file>
+        <file>pics/reserve_copy.png</file>
+        <file>pics/restore.png</file>
     </qresource>
 </RCC>
