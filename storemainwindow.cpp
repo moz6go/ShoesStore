@@ -64,7 +64,7 @@ StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) :
     wgt->setLayout (h_main_layout);
     setCentralWidget (wgt);
 
-    setMinimumSize(1000, 580);
+    setGeometry (200,100,1000,580);
 
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
     QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowGoodsInfo);
@@ -207,7 +207,7 @@ void StoreMainWindow::SwitchButtons(State state) {
 }
 
 void StoreMainWindow::CreateReportCSV(const QVector<QVariantList>& table, const QString& path) {
-    QFile report_csv(path + "/report.csv");
+    QFile report_csv(path + "/report " + QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh-mm-ss") + ".csv");
     if(report_csv.open(QIODevice::WriteOnly)){
         QTextStream fout(&report_csv);
 #if defined(_WIN32)
@@ -343,12 +343,13 @@ void StoreMainWindow::onActionAddModel() {
 
 void StoreMainWindow::onActionDelModel() {
     QString model_name = filter_model->data (filter_model->index (main_table_view->currentIndex ().row (), 1)).toString ();
-    QMessageBox* msgbox = new QMessageBox(QMessageBox::Question,
-                                          "Видалити модель",
-                                          "Ви дійсно бажаєте видалити з бази даних модель " + model_name +"?",
-                                          QMessageBox::No | QMessageBox::Yes,
-                                          this);
-    if(msgbox->exec () == QMessageBox::Yes) {
+    QMessageBox msgbox;
+    msgbox.setIcon (QMessageBox::Question);
+    msgbox.setWindowTitle ("Видалити модель");
+    msgbox.setText ("Ви дійсно бажаєте видалити з бази даних модель " + model_name +"?");
+    msgbox.addButton ("Видалити", QMessageBox::AcceptRole);
+    msgbox.addButton ("Скасувати", QMessageBox::RejectRole);
+    if(msgbox.exec () == QMessageBox::AcceptRole) {
         if(sdb->DeleteRow (MODELS_TABLE, MODEL_NAME, model_name)){
             ui->statusBar->showMessage ("Видалено модель " + model_name);
         }
@@ -394,8 +395,8 @@ void StoreMainWindow::onActionReserveCopy() {
     QString path = QFileDialog::getExistingDirectory(this, tr("Зберегти базу даних в ..."),
                                                     QDir::homePath (),
                                                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    if(QFile::copy (DB_PATH, path + "/shoes_strore_db.sqlite3")){
-        ui->statusBar->showMessage ("Резервну копію бази даних збережено " + path + "/shoes_strore_db.sqlite3");
+    if(QFile::copy (DB_PATH, path + "/shoes_strore_db " + QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh-mm-ss") + ".sqlite3")){
+        ui->statusBar->showMessage ("Резервну копію бази даних збережено в папці " + path );
     }
     else {
         ui->statusBar->showMessage ("Не вдалось зробити копію бази даних!");
@@ -403,24 +404,34 @@ void StoreMainWindow::onActionReserveCopy() {
 }
 
 void StoreMainWindow::onActionRestore() {
-    QString path = QFileDialog::getOpenFileName (this, "Виберіть файл бази даних", QDir::homePath (), "*.sqlite3");
-    sdb->CloseDataBase ();
-
-    if (QFile::remove (DB_PATH)) {
-        if(QFile::copy (path, DB_PATH)){
-            sdb = new DataBase();
-            if (!sdb->ConnectToDataBase (DB_PATH)) {
-                QMessageBox::critical (nullptr, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
+    QMessageBox msgbox;
+    msgbox.setIcon (QMessageBox::Warning);
+    msgbox.setWindowTitle ("Відновлення бази даних");
+    msgbox.setText ("УВАГА!!! Після здійснення відновлення бази даних, поточні дані видаляться!!!\n\nРекомендуємо перед відновленням зберегти резервну копію поточної бази даних.");
+    msgbox.addButton ("Відновити без збереження", QMessageBox::AcceptRole);
+    msgbox.addButton ("Скасувати", QMessageBox::RejectRole);
+    if(msgbox.exec () == QMessageBox::AcceptRole) {
+        QString path = QFileDialog::getOpenFileName (this, "Виберіть файл бази даних", QDir::homePath (), "*.sqlite3");
+        if (!path.isEmpty ()){
+            sdb->CloseDataBase ();
+            if (QFile::remove (DB_PATH)) {
+                if(QFile::copy (path, DB_PATH)){
+                    //sdb = new DataBase();
+                    if (!sdb->ConnectToDataBase (DB_PATH)) {
+                        QMessageBox::critical (this, "Error!", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
+                    }
+                    Update(0);
+                    ui->statusBar->showMessage ("Базу даних відновлено!");
+                    QMessageBox::information (this, "Shoes Store", "Для коректної роботи після відновлення бази даних, рекомендується перезапутити програму", QMessageBox::Ok);
+                }
+                else {
+                    QMessageBox::critical (this, "Error!", "Не вдалось відновити базу даних!", QMessageBox::Ok);
+                }
             }
-            Update(0);
-            ui->statusBar->showMessage ("Базу даних відновлено!");
+            else {
+                QMessageBox::critical (this, "Error!", "Не вдалось відновити базу даних!", QMessageBox::Ok);
+            }
         }
-        else {
-            ui->statusBar->showMessage ("Не вдалось відновити базу даних!");
-        }
-    }
-    else {
-        ui->statusBar->showMessage ("Не вдалось відновити базу даних!");
     }
 }
 

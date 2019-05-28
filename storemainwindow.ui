@@ -2,18 +2,16 @@
 <ui version="4.0">
  <class>StoreMainWindow</class>
  <widget class="QMainWindow" name="StoreMainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>900</width>
-    <height>550</height>
-   </rect>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>600</width>
-    <height>300</height>
+    <width>1000</width>
+    <height>580</height>
    </size>
   </property>
   <property name="windowTitle">

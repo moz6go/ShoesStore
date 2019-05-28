@@ -21,8 +21,6 @@ class StoreMainWindow : public QMainWindow
     QSqlTableModel* sql_model;
     QSortFilterProxyModel* filter_model;
     DataBase* sdb;
-//    AddGoodsDialog* add_goods;
-//    SaleDialog* sale_goods;
     QToolBar* toolbar;
     QAction* action_add_goods;
     QAction* action_sale_goods;
