@@ -1,7 +1,6 @@
 #ifndef RETURNGOODSDIALOG_H
 #define RETURNGOODSDIALOG_H
 
-#include <QDialog>
 #include "general.h"
 #include "database.h"
 

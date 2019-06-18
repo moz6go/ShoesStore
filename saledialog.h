@@ -1,7 +1,6 @@
 #ifndef SALEDIALOG_H
 #define SALEDIALOG_H
 
-#include <QDialog>
 #include "general.h"
 #include "database.h"
 

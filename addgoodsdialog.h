@@ -1,7 +1,6 @@
 #ifndef ADDGOODSDIALOG_H
 #define ADDGOODSDIALOG_H
 
-#include <QDialog>
 #include "general.h"
 #include "database.h"
 

@@ -15,16 +15,17 @@ CONFIG += c++11
 
 
 SOURCES += main.cpp\
-    storemainwindow.cpp \
     addmodeldialog.cpp \
     addgoodsdialog.cpp \
     database.cpp \
     saledialog.cpp \
     reportdialog.cpp \
     dictionarydialog.cpp \
-    returngoodsdialog.cpp
+    returngoodsdialog.cpp \
+    mainwindow.cpp \
+    myproxymodel.cpp
 
-HEADERS  +=    storemainwindow.h \
+HEADERS  +=    \
     general.h \
     addmodeldialog.h \
     addgoodsdialog.h \
@@ -32,15 +33,18 @@ HEADERS  +=    storemainwindow.h \
     saledialog.h \
     reportdialog.h \
     dictionarydialog.h \
-    returngoodsdialog.h
+    returngoodsdialog.h \
+    mainwindow.h \
+    myproxymodel.h
 
-FORMS    +=    storemainwindow.ui \
+FORMS    +=    \
     addmodeldialog.ui \
     addgoodsdialog.ui \
     saledialog.ui \
     reportdialog.ui \
     dictionarydialog.ui \
-    returngoodsdialog.ui
+    returngoodsdialog.ui \
+    mainwindow.ui
 
 RESOURCES += \
     pics.qrc

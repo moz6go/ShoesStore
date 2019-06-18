@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QMainWindow>
+#include <QDialog>
 #include <QtDebug>
 #include <QDebug>
 #include <QObject>
@@ -99,7 +100,7 @@ const QString CREATE_AVAILABLE_GOODS_TABLE = "CREATE TABLE " + AVAILABLE_GOODS_T
 const QString CREATE_BRANDS_TABLE = "CREATE TABLE " + BRANDS_TABLE + " ("+ BRAND +" TEXT)";
 const QString CREATE_CATEGORIES_TABLE = "CREATE TABLE " + CATEGORIES_TABLE + " (" + CATEGORY + "  TEXT)";
 const QString CREATE_SEASONS_TABLE = "CREATE TABLE " + SEASONS_TABLE + " ("+ SEASON + " TEXT)";
-const QString CREATE_SOLD_GOODS_TABLE = "CREATE TABLE sold_goods ("
+const QString CREATE_SOLD_GOODS_TABLE = "CREATE TABLE " + SOLD_GOODS_TABLE + " ("
                                         + MODEL_ID + " INTEGER NOT NULL, "
                                         + MODEL_NAME + " TEXT NOT NULL, "
                                         + BRAND + " TEXT NOT NULL, "
@@ -225,19 +226,54 @@ enum State {
     DISABLED_ALL
 };
 
-struct Model {
-    QString model_name;
-    QString season;
-    QString brand;
-    double wholesale_price;
-    double retail_price;
-    QString photo_path;
+enum ModelsCol{
+    MODEL_ID_COL,
+    MODEL_NAME_COL,
+    SEASON_COL,
+    CATEGORY_COL,
+    BRAND_COL,
+    WHOLESALE_PRICE_COL,
+    RETAIL_PRICE_COL,
+    PIC_COL,
+    DATE_COL
 };
 
-struct Product : public Model {
-    unsigned size;
+enum AvGoodsCol {
+    AV_MODEL_ID_COL,
+    AV_MODEL_NAME_COL,
+    AV_BRAND_COL,
+    GOODS_ID_COL,
+    GOODS_SIZE_COL,
+    GOODS_DATE_COL
 };
 
+enum SoldGoodCol {
+    S_MODEL_ID_COL,
+    S_MODEL_NAME_COL,
+    S_BRAND_COL,
+    S_GOODS_ID_COL,
+    S_GOODS_SIZE_COL,
+    S_GOODS_DATE_COL,
+    SALE_PRICE_COL,
+    PROFIT_COL,
+    SALE_DATE_COL
+};
+
+enum Sizes {
+    S35,
+    S36,
+    S37,
+    S38,
+    S39,
+    S40,
+    S41,
+    S42,
+    S43,
+    S44,
+    S45,
+    S46,
+    WITHOUT_SIZE
+};
 
 
 #endif // GENERAL

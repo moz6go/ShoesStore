@@ -1,7 +1,6 @@
 #ifndef ADDMODELDIALOG_H
 #define ADDMODELDIALOG_H
 
-#include <QDialog>
 #include "general.h"
 #include "database.h"
 
@@ -14,7 +13,7 @@ class AddModelDialog : public QDialog
     Q_OBJECT
     DataBase* sdb;
     QString photo_path;
-    Ui::AddModelDialog *ui_add_model_dialog;
+    Ui::AddModelDialog *ui;
 public:
     explicit AddModelDialog(DataBase* data_base, QWidget *parent = nullptr);
     QString getModel();

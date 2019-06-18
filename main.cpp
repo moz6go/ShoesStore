@@ -1,4 +1,4 @@
-#include "storemainwindow.h"
+#include "mainwindow.h"
 #include "database.h"
 
 int main(int argc, char *argv[]) {
@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    StoreMainWindow w(sdb);
+    MainWindow w(sdb);
     w.show();
     return a.exec();
 }

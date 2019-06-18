@@ -1,7 +1,6 @@
 #ifndef DICTIONARYDIALOG_H
 #define DICTIONARYDIALOG_H
 
-#include <QDialog>
 #include "general.h"
 #include "database.h"
 

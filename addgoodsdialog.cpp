@@ -76,7 +76,7 @@ void AddGoodsDialog::UpdateModelList(QString brand) {
     ui_add_goods_dialog->model_cb->setCurrentText (f_model->data(f_model->index (current_row, 1)).toString ());
 }
 
-void AddGoodsDialog::SetRes(int i) {
+void AddGoodsDialog::SetRes(int) {
     ui_add_goods_dialog->result_le->clear ();
     for (auto& sb : sb_list) {
         ui_add_goods_dialog->result_le->setText (QString::number (ui_add_goods_dialog->result_le->text ().toInt () + sb->value ()));

@@ -1,7 +1,6 @@
 #ifndef REPORTDIALOG_H
 #define REPORTDIALOG_H
 
-#include <QDialog>
 #include "general.h"
 #include "database.h"
 

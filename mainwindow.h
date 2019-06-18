@@ -9,17 +9,19 @@
 #include "reportdialog.h"
 #include "dictionarydialog.h"
 #include "returngoodsdialog.h"
+#include "myproxymodel.h"
 
 namespace Ui {
-    class StoreMainWindow;
+    class MainWindow;
 }
 
-class StoreMainWindow : public QMainWindow
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    Ui::StoreMainWindow *ui;
+    Ui::MainWindow *ui;
     QSqlTableModel* sql_model;
-    QSortFilterProxyModel* filter_model;
+    //QSortFilterProxyModel* filter_model;
+    MyProxyModel* filter_model;
     DataBase* sdb;
     QToolBar* toolbar;
     QAction* action_add_goods;
@@ -63,8 +65,8 @@ class StoreMainWindow : public QMainWindow
     void SwitchButtons(State state);
     void CreateReportCSV(const QVector<QVariantList>& table, const QString& path);
 public:
-    explicit StoreMainWindow(DataBase* data_base, QWidget *parent = nullptr);
-    ~StoreMainWindow();
+    explicit MainWindow(DataBase* data_base, QWidget *parent = nullptr);
+    ~MainWindow();
 private slots:
     void onActionAddGoods();
     void onActionSaleGoods();

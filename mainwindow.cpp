@@ -1,9 +1,9 @@
-#include "storemainwindow.h"
+#include "mainwindow.h"
 #include "ui_storemainwindow.h"
 
-StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) :
+MainWindow::MainWindow(DataBase* data_base, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::StoreMainWindow)
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -22,7 +22,7 @@ StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) :
     sql_model->setTable (MODELS_TABLE);
 
     main_table_view = new QTableView(this);
-    filter_model = new QSortFilterProxyModel(this);
+    filter_model = new MyProxyModel(this);
     filter_model->setSourceModel (sql_model);
     filter_model->setFilterCaseSensitivity (Qt::CaseInsensitive);
     filter_model->setFilterKeyColumn (BY_MODEL_NAME);
@@ -66,23 +66,23 @@ StoreMainWindow::StoreMainWindow(DataBase* data_base, QWidget *parent) :
 
     setGeometry (200,100,1000,580);
 
-    QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowPic);
-    QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::ShowGoodsInfo);
-    QObject::connect (main_table_view, &QTableView::clicked, this, &StoreMainWindow::UpdateButtons);
+    QObject::connect (main_table_view, &QTableView::clicked, this, &MainWindow::ShowPic);
+    QObject::connect (main_table_view, &QTableView::clicked, this, &MainWindow::ShowGoodsInfo);
+    QObject::connect (main_table_view, &QTableView::clicked, this, &MainWindow::UpdateButtons);
 
-    QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &StoreMainWindow::SetSearchType);
-    QObject::connect (search_line, &QLineEdit::textChanged, this, &StoreMainWindow::SearchTextChanged);
+    QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &MainWindow::SetSearchType);
+    QObject::connect (search_line, &QLineEdit::textChanged, this, &MainWindow::SearchTextChanged);
     Update(0);
 }
 
-void StoreMainWindow::resizeEvent(QResizeEvent *event) {
+void MainWindow::resizeEvent(QResizeEvent *event) {
     for(int i = 0; i < sql_model->columnCount(); ++i) {
         main_table_view->setColumnWidth(i, this->width() / sql_model->columnCount());
     }
     QMainWindow::resizeEvent(event);
 }
 
-void StoreMainWindow::MainTableInit() {
+void MainWindow::MainTableInit() {
     main_table_view->setColumnHidden(0, true);
     main_table_view->setColumnHidden(7, true);
     main_table_view->setColumnHidden(8, true);
@@ -102,7 +102,7 @@ void StoreMainWindow::MainTableInit() {
     main_table_view->setSortingEnabled (true);
 }
 
-void StoreMainWindow::TableInit(QTableWidget* table, QStringList headers) {
+void MainWindow::TableInit(QTableWidget* table, QStringList headers) {
     table->clear ();
     table->setRowCount (0);
     table->setColumnCount(2);
@@ -121,7 +121,7 @@ void StoreMainWindow::TableInit(QTableWidget* table, QStringList headers) {
     table->setStyleSheet ("QTableWidget { font-size: 9pt; }");
 }
 
-void StoreMainWindow::SetSummary() {
+void MainWindow::SetSummary() {
     TableInit(summary_table, QStringList() << "Показник" << "Значення");
     for (int row = 0; row < SUMMARY_ROWS.size (); ++row) {
         summary_table->insertRow (row);
@@ -142,7 +142,7 @@ void StoreMainWindow::SetSummary() {
     summary_table->setItem(10, 1, new QTableWidgetItem(QString("%L1").arg((year_income - year_costs), 0, 'f', 2)));
 }
 
-void StoreMainWindow::BuildToolBar() {
+void MainWindow::BuildToolBar() {
     search_line->setFixedSize (150, SIZE_WID_2);
     search_line->setPlaceholderText ("Пошук...");
 
@@ -176,7 +176,7 @@ void StoreMainWindow::BuildToolBar() {
     addToolBar(Qt::TopToolBarArea, toolbar);
 }
 
-void StoreMainWindow::SwitchButtons(State state) {
+void MainWindow::SwitchButtons(State state) {
     switch (state) {
     case ENABLED_ALL:
         action_add_goods->setEnabled (true);
@@ -206,7 +206,7 @@ void StoreMainWindow::SwitchButtons(State state) {
     }
 }
 
-void StoreMainWindow::CreateReportCSV(const QVector<QVariantList>& table, const QString& path) {
+void MainWindow::CreateReportCSV(const QVector<QVariantList>& table, const QString& path) {
     QFile report_csv(path + "/report " + QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh-mm-ss") + ".csv");
     if(report_csv.open(QIODevice::WriteOnly)){
         QTextStream fout(&report_csv);
@@ -224,7 +224,7 @@ void StoreMainWindow::CreateReportCSV(const QVector<QVariantList>& table, const 
     }
 }
 
-void StoreMainWindow::onActionAddGoods() {
+void MainWindow::onActionAddGoods() {
     AddGoodsDialog* add_goods = new AddGoodsDialog(sdb, main_table_view->currentIndex ().row (), filter_model, this);
     if (add_goods->exec () == QDialog::Accepted) {
         SwitchButtons(DISABLED_ALL);
@@ -257,7 +257,7 @@ void StoreMainWindow::onActionAddGoods() {
     }
 }
 
-void StoreMainWindow::onActionSaleGoods() {
+void MainWindow::onActionSaleGoods() {
     SaleDialog* sale_goods = new SaleDialog(sdb, main_table_view->currentIndex ().row (), filter_model, this);
     if (sale_goods->exec () == QDialog::Accepted) {
         for (int count = 0; count < sale_goods->GetCount (); ++count) {
@@ -290,7 +290,7 @@ void StoreMainWindow::onActionSaleGoods() {
     }
 }
 
-void StoreMainWindow::onActionReturnGoods() {
+void MainWindow::onActionReturnGoods() {
     ReturnGoodsDialog* return_goods = new ReturnGoodsDialog(sdb, this);
     if(return_goods->exec () == QDialog::Accepted){
         QVariantList data = sdb->SelectRow ("*", SOLD_GOODS_TABLE, GOODS_ID, return_goods->GetGoodsId (), GOODS_COL_COUNT);
@@ -312,7 +312,7 @@ void StoreMainWindow::onActionReturnGoods() {
     }
 }
 
-void StoreMainWindow::onActionAddModel() {
+void MainWindow::onActionAddModel() {
     AddModelDialog* add_model = new AddModelDialog (sdb, this);
     if(add_model->exec () == QDialog::Accepted) {
         QPixmap pic(add_model->getPhotoPath ());
@@ -341,7 +341,7 @@ void StoreMainWindow::onActionAddModel() {
     }
 }
 
-void StoreMainWindow::onActionDelModel() {
+void MainWindow::onActionDelModel() {
     QString model_name = filter_model->data (filter_model->index (main_table_view->currentIndex ().row (), 1)).toString ();
     QMessageBox msgbox;
     msgbox.setIcon (QMessageBox::Question);
@@ -357,7 +357,7 @@ void StoreMainWindow::onActionDelModel() {
     }
 }
 
-void StoreMainWindow::onActionReport() {
+void MainWindow::onActionReport() {
     ReportDialog* report_dialog = new ReportDialog(sdb, this);
     if(report_dialog->exec () == QDialog::Accepted) {
         QString path = QFileDialog::getExistingDirectory(this, tr("Зберегти звіт в ..."),
@@ -381,17 +381,17 @@ void StoreMainWindow::onActionReport() {
     }
 }
 
-void StoreMainWindow::onActionUpdate() {
+void MainWindow::onActionUpdate() {
     Update(main_table_view->currentIndex ().row ());
 }
 
-void StoreMainWindow::onActionDictionary() {
+void MainWindow::onActionDictionary() {
     DictionaryDialog* dict_dialog = new DictionaryDialog(sdb, this);
     dict_dialog->exec ();
     Update(0);
 }
 
-void StoreMainWindow::onActionReserveCopy() {
+void MainWindow::onActionReserveCopy() {
     QString path = QFileDialog::getExistingDirectory(this, tr("Зберегти базу даних в ..."),
                                                     QDir::homePath (),
                                                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
@@ -403,7 +403,7 @@ void StoreMainWindow::onActionReserveCopy() {
     }
 }
 
-void StoreMainWindow::onActionRestore() {
+void MainWindow::onActionRestore() {
     QMessageBox msgbox;
     msgbox.setIcon (QMessageBox::Warning);
     msgbox.setWindowTitle ("Відновлення бази даних");
@@ -435,12 +435,12 @@ void StoreMainWindow::onActionRestore() {
     }
 }
 
-void StoreMainWindow::SearchTextChanged(QString text) {
+void MainWindow::SearchTextChanged(QString text) {
     filter_model->setFilterFixedString (text);
     Update(main_table_view->currentIndex ().row ());
 }
 
-void StoreMainWindow::SetSearchType(QString type) {
+void MainWindow::SetSearchType(QString type) {
     if(type == MODELS_TABLE_HEADERS_LIST[1]) {
         filter_model->setFilterKeyColumn (BY_MODEL_NAME);
     }
@@ -461,7 +461,7 @@ void StoreMainWindow::SetSearchType(QString type) {
     }
 }
 
-void StoreMainWindow::ShowPic() {
+void MainWindow::ShowPic() {
     QPixmap pic;
     pic.loadFromData (filter_model->data(filter_model->index (main_table_view->currentIndex ().row (), 7)).toByteArray ());
     if (!pic.isNull ()){
@@ -475,7 +475,7 @@ void StoreMainWindow::ShowPic() {
     }
 }
 
-void StoreMainWindow::ShowGoodsInfo() {
+void MainWindow::ShowGoodsInfo() {
     if(filter_model->rowCount ()){
         TableInit(goods_info_table, QStringList() << "Розмір" << "Кількість");
         int sum_count(0);
@@ -502,7 +502,7 @@ void StoreMainWindow::ShowGoodsInfo() {
     }
 }
 
-void StoreMainWindow::Update(int row) {
+void MainWindow::Update(int row) {
     sql_model->select ();
     sql_model->sort (0, Qt::AscendingOrder);
     main_table_view->selectRow (row);
@@ -512,7 +512,7 @@ void StoreMainWindow::Update(int row) {
     UpdateButtons ();
 }
 
-void StoreMainWindow::UpdateButtons() {
+void MainWindow::UpdateButtons() {
     UpdateCounts ();
     action_add_goods->setEnabled (models_table_count);
     action_sale_goods->setEnabled (available_goods_table_count);
@@ -526,7 +526,7 @@ void StoreMainWindow::UpdateButtons() {
     action_res_copy->setEnabled (QFile::exists (DB_PATH));
 }
 
-void StoreMainWindow::UpdateCounts() {
+void MainWindow::UpdateCounts() {
     QString model_id = filter_model->data (filter_model->index (main_table_view->currentIndex ().row (), 0)).toString ();
     brand_table_count = sdb->SelectCount(BRANDS_TABLE);
     season_table_count = sdb->SelectCount (SEASONS_TABLE);
@@ -541,6 +541,6 @@ void StoreMainWindow::UpdateCounts() {
     available_goods_curr_model_count = sdb->SelectCount(AVAILABLE_GOODS_TABLE, MODEL_ID, "=", model_id);
 }
 
-StoreMainWindow::~StoreMainWindow() {
+MainWindow::~MainWindow() {
     delete ui;
 }
