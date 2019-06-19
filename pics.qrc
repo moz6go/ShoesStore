@@ -15,5 +15,6 @@
         <file>pics/reserve_copy.png</file>
         <file>pics/restore.png</file>
         <file>pics/default_pic.png</file>
+        <file>pics/edit_model.png</file>
     </qresource>
 </RCC>

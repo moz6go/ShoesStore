@@ -49,6 +49,11 @@ const int SIZE_WID_2 = 24;
 #else
     const QString DB_PATH = QDir::currentPath () + "/shoes_strore_db.sqlite3";
 #endif
+const QString DATE_FORMAT = "dd.MM.yyyy";
+const QString TIME_FORMAT = "hh:mm";
+const QString SQL_DATE_FORMAT = "yyyy-MM-dd";
+const QString SQL_DATE_TIME_FORMAT = "yyyy-MM-dd hh:mm:ss";
+const QString FS_DATE_TIME_FORMAT = "yyyy-MM-dd hh-mm-ss";
 
 //tables
 const QString MODELS_TABLE = "models";
@@ -273,6 +278,11 @@ enum Sizes {
     S45,
     S46,
     WITHOUT_SIZE
+};
+
+enum Role {
+    ADD,
+    EDIT
 };
 
 

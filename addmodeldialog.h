@@ -11,11 +11,13 @@ class AddModelDialog;
 class AddModelDialog : public QDialog
 {
     Q_OBJECT
+    Ui::AddModelDialog *ui;
+
     DataBase* sdb;
     QString photo_path;
-    Ui::AddModelDialog *ui;
+    QVariantList row;
 public:
-    explicit AddModelDialog(DataBase* data_base, QWidget *parent = nullptr);
+    explicit AddModelDialog(DataBase* data_base, const QVariantList& curr_row, QWidget *parent = nullptr);
     QString getModel();
     QString getCategory ();
     QString getSeason();
@@ -27,8 +29,6 @@ public:
 private slots:
     void LoadPic();
     void EnableAddButton();
-signals:
-    void PhotoLoaded();
 };
 
 #endif // ADDMODELDIALOG_H

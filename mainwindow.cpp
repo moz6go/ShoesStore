@@ -14,9 +14,10 @@ MainWindow::MainWindow(DataBase *data_base, QWidget *parent) :
     category_table_count = 0;
     models_table_count = 0;
     available_goods_table_count = 0;
+    available_goods_by_model_count = 0;
     sold_goods_table_count = 0;
     sold_goods_by_last_year_count = 0;
-    available_goods_curr_model_count = 0;
+    sold_goods_by_model_count = 0;
 
     sql_model = new QSqlTableModel(this);
     sql_model->setTable (MODELS_TABLE);
@@ -30,7 +31,6 @@ MainWindow::MainWindow(DataBase *data_base, QWidget *parent) :
     for(int col = 0; col < sql_model->columnCount(); ++col) {
         sql_model->setHeaderData(col, Qt::Horizontal, MODELS_TABLE_HEADERS_LIST[col]);
     }
-
 
     toolbar = new QToolBar(this);
     search_line = new QLineEdit(this);
@@ -63,16 +63,13 @@ void MainWindow::MainTableInit() {
     ui->main_table_view->setColumnHidden(DATE_COL, true);
     ui->main_table_view->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
     ui->main_table_view->verticalHeader ()->setDefaultSectionSize (18);
-//    ui->main_table_view->verticalHeader()->setVisible(false);
+    ui->main_table_view->verticalHeader()->setVisible(false);
     ui->main_table_view->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->main_table_view->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->main_table_view->resizeColumnsToContents();
     ui->main_table_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->main_table_view->horizontalHeader()->setStretchLastSection(true);
     ui->main_table_view->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
-//    ui->main_table_view->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 9pt; }");
-//    ui->main_table_view->setStyleSheet ("QTableView { font-size: 9pt; }");
-//    ui->main_table_view->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
     ui->main_table_view->setSortingEnabled (true);
 }
 
@@ -86,12 +83,9 @@ void MainWindow::TableInit(QTableWidget* table, QStringList headers) {
     table->verticalHeader ()->setVisible(false);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
-//    table->resizeColumnsToContents();
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->horizontalHeader()->setStretchLastSection(true);
     table->setColumnWidth (0, 150);
-//    table->horizontalHeader ()->setStyleSheet ("QHeaderView { font-size: 9pt; }");
-//    table->setStyleSheet ("QTableWidget { font-size: 9pt; }");
 }
 
 void MainWindow::SetSummary() {
@@ -118,6 +112,7 @@ void MainWindow::SetSummary() {
 void MainWindow::BuildToolBar() {
     search_line->setFixedSize (150, SIZE_WID_2);
     search_line->setPlaceholderText ("Пошук...");
+    search_line->setClearButtonEnabled (true);
 
     search_combo->setMaximumHeight (SIZE_WID_2);
     for (int col = MODEL_NAME_COL; col <= BRAND_COL; ++col) {
@@ -131,6 +126,7 @@ void MainWindow::BuildToolBar() {
     action_return_goods = toolbar->addAction(QPixmap(":/pics/return_goods.png"), "Повернення товару", this, SLOT(onActionReturnGoods()));
     toolbar->addSeparator ();
     action_add_new_model = toolbar->addAction(QPixmap(":/pics/add_model.png"), "Додати нову модель", this, SLOT(onActionAddModel()));
+    action_edit_model = toolbar->addAction (QPixmap(":/pics/edit_model.png"), "Редагувати дані моделі", this, SLOT(onActionEditModel ()));
     action_del_model = toolbar->addAction(QPixmap(":/pics/delete.png"), "Видалити модель", this, SLOT(onActionDelModel()));
     toolbar->addSeparator ();
     action_report = toolbar->addAction(QPixmap(":/pics/report.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
@@ -155,8 +151,9 @@ void MainWindow::SwitchButtons(State state) {
         action_add_goods->setEnabled (true);
         action_sale_goods->setEnabled (true);
         action_return_goods->setEnabled (true);
-        action_del_model->setEnabled (true);
         action_add_new_model->setEnabled (true);
+        action_edit_model->setEnabled (true);
+        action_del_model->setEnabled (true);
         action_report->setEnabled (true);
         action_update->setEnabled (true);
         action_dictionary->setEnabled (true);
@@ -168,8 +165,9 @@ void MainWindow::SwitchButtons(State state) {
         action_add_goods->setDisabled (true);
         action_sale_goods->setDisabled (true);
         action_return_goods->setDisabled (true);
-        action_del_model->setDisabled (true);
         action_add_new_model->setDisabled (true);
+        action_edit_model->setDisabled (true);
+        action_del_model->setDisabled (true);
         action_report->setDisabled (true);
         action_update->setDisabled (true);
         action_dictionary->setDisabled (true);
@@ -180,7 +178,7 @@ void MainWindow::SwitchButtons(State state) {
 }
 
 void MainWindow::CreateReportCSV(const QVector<QVariantList>& table, const QString& path) {
-    QFile report_csv(path + "/report " + QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh-mm-ss") + ".csv");
+    QFile report_csv(path + "/report " + QDateTime::currentDateTime ().toString (FS_DATE_TIME_FORMAT) + ".csv");
     if(report_csv.open(QIODevice::WriteOnly)){
         QTextStream fout(&report_csv);
 #if defined(_WIN32)
@@ -215,7 +213,7 @@ void MainWindow::onActionAddGoods() {
                                                        << model_name
                                                        << brand
                                                        << size
-                                                       << QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh:mm:ss");
+                                                       << QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT);
                     QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_SIZE, GOODS_DATE };
                     if (!sdb->InsertDataIntoTable(sdb->GenerateInsertQuery (AVAILABLE_GOODS_TABLE, columns),
                                                   sdb->GenerateBindValues (columns),
@@ -243,7 +241,7 @@ void MainWindow::onActionSaleGoods() {
                                                 GOODS_COL_COUNT);
             data.append (sale_goods->GetPrice ());
             data.append (sale_goods->GetProfit ());
-            data.append (QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh:mm:ss"));
+            data.append (QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT));
 
             QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_ID, GOODS_SIZE, GOODS_DATE, SALE_PRICE, PROFIT, SALE_DATE };
             if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (SOLD_GOODS_TABLE, columns),
@@ -286,7 +284,7 @@ void MainWindow::onActionReturnGoods() {
 }
 
 void MainWindow::onActionAddModel() {
-    AddModelDialog* add_model = new AddModelDialog (sdb, this);
+    AddModelDialog* add_model = new AddModelDialog (sdb,  QVariantList(), this);
     if(add_model->exec () == QDialog::Accepted) {
         QPixmap pic(add_model->getPhotoPath ());
         QByteArray pic_byte_arr;
@@ -314,8 +312,16 @@ void MainWindow::onActionAddModel() {
     }
 }
 
+void MainWindow::onActionEditModel() {
+    QVariantList row = sdb->SelectRow ("*", MODELS_TABLE, MODEL_ID, filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), MODEL_ID_COL)).toString (), filter_model->columnCount ());
+    AddModelDialog* edit_model = new AddModelDialog(sdb, row, this);
+    if (edit_model->exec () == QDialog::Accepted){
+
+    }
+}
+
 void MainWindow::onActionDelModel() {
-    QString model_name = filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), 1)).toString ();
+    QString model_name = filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), MODEL_NAME_COL)).toString ();
     QMessageBox msgbox;
     msgbox.setIcon (QMessageBox::Question);
     msgbox.setWindowTitle ("Видалити модель");
@@ -368,7 +374,7 @@ void MainWindow::onActionReserveCopy() {
     QString path = QFileDialog::getExistingDirectory(this, tr("Зберегти базу даних в ..."),
                                                     QDir::homePath (),
                                                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    if(QFile::copy (DB_PATH, path + "/shoes_strore_db " + QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh-mm-ss") + ".sqlite3")){
+    if(QFile::copy (DB_PATH, path + "/shoes_strore_db " + QDateTime::currentDateTime ().toString (FS_DATE_TIME_FORMAT) + ".sqlite3")){
         ui->statusbar->showMessage ("Резервну копію бази даних збережено в папці " + path );
     }
     else {
@@ -383,6 +389,7 @@ void MainWindow::onActionRestore() {
     msgbox.setText ("УВАГА!!! Після здійснення відновлення бази даних, поточні дані видаляться!!!\n\nРекомендуємо перед відновленням зберегти резервну копію поточної бази даних.");
     msgbox.addButton ("Відновити без збереження", QMessageBox::AcceptRole);
     msgbox.addButton ("Скасувати", QMessageBox::RejectRole);
+
     if(msgbox.exec () == QMessageBox::AcceptRole) {
         QString path = QFileDialog::getOpenFileName (this, "Виберіть файл бази даних", QDir::homePath (), "*.sqlite3");
         if (!path.isEmpty ()){
@@ -470,16 +477,17 @@ void MainWindow::Update(int row) {
     ShowPic ();
     SetSummary ();
     ShowGoodsInfo ();
-    UpdateCounts ();
     UpdateButtons ();
 }
 
 void MainWindow::UpdateButtons() {
+    UpdateCounts ();
     action_add_goods->setEnabled (models_table_count);
     action_sale_goods->setEnabled (available_goods_table_count);
     action_return_goods->setEnabled (sold_goods_table_count);
-    action_del_model->setEnabled (models_table_count && !sold_goods_by_last_year_count && !available_goods_curr_model_count);
     action_add_new_model->setEnabled (brand_table_count && season_table_count && category_table_count);
+    action_edit_model->setEnabled (models_table_count && !sold_goods_by_model_count && !available_goods_by_model_count);
+    action_del_model->setEnabled (models_table_count && !sold_goods_by_last_year_count && !available_goods_by_model_count);
     action_report->setEnabled (available_goods_table_count || sold_goods_table_count);
     action_update->setEnabled (true);
     action_dictionary->setEnabled (true);
@@ -488,18 +496,19 @@ void MainWindow::UpdateButtons() {
 }
 
 void MainWindow::UpdateCounts() {
-    QString model_id = filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), 0)).toString ();
+    QString model_id = filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), MODEL_ID_COL)).toString ();
     brand_table_count = sdb->SelectCount(BRANDS_TABLE);
     season_table_count = sdb->SelectCount (SEASONS_TABLE);
     category_table_count = sdb->SelectCount (CATEGORIES_TABLE);
     models_table_count = sdb->SelectCount (MODELS_TABLE);
     available_goods_table_count = sdb->SelectCount (AVAILABLE_GOODS_TABLE);
+    available_goods_by_model_count = sdb->SelectCount (AVAILABLE_GOODS_TABLE, MODEL_ID, "=", model_id);
     sold_goods_table_count = sdb->SelectCount(SOLD_GOODS_TABLE);
     sold_goods_by_last_year_count = sdb->SelectCount (SOLD_GOODS_TABLE,
                                                       MODEL_ID,     SALE_DATE,
                                                       "=",          ">=",
                                                       model_id,     "datetime('now', '-1 year')");
-    available_goods_curr_model_count = sdb->SelectCount(AVAILABLE_GOODS_TABLE, MODEL_ID, "=", model_id);
+    sold_goods_by_model_count = sdb->SelectCount (SOLD_GOODS_TABLE, MODEL_ID, "=", model_id);
 }
 
 MainWindow::~MainWindow() {

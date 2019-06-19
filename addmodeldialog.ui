@@ -34,7 +34,7 @@
    <iconset resource="pics.qrc">
     <normaloff>:/pics/add_model.png</normaloff>:/pics/add_model.png</iconset>
   </property>
-  <widget class="QWidget" name="layoutWidget5">
+  <widget class="QWidget" name="layoutWidget1">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -61,7 +61,11 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="model_le"/>
+     <widget class="QLineEdit" name="model_le">
+      <property name="clearButtonEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -138,7 +142,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget2">
    <property name="geometry">
     <rect>
      <x>383</x>
@@ -180,7 +184,7 @@
     <string>Завантажити ...</string>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget3">
    <property name="geometry">
     <rect>
      <x>22</x>

@@ -27,6 +27,7 @@ class MainWindow : public QMainWindow
     QAction* action_sale_goods;
     QAction* action_return_goods;
     QAction* action_add_new_model;
+    QAction* action_edit_model;
     QAction* action_del_model;
     QAction* action_report;
     QAction* action_dictionary;
@@ -42,9 +43,10 @@ class MainWindow : public QMainWindow
     int category_table_count;
     int models_table_count;
     int available_goods_table_count;
+    int available_goods_by_model_count;
     int sold_goods_table_count;
     int sold_goods_by_last_year_count;
-    int available_goods_curr_model_count;
+    int sold_goods_by_model_count;
 
     void resizeEvent(QResizeEvent *event);
     void MainTableInit();
@@ -61,6 +63,7 @@ private slots:
     void onActionSaleGoods();
     void onActionReturnGoods();
     void onActionAddModel();
+    void onActionEditModel();
     void onActionDelModel();
     void onActionReport();
     void onActionUpdate();

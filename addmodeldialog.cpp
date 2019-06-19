@@ -1,7 +1,7 @@
 #include "addmodeldialog.h"
 #include "ui_addmodeldialog.h"
 
-AddModelDialog::AddModelDialog (DataBase* data_base, QWidget *parent) :
+AddModelDialog::AddModelDialog (DataBase* data_base, const QVariantList &curr_row, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AddModelDialog)
 {
@@ -9,6 +9,7 @@ AddModelDialog::AddModelDialog (DataBase* data_base, QWidget *parent) :
     setModal (true);
     photo_path = "";
     sdb = data_base;
+    row = curr_row;
     ui->warning_lbl->setVisible (false);
     ui->pic_lbl->setPixmap (QPixmap(":/pics/default_pic.png"));
 
@@ -27,11 +28,30 @@ AddModelDialog::AddModelDialog (DataBase* data_base, QWidget *parent) :
     model_season->select ();
     ui->season_cb->setModel (model_season);
 
+    if (row.size ()) {
+        ui->model_le->setText (row.at (MODEL_NAME_COL).toString ());
+        ui->category_cb->setCurrentText (row.at (CATEGORY_COL).toString ());
+        ui->brand_cb->setCurrentText (row.at (BRAND_COL).toString ());
+        ui->season_cb->setCurrentText (row.at (SEASON_COL).toString ());
+        ui->wholesalepr_sb->setValue (row.at(WHOLESALE_PRICE_COL).toDouble ());
+        ui->retailpr_sb->setValue (row.at(RETAIL_PRICE_COL).toDouble ());
+
+        QPixmap photo;
+        photo.loadFromData (row.at (PIC_COL).toByteArray ());
+        if (!photo.isNull ()){
+            ui->pic_lbl->setPixmap(photo.scaledToHeight (ui->pic_lbl->height ()));
+        }
+        else {
+            ui->pic_lbl->setPixmap(QPixmap(":/pics/default_pic.png"));
+        }
+        setWindowTitle ("Редагувати модель");
+        EnableAddButton();
+    }
+
     QObject::connect(ui->add_pb, &QPushButton::clicked, this, &AddModelDialog::accept);
     QObject::connect(ui->cancel_pb, &QPushButton::clicked, this, &AddModelDialog::reject);
     QObject::connect(ui->load_pic_pb, &QPushButton::clicked, this, &AddModelDialog::LoadPic);
     QObject::connect (ui->model_le, &QLineEdit::textChanged, this, &AddModelDialog::EnableAddButton);
-    QObject::connect (this, &AddModelDialog::PhotoLoaded, this, &AddModelDialog::EnableAddButton);
 }
 
 QString AddModelDialog::getModel() {
@@ -55,7 +75,7 @@ double AddModelDialog::getWholesalepr () {
 }
 
 double AddModelDialog::getRetailpr () {
-    return ui->retailpr_sb ->value ();
+    return ui->retailpr_sb->value ();
 }
 
 QString AddModelDialog::getPhotoPath(){
@@ -76,16 +96,14 @@ void AddModelDialog::LoadPic(){
         ui->pic_name_lbl->setText("");
         ui->pic_lbl->setPixmap (QPixmap(":/pics/default_pic.png"));
     }
-    emit PhotoLoaded ();
 }
 
 void AddModelDialog::EnableAddButton() {
 
-    bool photo_ok = !photo_path.isEmpty ();
     bool text_ok = !ui->model_le->text ().isEmpty ();
-    bool model_ok = !sdb->SelectCount (MODELS_TABLE, MODEL_NAME, "=", ui->model_le->text ());
+    bool model_ok = !sdb->SelectCount (MODELS_TABLE, MODEL_NAME, "=", ui->model_le->text ()) || row.at (MODEL_NAME_COL).toString () == ui->model_le->text ();
 
-    if(photo_ok && text_ok && model_ok) {
+    if(text_ok && model_ok) {
         ui->warning_lbl->setVisible (false);
         ui->add_pb->setEnabled (true);
     }
