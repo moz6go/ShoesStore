@@ -18,11 +18,11 @@ SOURCES += main.cpp\
     addmodeldialog.cpp \
     addgoodsdialog.cpp \
     database.cpp \
+    mainwindow.cpp \
     saledialog.cpp \
     reportdialog.cpp \
     dictionarydialog.cpp \
     returngoodsdialog.cpp \
-    mainwindow.cpp \
     myproxymodel.cpp
 
 HEADERS  +=    \
@@ -30,21 +30,21 @@ HEADERS  +=    \
     addmodeldialog.h \
     addgoodsdialog.h \
     database.h \
+    mainwindow.h \
     saledialog.h \
     reportdialog.h \
     dictionarydialog.h \
     returngoodsdialog.h \
-    mainwindow.h \
     myproxymodel.h
 
 FORMS    +=    \
     addmodeldialog.ui \
     addgoodsdialog.ui \
+    mainwindow.ui \
     saledialog.ui \
     reportdialog.ui \
     dictionarydialog.ui \
-    returngoodsdialog.ui \
-    mainwindow.ui
+    returngoodsdialog.ui
 
 RESOURCES += \
     pics.qrc

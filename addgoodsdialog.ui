@@ -22,6 +22,11 @@
     <height>350</height>
    </size>
   </property>
+  <property name="font">
+   <font>
+    <family>Comic Sans MS</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Прийняти товар</string>
   </property>

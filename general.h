@@ -188,14 +188,14 @@ enum ReportsTypes {
     AVAILABLE_GOODS_REPORT
 };
 
-enum SearchType {
-    BY_MODEL_NAME = 1,
-    BY_SEASON,
-    BY_CATEGORY,
-    BY_BRAND,
-    BY_WPRICE,
-    BY_RPRICE
-};
+//enum SearchType {
+//    BY_MODEL_NAME = 1,
+//    BY_SEASON,
+//    BY_CATEGORY,
+//    BY_BRAND,
+//    BY_WPRICE,
+//    BY_RPRICE
+//};
 
 const QStringList MODELS_TABLE_HEADERS_LIST = {
     /*0*/"!id",

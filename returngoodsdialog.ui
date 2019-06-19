@@ -22,6 +22,11 @@
     <height>490</height>
    </size>
   </property>
+  <property name="font">
+   <font>
+    <family>Comic Sans MS</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Повернення товару</string>
   </property>
@@ -76,6 +81,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Comic Sans MS</family>
      <italic>true</italic>
     </font>
    </property>

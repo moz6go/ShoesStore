@@ -1,5 +1,5 @@
-#ifndef STOREMAINWINDOW_H
-#define STOREMAINWINDOW_H
+#ifndef MAINWINDOW1_H
+#define MAINWINDOW1_H
 
 #include "general.h"
 #include "addmodeldialog.h"
@@ -12,7 +12,7 @@
 #include "myproxymodel.h"
 
 namespace Ui {
-    class MainWindow;
+class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -20,7 +20,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     Ui::MainWindow *ui;
     QSqlTableModel* sql_model;
-    //QSortFilterProxyModel* filter_model;
     MyProxyModel* filter_model;
     DataBase* sdb;
     QToolBar* toolbar;
@@ -37,16 +36,6 @@ class MainWindow : public QMainWindow
 
     QLineEdit* search_line;
     QComboBox* search_combo;
-
-    QHBoxLayout* h_main_layout;
-    QVBoxLayout* rv_layout;
-    QVBoxLayout* lv_layout;
-
-    QTableView* main_table_view;
-    QTableWidget* goods_info_table;
-    QTableWidget* summary_table;
-
-    QLabel* pic_label;
 
     int brand_table_count;
     int season_table_count;
@@ -90,4 +79,4 @@ signals:
     void finishAddGoods();
 };
 
-#endif // STOREMAINWINDOW_H
+#endif // MAINWINDOW1_H

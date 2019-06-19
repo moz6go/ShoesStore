@@ -22,6 +22,11 @@
     <height>250</height>
    </size>
   </property>
+  <property name="font">
+   <font>
+    <family>Comic Sans MS</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Додати модель</string>
   </property>
@@ -99,6 +104,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Comic Sans MS</family>
      <pointsize>8</pointsize>
      <italic>true</italic>
     </font>
@@ -132,13 +138,13 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>383</x>
      <y>220</y>
      <width>261</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -174,13 +180,13 @@
     <string>Завантажити ...</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>22</x>
      <y>54</y>
      <width>341</width>
-     <height>138</height>
+     <height>143</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">

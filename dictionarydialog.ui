@@ -10,6 +10,11 @@
     <height>225</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Comic Sans MS</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Змінити довідники</string>
   </property>

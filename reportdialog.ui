@@ -22,6 +22,11 @@
     <height>180</height>
    </size>
   </property>
+  <property name="font">
+   <font>
+    <family>Comic Sans MS</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Звіт</string>
   </property>
@@ -89,7 +94,7 @@
     <rect>
      <x>210</x>
      <y>60</y>
-     <width>111</width>
+     <width>113</width>
      <height>64</height>
     </rect>
    </property>
