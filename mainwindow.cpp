@@ -41,10 +41,10 @@ MainWindow::MainWindow(DataBase *data_base, QWidget *parent) :
     TableInit(ui->summary_table, QStringList() << "Показник" << "Значення");
     MainTableInit ();
 
-    QObject::connect (ui->main_table_view, &QTableView::clicked, this, &MainWindow::ShowPic);
-    QObject::connect (ui->main_table_view, &QTableView::clicked, this, &MainWindow::ShowGoodsInfo);
-    QObject::connect (ui->main_table_view, &QTableView::clicked, this, &MainWindow::UpdateButtons);
-
+//    QObject::connect (ui->main_table_view, &QTableView::clicked, this, &MainWindow::ShowPic);
+//    QObject::connect (ui->main_table_view, &QTableView::clicked, this, &MainWindow::ShowGoodsInfo);
+//    QObject::connect (ui->main_table_view, &QTableView::clicked, this, &MainWindow::UpdateButtons);
+    QObject::connect (ui->main_table_view, &QTableView::clicked, [=]{Update(ui->main_table_view->currentIndex().row());});
     QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &MainWindow::SetSearchType);
     QObject::connect (search_line, &QLineEdit::textChanged, this, &MainWindow::SearchTextChanged);
     Update(0);
@@ -215,7 +215,7 @@ void MainWindow::onActionAddGoods() {
                                                        << size
                                                        << QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT);
                     QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_SIZE, GOODS_DATE };
-                    if (!sdb->InsertDataIntoTable(sdb->GenerateInsertQuery (AVAILABLE_GOODS_TABLE, columns),
+                    if (!sdb->UpdateInsertData(sdb->GenerateInsertQuery (AVAILABLE_GOODS_TABLE, columns),
                                                   sdb->GenerateBindValues (columns),
                                                   data)) {
                         ui->statusbar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
@@ -244,7 +244,7 @@ void MainWindow::onActionSaleGoods() {
             data.append (QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT));
 
             QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_ID, GOODS_SIZE, GOODS_DATE, SALE_PRICE, PROFIT, SALE_DATE };
-            if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (SOLD_GOODS_TABLE, columns),
+            if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (SOLD_GOODS_TABLE, columns),
                                            sdb->GenerateBindValues (columns),
                                            data))
             {
@@ -266,7 +266,7 @@ void MainWindow::onActionReturnGoods() {
     if(return_goods->exec () == QDialog::Accepted){
         QVariantList data = sdb->SelectRow ("*", SOLD_GOODS_TABLE, GOODS_ID, return_goods->GetGoodsId (), GOODS_COL_COUNT);
         QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_ID, GOODS_SIZE, GOODS_DATE };
-        if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (AVAILABLE_GOODS_TABLE, columns),
+        if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (AVAILABLE_GOODS_TABLE, columns),
                                        sdb->GenerateBindValues (columns),
                                        data))
         {
@@ -301,7 +301,7 @@ void MainWindow::onActionAddModel() {
                                            << pic_byte_arr
                                            << QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh:mm:ss");
         QStringList columns = { MODEL_NAME, SEASON, CATEGORY, BRAND, WHOLESALE_PRICE, RETAIL_PRICE, PIC, DATE };
-        if (!sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (MODELS_TABLE, columns),
+        if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (MODELS_TABLE, columns),
                                        sdb->GenerateBindValues (columns),
                                        data)) {
             ui->statusbar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
@@ -316,7 +316,34 @@ void MainWindow::onActionEditModel() {
     QVariantList row = sdb->SelectRow ("*", MODELS_TABLE, MODEL_ID, filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), MODEL_ID_COL)).toString (), filter_model->columnCount ());
     AddModelDialog* edit_model = new AddModelDialog(sdb, row, this);
     if (edit_model->exec () == QDialog::Accepted){
+        QVariantList data = { edit_model->getModel(),
+                              edit_model->getCategory(),
+                              edit_model->getSeason(),
+                              edit_model->getBrand(),
+                              edit_model->getWholesalepr(),
+                              edit_model->getRetailpr(),
+                              QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT) };
+        QStringList columns = { MODEL_NAME, CATEGORY, SEASON,  BRAND, WHOLESALE_PRICE, RETAIL_PRICE, DATE };
 
+        if (!edit_model->getPhotoPath ().isEmpty ()){
+            QPixmap pic(edit_model->getPhotoPath ());
+            QByteArray pic_byte_arr;
+            QBuffer buff(&pic_byte_arr);
+            buff.open (QIODevice::WriteOnly);
+            pic.save (&buff, "JPG");
+
+            data.append (pic_byte_arr);
+            columns.append (PIC);
+        }
+
+        if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (MODELS_TABLE, columns, MODEL_ID, row.at(MODEL_ID_COL).toString ()),
+                                    sdb->GenerateBindValues (columns),
+                                    data)) {
+            QMessageBox::critical (this, "Error!", "Невдалось відредагувати модель! Проблема з підключеням до бази даних");
+            ui->statusbar->showMessage ("Невдалось відредагувати модель! Проблема з підключеням до бази даних");
+            return;
+        }
+        Update(ui->main_table_view->currentIndex ().row ());
     }
 }
 
@@ -441,6 +468,9 @@ void MainWindow::ShowPic() {
     if (!pic.isNull ()){
         ui->pic_lbl->setPixmap (pic.scaledToHeight(ui->pic_lbl->height()));
     }
+    else {
+        ui->pic_lbl->setPixmap(QPixmap(":/pics/default_pic.png"));
+    }
 }
 
 void MainWindow::ShowGoodsInfo() {
@@ -471,17 +501,18 @@ void MainWindow::ShowGoodsInfo() {
 }
 
 void MainWindow::Update(int row) {
+    qDebug() << QDateTime::currentDateTime();
     sql_model->select ();
     sql_model->sort (0, Qt::AscendingOrder);
     ui->main_table_view->selectRow (row);
     ShowPic ();
     SetSummary ();
     ShowGoodsInfo ();
+    UpdateCounts ();
     UpdateButtons ();
 }
 
 void MainWindow::UpdateButtons() {
-    UpdateCounts ();
     action_add_goods->setEnabled (models_table_count);
     action_sale_goods->setEnabled (available_goods_table_count);
     action_return_goods->setEnabled (sold_goods_table_count);

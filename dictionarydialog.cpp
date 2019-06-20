@@ -53,7 +53,7 @@ void DictionaryDialog::EnableDelButton() {
 void DictionaryDialog::AddButtonClicked() {
     QVariantList data = QVariantList() << ui_dict->new_value_le->text ();
     QStringList columns = QStringList() << col;
-    sdb->InsertDataIntoTable (sdb->GenerateInsertQuery (dict_table, columns),
+    sdb->UpdateInsertData (sdb->GenerateInsertQuery (dict_table, columns),
                             sdb->GenerateBindValues (columns),
                             data);
     UpdateDictView(ui_dict->dict_cb->currentText ());
