@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "database.h"
 
+
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     //qDebug() << QStyleFactory::keys ();
@@ -12,7 +13,16 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    DataBase* sdb = new DataBase();
+    QStringList create_tables_queries = {
+        SqlQueries::CreateModelsTable (),
+        SqlQueries::CreateBrandsTable (),
+        SqlQueries::CreateSeasonsTable (),
+        SqlQueries::CreateSoldGoodsTable (),
+        SqlQueries::CreateCategoriesTable (),
+        SqlQueries::CreateAvailablesGoodsTable ()
+    };
+
+    DataBase* sdb = new DataBase(create_tables_queries);
     if (!sdb->ConnectToDataBase (DB_PATH)) {
         QMessageBox::critical (nullptr, "Error", "Неможливо з'єднатись з базою даних!", QMessageBox::Ok);
         return -1;

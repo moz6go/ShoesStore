@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>350</height>
+    <width>550</width>
+    <height>265</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>600</width>
-    <height>350</height>
+    <width>550</width>
+    <height>265</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>600</width>
-    <height>350</height>
+    <width>550</width>
+    <height>265</height>
    </size>
   </property>
   <property name="font">
@@ -34,35 +34,6 @@
    <iconset resource="pics.qrc">
     <normaloff>:/pics/add_goods.png</normaloff>:/pics/add_goods.png</iconset>
   </property>
-  <widget class="QPushButton" name="add_goods_pb">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>310</y>
-     <width>89</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Додати</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="cancel_pb">
-   <property name="geometry">
-    <rect>
-     <x>480</x>
-     <y>310</y>
-     <width>89</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Скасувати</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="text_lbl">
    <property name="geometry">
     <rect>
@@ -79,13 +50,45 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget2">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>30</x>
      <y>20</y>
-     <width>302</width>
-     <height>281</height>
+     <width>221</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0" rowspan="2">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Бренд</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Модель</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" rowspan="2" colspan="2">
+     <widget class="QComboBox" name="brand_cb"/>
+    </item>
+    <item row="2" column="1" colspan="2">
+     <widget class="QComboBox" name="model_cb"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>271</x>
+     <y>20</y>
+     <width>269</width>
+     <height>191</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -93,18 +96,24 @@
      <widget class="QLabel" name="pic_lbl">
       <property name="minimumSize">
        <size>
-        <width>300</width>
-        <height>210</height>
+        <width>267</width>
+        <height>150</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>300</width>
-        <height>210</height>
+        <width>267</width>
+        <height>150</height>
        </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
       </property>
       <property name="text">
        <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
@@ -126,7 +135,7 @@
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>К-сть:</string>
+         <string>Загальна кількість:</string>
         </property>
        </widget>
       </item>
@@ -162,41 +171,84 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget3">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>370</x>
+     <y>220</y>
+     <width>168</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="add_goods_pb">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Додати</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="cancel_pb">
+      <property name="text">
+       <string>Скасувати</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>31</x>
      <y>130</y>
-     <width>221</width>
-     <height>200</height>
+     <width>219</width>
+     <height>124</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="5" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QLabel" name="lb_41">
+       <widget class="QLabel" name="lb_36">
         <property name="text">
-         <string>41</string>
+         <string>36</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="sb_41"/>
+       <widget class="QSpinBox" name="sb_36"/>
       </item>
      </layout>
     </item>
-    <item row="1" column="2">
-     <layout class="QHBoxLayout" name="horizontalLayout_9">
+    <item row="0" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
       <item>
-       <widget class="QLabel" name="lb_43">
+       <widget class="QLabel" name="lb_40">
         <property name="text">
-         <string>43</string>
+         <string>40</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="sb_43"/>
+       <widget class="QSpinBox" name="sb_40"/>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="2">
+     <layout class="QHBoxLayout" name="horizontalLayout_10">
+      <item>
+       <widget class="QLabel" name="lb_44">
+        <property name="text">
+         <string>44</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sb_44"/>
       </item>
      </layout>
     </item>
@@ -214,6 +266,34 @@
       </item>
      </layout>
     </item>
+    <item row="1" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QLabel" name="lb_41">
+        <property name="text">
+         <string>41</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sb_41"/>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="2">
+     <layout class="QHBoxLayout" name="horizontalLayout_11">
+      <item>
+       <widget class="QLabel" name="lb_45">
+        <property name="text">
+         <string>45</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sb_45"/>
+      </item>
+     </layout>
+    </item>
     <item row="2" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
@@ -228,63 +308,7 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="lb_36">
-        <property name="text">
-         <string>36</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_36"/>
-      </item>
-     </layout>
-    </item>
-    <item row="3" column="2">
-     <layout class="QHBoxLayout" name="horizontalLayout_11">
-      <item>
-       <widget class="QLabel" name="lb_45">
-        <property name="text">
-         <string>45</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_45"/>
-      </item>
-     </layout>
-    </item>
-    <item row="4" column="2">
-     <layout class="QHBoxLayout" name="horizontalLayout_12">
-      <item>
-       <widget class="QLabel" name="lb_46">
-        <property name="text">
-         <string>46</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_46"/>
-      </item>
-     </layout>
-    </item>
-    <item row="2" column="2">
-     <layout class="QHBoxLayout" name="horizontalLayout_10">
-      <item>
-       <widget class="QLabel" name="lb_44">
-        <property name="text">
-         <string>44</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_44"/>
-      </item>
-     </layout>
-    </item>
-    <item row="0" column="2">
+    <item row="2" column="1">
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <item>
        <widget class="QLabel" name="lb_42">
@@ -298,17 +322,17 @@
       </item>
      </layout>
     </item>
-    <item row="4" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_6">
+    <item row="2" column="2">
+     <layout class="QHBoxLayout" name="horizontalLayout_12">
       <item>
-       <widget class="QLabel" name="lb_40">
+       <widget class="QLabel" name="lb_46">
         <property name="text">
-         <string>40</string>
+         <string>46</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="sb_40"/>
+       <widget class="QSpinBox" name="sb_46"/>
       </item>
      </layout>
     </item>
@@ -326,50 +350,33 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="1">
-     <spacer name="horizontalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
+    <item row="3" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
+      <item>
+       <widget class="QLabel" name="lb_43">
+        <property name="text">
+         <string>43</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sb_43"/>
+      </item>
+     </layout>
     </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>20</y>
-     <width>221</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0" rowspan="2">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>Бренд</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Модель</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1" rowspan="2" colspan="2">
-     <widget class="QComboBox" name="brand_cb"/>
-    </item>
-    <item row="2" column="1" colspan="2">
-     <widget class="QComboBox" name="model_cb"/>
+    <item row="3" column="2">
+     <layout class="QHBoxLayout" name="horizontalLayout_14">
+      <item>
+       <widget class="QLabel" name="lb_ws">
+        <property name="text">
+         <string>б.р.</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sb_ws"/>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

@@ -12,12 +12,12 @@ ReturnGoodsDialog::ReturnGoodsDialog(DataBase* data_base, QWidget *parent) :
 
     query_model = new QSqlQueryModel();
     query_model->setQuery ("SELECT model_name, brand, goods_size, sale_price, sale_date, goods_id FROM sold_goods WHERE sale_date >= datetime('now', '-1 year')");
-    query_model->setHeaderData (0, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[1]);
-    query_model->setHeaderData (1, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[2]);
-    query_model->setHeaderData (2, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[4]);
-    query_model->setHeaderData (3, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[6]);
-    query_model->setHeaderData (4, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[8]);
-    query_model->setHeaderData (5, Qt::Horizontal, SOLD_GOODS_TABLE_HEADERS_LIST[3]);
+    query_model->setHeaderData (0, Qt::Horizontal, SOLD_GOODS_HEADERS_LIST[1]);
+    query_model->setHeaderData (1, Qt::Horizontal, SOLD_GOODS_HEADERS_LIST[2]);
+    query_model->setHeaderData (2, Qt::Horizontal, SOLD_GOODS_HEADERS_LIST[4]);
+    query_model->setHeaderData (3, Qt::Horizontal, SOLD_GOODS_HEADERS_LIST[6]);
+    query_model->setHeaderData (4, Qt::Horizontal, SOLD_GOODS_HEADERS_LIST[8]);
+    query_model->setHeaderData (5, Qt::Horizontal, SOLD_GOODS_HEADERS_LIST[3]);
 
     ui_return->sold_goods_table->setModel (query_model);
 

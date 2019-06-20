@@ -16,19 +16,22 @@ class AddModelDialog : public QDialog
     DataBase* sdb;
     QString photo_path;
     QVariantList row;
+    bool isPicDel;
 public:
     explicit AddModelDialog(DataBase* data_base, const QVariantList& curr_row, QWidget *parent = nullptr);
     QString getModel();
     QString getCategory ();
     QString getSeason();
     QString getBrand();
-    double getWholesalepr();
-    double getRetailpr();
+    QString getWholesalepr();
+    QString getRetailpr();
     QString getPhotoPath();
+    bool isPicDeleted();
     ~AddModelDialog();
 private slots:
     void LoadPic();
     void EnableAddButton();
+    void onClosePbClick();
 };
 
 #endif // ADDMODELDIALOG_H

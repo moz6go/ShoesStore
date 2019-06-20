@@ -8,31 +8,31 @@ class DataBase : public QObject
     Q_OBJECT
     QSqlDatabase sdb;
     QString last_error;
+    QStringList create_queries;
     bool OpenDataBase(QString db_path);
     bool RestoreDataBase();
 public:
-    DataBase (QObject *parent = nullptr);
+    DataBase (const QStringList& create_tables_queries, QObject *parent = nullptr);
     ~DataBase ();
     QString LastError();
-    bool ConnectToDataBase(QString db_path);
+    bool ConnectToDataBase(const QString& db_path);
     bool CreateDataBase();
     void CloseDataBase();
     bool UpdateInsertData (const QString& query_str,  const QStringList& bind_values_list, const QVariantList& data);
     QString GenerateInsertQuery(const QString& table, const QStringList& columns);
     QString GenerateUpdateQuery(const QString& table, const QStringList& columns, const QString& where, const QString& equal);
     QStringList GenerateBindValues(QStringList columns);
+    QString Select(const QString &query);
     double SelectSum(const QString& qeury);
 
-    QVector<QVariantList> SelectTable(const QString& query,
-                                      const QString& where,
-                                      const QString& date_from,
-                                      const QString& date_to);
+    QVector<QVariantList> SelectTable(const QString &str_query);
+
     int SelectCount(const QString& from);
+
     int SelectCount(const QString& from,
                     const QString& where,
                     const QString& equal_sign,
                     const QString& equal);
-
 
     int SelectCount(const QString& from,
                     const QString& where1, const QString& where2,

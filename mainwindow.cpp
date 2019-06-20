@@ -41,9 +41,6 @@ MainWindow::MainWindow(DataBase *data_base, QWidget *parent) :
     TableInit(ui->summary_table, QStringList() << "Показник" << "Значення");
     MainTableInit ();
 
-//    QObject::connect (ui->main_table_view, &QTableView::clicked, this, &MainWindow::ShowPic);
-//    QObject::connect (ui->main_table_view, &QTableView::clicked, this, &MainWindow::ShowGoodsInfo);
-//    QObject::connect (ui->main_table_view, &QTableView::clicked, this, &MainWindow::UpdateButtons);
     QObject::connect (ui->main_table_view, &QTableView::clicked, [=]{Update(ui->main_table_view->currentIndex().row());});
     QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &MainWindow::SetSearchType);
     QObject::connect (search_line, &QLineEdit::textChanged, this, &MainWindow::SearchTextChanged);
@@ -94,13 +91,13 @@ void MainWindow::SetSummary() {
         ui->summary_table->insertRow (row);
         ui->summary_table->setItem(row, 0, new QTableWidgetItem (SUMMARY_ROWS[row]));
     }
-    double month_income(sdb->SelectSum (INCOME_BY_MONTH_QUERY)),
-            month_costs(sdb->SelectSum (COSTS_BY_MONTH_QUERY)),
-            year_income(sdb->SelectSum (INCOME_BY_YEAR_QUERY)),
-            year_costs(sdb->SelectSum (COSTS_BY_YEAR_QUERY));
+    double month_income(sdb->SelectSum (SqlQueries::IncomeByMonth ())),
+            month_costs(sdb->SelectSum (SqlQueries::CostsByMonth ())),
+            year_income(sdb->SelectSum (SqlQueries::IncomeByYear ())),
+            year_costs(sdb->SelectSum (SqlQueries::CostsByYear ()));
 
     ui->summary_table->setItem(1, 1, new QTableWidgetItem(QString::number (sdb->SelectCount (AVAILABLE_GOODS_TABLE))));
-    ui->summary_table->setItem(2, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (AVAILABLE_GOODS_WPRICE_SUM_QUERY), 0, 'f', 2)));
+    ui->summary_table->setItem(2, 1, new QTableWidgetItem(QString("%L1").arg(sdb->SelectSum (SqlQueries::AvailableGoodsWpriceSum ()), 0, 'f', 2)));
     ui->summary_table->setItem(4, 1, new QTableWidgetItem(QString("%L1").arg(month_income, 0, 'f', 2)));
     ui->summary_table->setItem(5, 1, new QTableWidgetItem(QString("%L1").arg(month_costs, 0, 'f', 2)));
     ui->summary_table->setItem(6, 1, new QTableWidgetItem(QString("%L1").arg((month_income - month_costs), 0, 'f', 2)));
@@ -207,7 +204,7 @@ void MainWindow::onActionAddGoods() {
         int model_id = sdb->Select (MODEL_ID, MODELS_TABLE, MODEL_NAME, add_goods->GetModelName ()).toInt ();
         for (int i = 0; i < sb_list.size (); ++i) {
             if (sb_list[i]->value ()) {
-                int size = i + 36;
+                QString size = i == WITHOUT_SIZE ? "б.р." : QString::number (i + 36);
                 for (int count = 0; count < sb_list[i]->value (); ++count) {
                     QVariantList data = QVariantList() << model_id
                                                        << model_name
@@ -218,6 +215,7 @@ void MainWindow::onActionAddGoods() {
                     if (!sdb->UpdateInsertData(sdb->GenerateInsertQuery (AVAILABLE_GOODS_TABLE, columns),
                                                   sdb->GenerateBindValues (columns),
                                                   data)) {
+                        QMessageBox::critical (this, "Error","Невдалось додати товари! Проблема з підключеням до бази даних\n\n" + sdb->LastError ());
                         ui->statusbar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
                     }
                 }
@@ -286,20 +284,22 @@ void MainWindow::onActionReturnGoods() {
 void MainWindow::onActionAddModel() {
     AddModelDialog* add_model = new AddModelDialog (sdb,  QVariantList(), this);
     if(add_model->exec () == QDialog::Accepted) {
-        QPixmap pic(add_model->getPhotoPath ());
         QByteArray pic_byte_arr;
-        QBuffer buff(&pic_byte_arr);
-        buff.open (QIODevice::WriteOnly);
-        pic.save (&buff, "JPG");
+        if(add_model->getPhotoPath ().size ()){
+            QPixmap pic(add_model->getPhotoPath ());
+            QBuffer buff(&pic_byte_arr);
+            buff.open (QIODevice::WriteOnly);
+            pic.save (&buff, "JPG");
+        }
 
-        QVariantList data = QVariantList() << add_model->getModel ()
-                                           << add_model->getSeason ()
-                                           << add_model->getCategory ()
-                                           << add_model->getBrand ()
-                                           << QString::number (add_model->getWholesalepr ())
-                                           << QString::number (add_model->getRetailpr ())
-                                           << pic_byte_arr
-                                           << QDateTime::currentDateTime ().toString ("yyyy-MM-dd hh:mm:ss");
+        QVariantList data = { add_model->getModel (),
+                              add_model->getSeason (),
+                              add_model->getCategory (),
+                              add_model->getBrand (),
+                              add_model->getWholesalepr (),
+                              add_model->getRetailpr (),
+                              pic_byte_arr,
+                              QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT) };
         QStringList columns = { MODEL_NAME, SEASON, CATEGORY, BRAND, WHOLESALE_PRICE, RETAIL_PRICE, PIC, DATE };
         if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (MODELS_TABLE, columns),
                                        sdb->GenerateBindValues (columns),
@@ -317,15 +317,19 @@ void MainWindow::onActionEditModel() {
     AddModelDialog* edit_model = new AddModelDialog(sdb, row, this);
     if (edit_model->exec () == QDialog::Accepted){
         QVariantList data = { edit_model->getModel(),
-                              edit_model->getCategory(),
                               edit_model->getSeason(),
+                              edit_model->getCategory(),
                               edit_model->getBrand(),
                               edit_model->getWholesalepr(),
                               edit_model->getRetailpr(),
                               QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT) };
-        QStringList columns = { MODEL_NAME, CATEGORY, SEASON,  BRAND, WHOLESALE_PRICE, RETAIL_PRICE, DATE };
+        QStringList columns = { MODEL_NAME, SEASON, CATEGORY, BRAND, WHOLESALE_PRICE, RETAIL_PRICE, DATE };
 
-        if (!edit_model->getPhotoPath ().isEmpty ()){
+        if (edit_model->getPhotoPath ().isEmpty () && edit_model->isPicDeleted ()){
+            data.append (QByteArray());
+            columns.append (PIC);
+        }
+        else if(!edit_model->getPhotoPath ().isEmpty ()) {
             QPixmap pic(edit_model->getPhotoPath ());
             QByteArray pic_byte_arr;
             QBuffer buff(&pic_byte_arr);
@@ -339,11 +343,12 @@ void MainWindow::onActionEditModel() {
         if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (MODELS_TABLE, columns, MODEL_ID, row.at(MODEL_ID_COL).toString ()),
                                     sdb->GenerateBindValues (columns),
                                     data)) {
-            QMessageBox::critical (this, "Error!", "Невдалось відредагувати модель! Проблема з підключеням до бази даних");
+            QMessageBox::critical (this, "Error!", "Невдалось відредагувати модель! Проблема з підключеням до бази даних\n\n" + sdb->LastError ());
             ui->statusbar->showMessage ("Невдалось відредагувати модель! Проблема з підключеням до бази даних");
             return;
         }
         Update(ui->main_table_view->currentIndex ().row ());
+        ui->statusbar->showMessage ("Відредаговано модель " + edit_model->getModel () + ", виробник " + edit_model->getBrand ());
     }
 }
 
@@ -374,11 +379,11 @@ void MainWindow::onActionReport() {
             QString table_name;
             switch (report_dialog->GetReportType ()) {
             case SOLD_GOODS_REPORT:
-                table = sdb->SelectTable (SOLD_GOODS_TABLE, SALE_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ());
+                table = sdb->SelectTable (SqlQueries::SelectTableForReport (SOLD_GOODS_TABLE, SALE_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ()));
                 table_name = SOLD_GOODS_TABLE;
                 break;
             case AVAILABLE_GOODS_REPORT:
-                table = sdb->SelectTable (AVAILABLE_GOODS_TABLE, GOODS_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ());
+                table = sdb->SelectTable (SqlQueries::SelectTableForReport (AVAILABLE_GOODS_TABLE, GOODS_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ()));
                 table_name = AVAILABLE_GOODS_TABLE;
                 break;
             }
@@ -477,17 +482,18 @@ void MainWindow::ShowGoodsInfo() {
     if(filter_model->rowCount ()){
         TableInit(ui->goods_info_table, QStringList() << "Розмір" << "Кількість");
         int sum_count(0);
-        int model_id = filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), 0)).toInt ();
-        for (int size = 36; size <= 46; ++size) {
+        QString model_id = filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), 0)).toString ();
+        for (int i = S36; i <= WITHOUT_SIZE; ++i) {
+            QString size = i == WITHOUT_SIZE ? "б.р." : QString::number (i + 36);
             int count = sdb->SelectCount (AVAILABLE_GOODS_TABLE,
-                    MODEL_ID,                       GOODS_SIZE,
-                    "=",                            "=",
-                    QString::number (model_id),     QString::number (size));
+                                          MODEL_ID,   GOODS_SIZE,
+                                          "=",        "=",
+                                          model_id,   size);
             sum_count += count;
             if(count) {
                 ui->goods_info_table->insertRow (ui->goods_info_table->rowCount ());
                 for(int col = 0; col < 2; ++col) {
-                    QTableWidgetItem* item = new QTableWidgetItem (col == 0 ? QString::number (size) : QString::number (count));
+                    QTableWidgetItem* item = new QTableWidgetItem (col == 0 ? size : QString::number (count));
                     ui->goods_info_table->setItem(ui->goods_info_table->rowCount() - 1, col, item);
                 }
             }
@@ -501,9 +507,8 @@ void MainWindow::ShowGoodsInfo() {
 }
 
 void MainWindow::Update(int row) {
-    qDebug() << QDateTime::currentDateTime();
     sql_model->select ();
-    sql_model->sort (0, Qt::AscendingOrder);
+    filter_model->sort (DATE_COL, Qt::DescendingOrder);
     ui->main_table_view->selectRow (row);
     ShowPic ();
     SetSummary ();

@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     reportdialog.cpp \
     dictionarydialog.cpp \
     returngoodsdialog.cpp \
-    myproxymodel.cpp
+    myproxymodel.cpp \
+    sqlqueries.cpp
 
 HEADERS  +=    \
     general.h \
@@ -35,7 +36,8 @@ HEADERS  +=    \
     reportdialog.h \
     dictionarydialog.h \
     returngoodsdialog.h \
-    myproxymodel.h
+    myproxymodel.h \
+    sqlqueries.h
 
 FORMS    +=    \
     addmodeldialog.ui \

@@ -10,6 +10,7 @@
 #include "dictionarydialog.h"
 #include "returngoodsdialog.h"
 #include "myproxymodel.h"
+#include "sqlqueries.h"
 
 namespace Ui {
 class MainWindow;

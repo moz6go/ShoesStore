@@ -15,7 +15,7 @@ class AddGoodsDialog : public QDialog
     QSortFilterProxyModel* f_model;
     int current_row;
     QList<QSpinBox*> sb_list;
-    Ui::AddGoodsDialog *ui_add_goods_dialog;
+    Ui::AddGoodsDialog *ui;
 public:
     explicit AddGoodsDialog(DataBase* data_base, int row, QSortFilterProxyModel* model, QWidget *parent = nullptr);
     QList<QSpinBox*>& GetSbList();

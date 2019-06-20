@@ -11,7 +11,9 @@ AddModelDialog::AddModelDialog (DataBase* data_base, const QVariantList &curr_ro
     sdb = data_base;
     row = curr_row;
     ui->warning_lbl->setVisible (false);
+
     ui->pic_lbl->setPixmap (QPixmap(":/pics/default_pic.png"));
+    ui->close_pb->setVisible (false);
 
     QSqlTableModel* model_category = new QSqlTableModel(this);
     model_category->setTable (CATEGORIES_TABLE);
@@ -29,6 +31,8 @@ AddModelDialog::AddModelDialog (DataBase* data_base, const QVariantList &curr_ro
     ui->season_cb->setModel (model_season);
 
     if (row.size ()) {
+        isPicDel = false;
+
         ui->model_le->setText (row.at (MODEL_NAME_COL).toString ());
         ui->category_cb->setCurrentText (row.at (CATEGORY_COL).toString ());
         ui->brand_cb->setCurrentText (row.at (BRAND_COL).toString ());
@@ -40,14 +44,16 @@ AddModelDialog::AddModelDialog (DataBase* data_base, const QVariantList &curr_ro
         photo.loadFromData (row.at (PIC_COL).toByteArray ());
         if (!photo.isNull ()){
             ui->pic_lbl->setPixmap(photo.scaledToHeight (ui->pic_lbl->height ()));
+            ui->close_pb->setVisible (true);
         }
         else {
             ui->pic_lbl->setPixmap(QPixmap(":/pics/default_pic.png"));
+            ui->close_pb->setVisible (false);
         }
         setWindowTitle ("Редагувати модель");
         EnableAddButton();
     }
-
+    QObject::connect (ui->close_pb, &QPushButton::clicked, this, &AddModelDialog::onClosePbClick);
     QObject::connect(ui->add_pb, &QPushButton::clicked, this, &AddModelDialog::accept);
     QObject::connect(ui->cancel_pb, &QPushButton::clicked, this, &AddModelDialog::reject);
     QObject::connect(ui->load_pic_pb, &QPushButton::clicked, this, &AddModelDialog::LoadPic);
@@ -70,16 +76,20 @@ QString AddModelDialog::getBrand () {
     return ui->brand_cb->currentText ();
 }
 
-double AddModelDialog::getWholesalepr () {
-    return ui->wholesalepr_sb->value ();
+QString AddModelDialog::getWholesalepr () {
+    return QString::number (ui->wholesalepr_sb->value ());
 }
 
-double AddModelDialog::getRetailpr () {
-    return ui->retailpr_sb->value ();
+QString AddModelDialog::getRetailpr() {
+    return QString::number (ui->retailpr_sb->value ());
 }
 
 QString AddModelDialog::getPhotoPath(){
     return photo_path;
+}
+
+bool AddModelDialog::isPicDeleted() {
+    return isPicDel;
 }
 
 AddModelDialog::~AddModelDialog() {
@@ -91,10 +101,7 @@ void AddModelDialog::LoadPic(){
     if (!photo_path.isEmpty ()){
         ui->pic_name_lbl->setText (photo_path.right (photo_path.size () - photo_path.lastIndexOf ('/') - 1));
         ui->pic_lbl->setPixmap (QPixmap(photo_path).scaledToHeight (ui->pic_lbl->height ()));
-    }
-    else {
-        ui->pic_name_lbl->setText("");
-        ui->pic_lbl->setPixmap (QPixmap(":/pics/default_pic.png"));
+        ui->close_pb->setVisible (true);
     }
 }
 
@@ -115,4 +122,12 @@ void AddModelDialog::EnableAddButton() {
         ui->warning_lbl->setVisible (true);
         ui->add_pb->setDisabled (true);
     }
+}
+
+void AddModelDialog::onClosePbClick() {
+    photo_path = "";
+    ui->pic_name_lbl->setText ("");
+    ui->pic_lbl->setPixmap(QPixmap(":/pics/default_pic.png"));
+    ui->close_pb->setVisible (false);
+    isPicDel = true;
 }

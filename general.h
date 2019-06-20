@@ -82,80 +82,13 @@ const QString SALE_PRICE = "sale_price";
 const QString SALE_DATE = "sale_date";
 const QString PROFIT = "profit";
 
-//create tables queries
-const QString CREATE_MODELS_TABLE = "CREATE TABLE " + MODELS_TABLE + " ("
-                                    + MODEL_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-                                    + MODEL_NAME + " TEXT NOT NULL, "
-                                    + SEASON + " TEXT NOT NULL, "
-                                    + CATEGORY + " TEXT NOT NULL, "
-                                    + BRAND + " TEXT NOT NULL, "
-                                    + WHOLESALE_PRICE + " REAL NOT NULL, "
-                                    + RETAIL_PRICE + " REAL NOT NULL, "
-                                    + PIC + " BLOB, "
-                                    + DATE + " TEXT NOT NULL)";
 
-const QString CREATE_AVAILABLE_GOODS_TABLE = "CREATE TABLE " + AVAILABLE_GOODS_TABLE + " ("
-                                             + MODEL_ID + "	INTEGER NOT NULL,"
-                                             + MODEL_NAME + " TEXT NOT NULL,"
-                                             + BRAND + " TEXT NOT NULL,"
-                                             + GOODS_ID + "	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,"
-                                             + GOODS_SIZE + " INTEGER NOT NULL,"
-                                             + GOODS_DATE + " TEXT NOT NULL)";
-
-const QString CREATE_BRANDS_TABLE = "CREATE TABLE " + BRANDS_TABLE + " ("+ BRAND +" TEXT)";
-const QString CREATE_CATEGORIES_TABLE = "CREATE TABLE " + CATEGORIES_TABLE + " (" + CATEGORY + "  TEXT)";
-const QString CREATE_SEASONS_TABLE = "CREATE TABLE " + SEASONS_TABLE + " ("+ SEASON + " TEXT)";
-const QString CREATE_SOLD_GOODS_TABLE = "CREATE TABLE " + SOLD_GOODS_TABLE + " ("
-                                        + MODEL_ID + " INTEGER NOT NULL, "
-                                        + MODEL_NAME + " TEXT NOT NULL, "
-                                        + BRAND + " TEXT NOT NULL, "
-                                        + GOODS_ID + " INTEGER NOT NULL, "
-                                        + GOODS_SIZE + " INTEGER NOT NULL, "
-                                        + GOODS_DATE + " TEXT NOT NULL, "
-                                        + SALE_PRICE + " REAL NOT NULL, "
-                                        + PROFIT + " REAL NOT NULL, "
-                                        + SALE_DATE + " TEXT NOT NULL)";
 
 //count of columns
 const int MODELS_COL_COUNT = 9;
 const int GOODS_COL_COUNT = 6;
 const int SOLD_COL_COUNT = 9;
 
-
-const QString COUNT_OF_SOLD_GOODS_BY_LAST_YEAR_QUERY = "SELECT COUNT(*)"
-                                                       " FROM (SELECT * FROM "+ SOLD_GOODS_TABLE +" WHERE " + MODEL_ID + " = 2)"
-                                                       " WHERE " + SALE_DATE + " >= datetime('now', '-1 year')";
-
-const QString AVAILABLE_GOODS_WPRICE_SUM_QUERY = "SELECT SUM(" + WHOLESALE_PRICE + ")"
-                                          " FROM ("
-                                            " SELECT " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + ", " + MODELS_TABLE + "." + WHOLESALE_PRICE + ""
-                                            " FROM " + AVAILABLE_GOODS_TABLE +
-                                            " INNER JOIN " + MODELS_TABLE + " ON " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID + ")";
-
-const QString COSTS_BY_MONTH_QUERY = "SELECT SUM(" + WHOLESALE_PRICE + ")"
-                                          " FROM ("
-                                            " SELECT " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + ", " + MODELS_TABLE + "." + WHOLESALE_PRICE + ""
-                                            " FROM " + AVAILABLE_GOODS_TABLE +
-                                            " INNER JOIN " + MODELS_TABLE + " ON " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID +
-                                            " WHERE " + GOODS_DATE + " >= datetime('now', 'start of month'))";
-
-const QString COSTS_BY_YEAR_QUERY = "SELECT SUM(" + WHOLESALE_PRICE + ")"
-                                          " FROM ("
-                                            " SELECT " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + ", " + MODELS_TABLE + "." + WHOLESALE_PRICE + ""
-                                            " FROM " + AVAILABLE_GOODS_TABLE +
-                                            " INNER JOIN " + MODELS_TABLE + " ON " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID +
-                                            " WHERE " + GOODS_DATE + " >= datetime('now', 'start of year'))";
-
-const QString INCOME_BY_MONTH_QUERY = "SELECT SUM("+ SALE_PRICE +")"
-                                             " FROM " + SOLD_GOODS_TABLE +
-                                             " WHERE " + SALE_DATE + ">= datetime('now', 'start of month')";
-
-const QString INCOME_BY_YEAR_QUERY = "SELECT SUM("+ SALE_PRICE +")"
-                                             " FROM " + SOLD_GOODS_TABLE +
-                                             " WHERE " + SALE_DATE + ">= datetime('now', 'start of year')";
-
-const QString AVAILABLE_GOODS_QUERY = "SELECT * FROM " + AVAILABLE_GOODS_TABLE;
-const QString SOLD_GOODS_QUERY = "SELECT * FROM " + SOLD_GOODS_TABLE;
 
 const QStringList SUMMARY_ROWS = {
     /*0*/ "Всього товару:",
@@ -193,15 +126,6 @@ enum ReportsTypes {
     AVAILABLE_GOODS_REPORT
 };
 
-//enum SearchType {
-//    BY_MODEL_NAME = 1,
-//    BY_SEASON,
-//    BY_CATEGORY,
-//    BY_BRAND,
-//    BY_WPRICE,
-//    BY_RPRICE
-//};
-
 const QStringList MODELS_TABLE_HEADERS_LIST = {
     /*0*/"!id",
     /*1*/"Назва моделі",
@@ -214,7 +138,7 @@ const QStringList MODELS_TABLE_HEADERS_LIST = {
     /*8*/"!date"
 };
 
-const QStringList SOLD_GOODS_TABLE_HEADERS_LIST = {
+const QStringList SOLD_GOODS_HEADERS_LIST = {
     /*0*/"Код моделі",
     /*1*/"Назва моделі",
     /*2*/"Виробник",
@@ -265,7 +189,6 @@ enum SoldGoodCol {
 };
 
 enum Sizes {
-    S35,
     S36,
     S37,
     S38,

@@ -16,5 +16,6 @@
         <file>pics/restore.png</file>
         <file>pics/default_pic.png</file>
         <file>pics/edit_model.png</file>
+        <file>pics/close.png</file>
     </qresource>
 </RCC>

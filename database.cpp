@@ -1,6 +1,8 @@
 #include "database.h"
 
-DataBase::DataBase(QObject *parent) : QObject(parent) {}
+DataBase::DataBase(const QStringList &create_tables_queries, QObject *parent) : QObject(parent) {
+    create_queries = create_tables_queries;
+}
 
 DataBase::~DataBase() {
     CloseDataBase();
@@ -10,7 +12,7 @@ QString DataBase::LastError() {
     return last_error;
 }
 
-bool DataBase::ConnectToDataBase (QString db_path) {
+bool DataBase::ConnectToDataBase (const QString& db_path) {
     if(!QFile(db_path).exists()){
         if(!RestoreDataBase()){
             return false;
@@ -52,29 +54,11 @@ bool DataBase::RestoreDataBase() {
 bool DataBase::CreateDataBase() {
     QSqlQuery query;
 
-    if(!query.exec (CREATE_MODELS_TABLE))  {
-        last_error = sdb.lastError ().text ();
-        return false;
-    }
-    if(!query.exec (CREATE_AVAILABLE_GOODS_TABLE)){
-        last_error = sdb.lastError ().text ();
-        return false;
-    }
-    if(!query.exec (CREATE_BRANDS_TABLE)){
-        last_error = sdb.lastError ().text ();
-        return false;
-    }
-    if(!query.exec (CREATE_CATEGORIES_TABLE)) {
-        last_error = sdb.lastError ().text ();
-        return false;
-    }
-    if(!query.exec (CREATE_SEASONS_TABLE)) {
-        last_error = sdb.lastError ().text ();
-        return false;
-    }
-    if(!query.exec (CREATE_SOLD_GOODS_TABLE)){
-        last_error = sdb.lastError ().text ();
-        return false;
+    for (auto& cr_query : create_queries) {
+        if(!query.exec (cr_query))  {
+            last_error = sdb.lastError ().text ();
+            return false;
+        }
     }
     return true;
 }
@@ -93,7 +77,7 @@ bool DataBase::UpdateInsertData (const QString& query_str, const QStringList& bi
         query.bindValue (bind_values_list[i], data[i]);
     }
     if(!query.exec ()) {
-        qDebug() << query.lastError ();
+        last_error = sdb.lastError ().text ();
         return false;
     }
     else {
@@ -101,31 +85,32 @@ bool DataBase::UpdateInsertData (const QString& query_str, const QStringList& bi
     }
 }
 
+QString DataBase::Select(const QString &query) {
+    QSqlQuery sel_query;
+    sel_query.exec (query);
+    sel_query.next ();
+    return  sel_query.isValid () ? sel_query.value(0).toString () : QString();
+}
+
 int DataBase::SelectCount(const QString &from) {
     QSqlQuery sel_query;
     sel_query.exec ("SELECT COUNT(*) FROM " + from);
     sel_query.next ();
-    return sel_query.value (0).toInt ();
+    return sel_query.isValid () ? sel_query.value (0).toInt (): 0;
 }
 
 double DataBase::SelectSum(const QString &query) {
     QSqlQuery sel_query;
     sel_query.exec (query);
     sel_query.next ();
-    return sel_query.value (0).toDouble ();
+    return sel_query.isValid () ? sel_query.value (0).toDouble () : 0.0;
 }
 
-QVector<QVariantList> DataBase::SelectTable(const QString &table_name, const QString& where, const QString& date_from, const QString& date_to) {
+QVector<QVariantList> DataBase::SelectTable(const QString &str_query) {
     QVector<QVariantList> table;
     QLocale loc(QLocale::Ukrainian, QLocale::Ukraine);
     QSqlQuery query;
-    query.exec ("SELECT " + table_name + ".*, " + MODELS_TABLE + "." + CATEGORY + ", "
-                                                + MODELS_TABLE + "." + SEASON + ", "
-                                                + MODELS_TABLE + "." + WHOLESALE_PRICE + ", "
-                                                + MODELS_TABLE + "." + RETAIL_PRICE +
-                " FROM " + table_name +
-                " INNER JOIN " + MODELS_TABLE + " ON " + table_name + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID +
-                " WHERE " + where + " BETWEEN '" + date_from + "' AND '" + date_to + "'");
+    query.exec (str_query);
     QSqlRecord rec = query.record ();
 
     QVariantList header;
@@ -151,27 +136,22 @@ QVector<QVariantList> DataBase::SelectTable(const QString &table_name, const QSt
 }
 
 int DataBase::SelectCount(const QString &from, const QString &where, const QString& equal_sign, const QString &equal) {
-    QSqlQuery query;
-    query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where + " " + equal_sign + " '" + equal + "'");
-    query.next ();
-    return query.value (0).toInt ();
+    QSqlQuery sel_query;
+    sel_query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where + " " + equal_sign + " '" + equal + "'");
+    sel_query.next ();
+    return sel_query.isValid () ? sel_query.value (0).toInt (): 0;
 }
 
 int DataBase::SelectCount(const QString& from, const QString& where1, const QString& where2, const QString& equal_sign1, const QString& equal_sign2, const QString& equal1, const QString& equal2) {
-    QSqlQuery query;
-    query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where1 + " " + equal_sign1 + " '" + equal1 + "' AND " + where2 + " " + equal_sign2 + " " + equal2 );
-    query.next ();
-    return query.value (0).toInt ();
+    QSqlQuery sel_query;
+    sel_query.exec ("SELECT COUNT(*) FROM " + from + " WHERE " + where1 + " " + equal_sign1 + " '" + equal1 + "' AND " + where2 + " " + equal_sign2 + " '" + equal2 + "'" );
+    sel_query.next ();
+    return sel_query.isValid () ? sel_query.value (0).toInt (): 0;
 }
 
 bool DataBase::DeleteRow(const QString &from, const QString &where, const QString &equal) {
     QSqlQuery query;
-    if (query.exec ("DELETE FROM " + from + " WHERE " + where + " = '" + equal + "'")){
-        return true;
-    }
-    else {
-        return false;
-    }
+    return query.exec ("DELETE FROM " + from + " WHERE " + where + " = '" + equal + "'");
 }
 
 QByteArray DataBase::SelectPic(const QString &from, const QString &where, const QString &equal) {
@@ -187,7 +167,7 @@ QString DataBase::Select(const QString &select, const QString &from, const QStri
     query.exec ("SELECT " + select + " FROM "+ from +" WHERE "+ where +" = '" + equal + "'");
     QSqlRecord rec = query.record ();
     query.next ();
-    return  query.value(rec.indexOf(select)).toString ();
+    return  query.isValid () ? query.value(rec.indexOf(select)).toString () : QString();
 }
 
 QVariantList DataBase::SelectRow(const QString &select,

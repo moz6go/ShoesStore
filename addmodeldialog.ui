@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>AddModelDialog</class>
  <widget class="QDialog" name="AddModelDialog">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -295,6 +298,29 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QPushButton" name="close_pb">
+   <property name="geometry">
+    <rect>
+     <x>627</x>
+     <y>19</y>
+     <width>16</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Видалити фото</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="pics.qrc">
+     <normaloff>:/pics/close.png</normaloff>:/pics/close.png</iconset>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
   </widget>
  </widget>
  <tabstops>
