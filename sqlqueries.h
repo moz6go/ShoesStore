@@ -22,6 +22,10 @@ public:
     static QString AvailableGoods();
     static QString SoldGoods();
     static QString SelectTableForReport(const QString &table_name, const QString& where, const QString& date_from, const QString& date_to);
+    static QString AvailableBrands();
+    static QString ModelsListByBrand(const QString& brand);
+    static QString AvailableSizesByModelId(const QString& model_id);
+    static QString SoldGoodsByLastYear(const QString& model_id);
 };
 
 #endif // SQLQUERIES_H

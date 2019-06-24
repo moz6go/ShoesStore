@@ -227,30 +227,26 @@ void MainWindow::onActionAddGoods() {
 }
 
 void MainWindow::onActionSaleGoods() {
-    SaleDialog* sale_goods = new SaleDialog(sdb, ui->main_table_view->currentIndex ().row (), filter_model, this);
+    QVariantList row = sdb->SelectRow ("*", MODELS_TABLE, MODEL_ID, filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), MODEL_ID_COL)).toString (), filter_model->columnCount ());
+    SaleDialog* sale_goods = new SaleDialog(sdb, row, this);
     if (sale_goods->exec () == QDialog::Accepted) {
         for (int count = 0; count < sale_goods->GetCount (); ++count) {
-            QVariantList data = sdb->SelectRow ("*",
-                                                AVAILABLE_GOODS_TABLE,
-                                                MODEL_NAME,
-                                                GOODS_SIZE,
-                                                sale_goods->GetModel (),
-                                                sale_goods->GetSize (),
-                                                GOODS_COL_COUNT);
+            QVariantList data = sdb->SelectRow ("*", AVAILABLE_GOODS_TABLE, MODEL_NAME, GOODS_SIZE, sale_goods->GetModel (), sale_goods->GetSize (), GOODS_COL_COUNT);
             data.append (sale_goods->GetPrice ());
             data.append (sale_goods->GetProfit ());
             data.append (QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT));
 
             QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_ID, GOODS_SIZE, GOODS_DATE, SALE_PRICE, PROFIT, SALE_DATE };
             if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (SOLD_GOODS_TABLE, columns),
-                                           sdb->GenerateBindValues (columns),
-                                           data))
+                                        sdb->GenerateBindValues (columns),
+                                        data))
             {
+                QMessageBox::critical (this, "Error!", "Невдалось виконати операцію! Проблема з підключеням до бази даних\n\n" + sdb->LastError ());
                 ui->statusbar->showMessage ("Невдалось виконати операцію! Проблема з підключеням до бази даних");
                 return;
             }
             else {
-                sdb->DeleteRow (AVAILABLE_GOODS_TABLE, GOODS_ID, data[3].toString ());
+                sdb->DeleteRow (AVAILABLE_GOODS_TABLE, GOODS_ID, data.at(GOODS_ID_COL).toString ());
                 Update (ui->main_table_view->currentIndex ().row ());
                 ui->statusbar->showMessage ("Продано модель " + sale_goods->GetModel () + " в кількості " + QString::number (sale_goods->GetCount ()) +
                                             " шт., розмір " + sale_goods->GetSize ());
@@ -268,6 +264,7 @@ void MainWindow::onActionReturnGoods() {
                                        sdb->GenerateBindValues (columns),
                                        data))
         {
+            QMessageBox::critical (this, "Error!", "Невдалось виконати операцію! Проблема з підключеням до бази даних\n\n" + sdb->LastError ());
             ui->statusbar->showMessage ("Невдалось виконати операцію! Проблема з підключеням до бази даних");
             return;
         }
@@ -304,7 +301,8 @@ void MainWindow::onActionAddModel() {
         if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (MODELS_TABLE, columns),
                                        sdb->GenerateBindValues (columns),
                                        data)) {
-            ui->statusbar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
+            QMessageBox::critical (this, "Error!", "Невдалось додати модель! Проблема з підключеням до бази даних\n\n" + sdb->LastError ());
+            ui->statusbar->showMessage ("Невдалось додати модель! Проблема з підключеням до бази даних");
             return;
         }
         Update(filter_model->rowCount ());
@@ -540,10 +538,7 @@ void MainWindow::UpdateCounts() {
     available_goods_table_count = sdb->SelectCount (AVAILABLE_GOODS_TABLE);
     available_goods_by_model_count = sdb->SelectCount (AVAILABLE_GOODS_TABLE, MODEL_ID, "=", model_id);
     sold_goods_table_count = sdb->SelectCount(SOLD_GOODS_TABLE);
-    sold_goods_by_last_year_count = sdb->SelectCount (SOLD_GOODS_TABLE,
-                                                      MODEL_ID,     SALE_DATE,
-                                                      "=",          ">=",
-                                                      model_id,     "datetime('now', '-1 year')");
+    sold_goods_by_last_year_count = sdb->Select (SqlQueries::SoldGoodsByLastYear (model_id)).toInt ();
     sold_goods_by_model_count = sdb->SelectCount (SOLD_GOODS_TABLE, MODEL_ID, "=", model_id);
 }
 

@@ -113,3 +113,20 @@ QString SqlQueries::SelectTableForReport(const QString &table_name, const QStrin
            " INNER JOIN " + MODELS_TABLE + " ON " + table_name + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID +
            " WHERE " + where + " BETWEEN '" + date_from + "' AND '" + date_to + "'";
 }
+
+QString SqlQueries::AvailableBrands() {
+    return "SELECT DISTINCT " + BRAND + " FROM " + AVAILABLE_GOODS_TABLE;
+}
+
+QString SqlQueries::ModelsListByBrand(const QString &brand) {
+    return "SELECT DISTINCT " + MODEL_NAME + " FROM " + AVAILABLE_GOODS_TABLE + " WHERE " + BRAND + " = '" + brand + "'";
+}
+
+QString SqlQueries::AvailableSizesByModelId(const QString &model_id) {
+    return "SELECT DISTINCT " + GOODS_SIZE + " FROM " + AVAILABLE_GOODS_TABLE + " WHERE " + MODEL_ID + " ='" + model_id + "'";
+}
+
+QString SqlQueries::SoldGoodsByLastYear(const QString &model_id) {
+    return "SELECT COUNT(*) FROM " + SOLD_GOODS_TABLE +
+           " WHERE " + MODEL_ID + " = '" + model_id + "' AND " + SALE_DATE + " >= datetime('now', '-1 year')";
+}

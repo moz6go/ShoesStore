@@ -3,6 +3,7 @@
 
 #include "general.h"
 #include "database.h"
+#include "sqlqueries.h"
 
 namespace Ui {
 class SaleDialog;
@@ -12,11 +13,10 @@ class SaleDialog : public QDialog
 {
     Q_OBJECT
     DataBase* sdb;
-    QSortFilterProxyModel* f_model;
-    int current_row;
-    Ui::SaleDialog *ui_sale;
+    QVariantList row;
+    Ui::SaleDialog *ui;
 public:
-    explicit SaleDialog(DataBase* data_base, int row, QSortFilterProxyModel* model, QWidget *parent = nullptr);
+    explicit SaleDialog(DataBase* data_base, const QVariantList& curr_row, QWidget *parent = nullptr);
     QString GetModel();
     QString GetSize();
     double GetPrice();
