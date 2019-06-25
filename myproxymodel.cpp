@@ -11,7 +11,7 @@ QVariant MyProxyModel::data(const QModelIndex &index, int role) const
     }
     if (role == Qt::TextColorRole) {
 //        QColor color;
-//        if(this->data(this->index(index.row(), EVENT_STATUS_COL)).toString() == STATUS_LIST[CANCELED]) {
+//        if(....) {
 //            color = Qt::darkGray;
 //        }
 //        return QBrush(color);

@@ -1,20 +1,19 @@
 #include "addgoodsdialog.h"
 #include "ui_addgoodsdialog.h"
 
-AddGoodsDialog::AddGoodsDialog(DataBase* data_base, int row, QSortFilterProxyModel* model, QWidget *parent) :
+AddGoodsDialog::AddGoodsDialog(DataBase* data_base, const QVariantList &curr_row, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AddGoodsDialog)
 {
     ui->setupUi(this);
     setModal (true);
     sdb = data_base;
-    f_model = model;
-    current_row = row;
+    row = curr_row;
 
     QSqlQueryModel* brand_model = new QSqlQueryModel(this);
-    brand_model->setQuery ("SELECT DISTINCT " + BRAND + " FROM " + MODELS_TABLE);
+    brand_model->setQuery (SqlQueries::BrandsFrom(MODELS_TABLE));
     ui->brand_cb->setModel (brand_model);
-    ui->brand_cb->setCurrentText (f_model->data (f_model->index (current_row, 4)).toString ());
+    ui->brand_cb->setCurrentText (row.at(BRAND_COL).toString ());
 
     UpdateModelList (ui->brand_cb->currentText ());
 
@@ -35,7 +34,7 @@ AddGoodsDialog::AddGoodsDialog(DataBase* data_base, int row, QSortFilterProxyMod
     QObject::connect (ui->model_cb, &QComboBox::currentTextChanged, this, &AddGoodsDialog::ShowPic);
     QObject::connect (ui->brand_cb, &QComboBox::currentTextChanged, this, &AddGoodsDialog::UpdateModelList);
     for (int i = 0; i < sb_list.size (); ++i) {
-        QObject::connect (sb_list[i], static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AddGoodsDialog::SetRes);
+        QObject::connect (sb_list.at (i), static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &AddGoodsDialog::SetRes);
     }
     QObject::connect (ui->result_le, &QLineEdit::textChanged, this, &AddGoodsDialog::EnableAddButton);
     QObject::connect (ui->add_goods_pb, &QPushButton::clicked, this, &AddGoodsDialog::accept);
@@ -72,9 +71,9 @@ void AddGoodsDialog::ShowPic(QString text) {
 
 void AddGoodsDialog::UpdateModelList(QString brand) {
     QSqlQueryModel* model = new QSqlQueryModel(this);
-    model->setQuery ("SELECT " + MODEL_NAME + " FROM " + MODELS_TABLE + " WHERE " + BRAND + " ='" + brand + "'");
+    model->setQuery (SqlQueries::ModelsListByBrand(MODELS_TABLE, brand));
     ui->model_cb->setModel (model);
-    ui->model_cb->setCurrentText (f_model->data(f_model->index (current_row, 1)).toString ());
+    ui->model_cb->setCurrentText (row.at (MODEL_NAME_COL).toString ());
 }
 
 void AddGoodsDialog::SetRes(int) {
@@ -85,12 +84,7 @@ void AddGoodsDialog::SetRes(int) {
 }
 
 void AddGoodsDialog::EnableAddButton() {
-    if (ui->result_le->text ().toInt ()) {
-        ui->add_goods_pb->setEnabled (true);
-    }
-    else {
-        ui->add_goods_pb->setDisabled (true);
-    }
+    ui->add_goods_pb->setEnabled (ui->result_le->text ().toInt ());
 }
 
 AddGoodsDialog::~AddGoodsDialog() {

@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
-    <height>180</height>
+    <width>320</width>
+    <height>140</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>360</width>
-    <height>180</height>
+    <width>320</width>
+    <height>140</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>360</width>
-    <height>180</height>
+    <width>320</width>
+    <height>140</height>
    </size>
   </property>
   <property name="font">
@@ -37,8 +37,8 @@
   <widget class="QPushButton" name="ok_pb">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>140</y>
+     <x>120</x>
+     <y>110</y>
      <width>89</width>
      <height>25</height>
     </rect>
@@ -50,8 +50,8 @@
   <widget class="QPushButton" name="cancel_pb">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>140</y>
+     <x>220</x>
+     <y>110</y>
      <width>89</width>
      <height>25</height>
     </rect>
@@ -63,8 +63,8 @@
   <widget class="QWidget" name="layoutWidget1">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>30</y>
+     <x>20</x>
+     <y>10</y>
      <width>291</width>
      <height>27</height>
     </rect>
@@ -92,8 +92,8 @@
   <widget class="QWidget" name="layoutWidget2">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>60</y>
+     <x>200</x>
+     <y>40</y>
      <width>113</width>
      <height>64</height>
     </rect>

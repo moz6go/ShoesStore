@@ -3,6 +3,7 @@
 
 #include "general.h"
 #include "database.h"
+#include "sqlqueries.h"
 
 namespace Ui {
 class AddGoodsDialog;
@@ -12,12 +13,11 @@ class AddGoodsDialog : public QDialog
 {
     Q_OBJECT
     DataBase* sdb;
-    QSortFilterProxyModel* f_model;
-    int current_row;
+    QVariantList row;
     QList<QSpinBox*> sb_list;
     Ui::AddGoodsDialog *ui;
 public:
-    explicit AddGoodsDialog(DataBase* data_base, int row, QSortFilterProxyModel* model, QWidget *parent = nullptr);
+    explicit AddGoodsDialog(DataBase* data_base, const QVariantList& curr_row, QWidget *parent = nullptr);
     QList<QSpinBox*>& GetSbList();
     int GetGoodsCount();
     QString GetModelName();

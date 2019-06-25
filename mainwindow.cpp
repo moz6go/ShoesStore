@@ -193,7 +193,8 @@ void MainWindow::CreateReportCSV(const QVector<QVariantList>& table, const QStri
 }
 
 void MainWindow::onActionAddGoods() {
-    AddGoodsDialog* add_goods = new AddGoodsDialog(sdb, ui->main_table_view->currentIndex ().row (), filter_model, this);
+    QVariantList row = sdb->SelectRow ("*", MODELS_TABLE, MODEL_ID, filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), MODEL_ID_COL)).toString (), filter_model->columnCount ());
+    AddGoodsDialog* add_goods = new AddGoodsDialog(sdb, row, this);
     if (add_goods->exec () == QDialog::Accepted) {
         SwitchButtons(DISABLED_ALL);
         ui->statusbar->showMessage ("Зачекайте, додаю товар...");
@@ -206,11 +207,7 @@ void MainWindow::onActionAddGoods() {
             if (sb_list[i]->value ()) {
                 QString size = i == WITHOUT_SIZE ? "б.р." : QString::number (i + 36);
                 for (int count = 0; count < sb_list[i]->value (); ++count) {
-                    QVariantList data = QVariantList() << model_id
-                                                       << model_name
-                                                       << brand
-                                                       << size
-                                                       << QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT);
+                    QVariantList data = { model_id, model_name, brand, size, QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT) };
                     QStringList columns = { MODEL_ID, MODEL_NAME, BRAND, GOODS_SIZE, GOODS_DATE };
                     if (!sdb->UpdateInsertData(sdb->GenerateInsertQuery (AVAILABLE_GOODS_TABLE, columns),
                                                   sdb->GenerateBindValues (columns),
@@ -223,6 +220,9 @@ void MainWindow::onActionAddGoods() {
         }
         Update (ui->main_table_view->currentIndex ().row ());
         ui->statusbar->showMessage ("Додано " + QString::number(add_goods->GetGoodsCount ()) + " одиниць моделі " + add_goods->GetModelName ());
+    }
+    else {
+        ui->statusbar->clearMessage ();
     }
 }
 
@@ -253,6 +253,9 @@ void MainWindow::onActionSaleGoods() {
             }
         }
     }
+    else {
+        ui->statusbar->clearMessage ();
+    }
 }
 
 void MainWindow::onActionReturnGoods() {
@@ -275,6 +278,9 @@ void MainWindow::onActionReturnGoods() {
                                         " виробника " + return_goods->GetBrand () +
                                         ", розмір " + return_goods->GetSize ());
         }
+    }
+    else {
+        ui->statusbar->clearMessage ();
     }
 }
 
@@ -307,6 +313,9 @@ void MainWindow::onActionAddModel() {
         }
         Update(filter_model->rowCount ());
         ui->statusbar->showMessage ("Додано модель " + add_model->getModel () + ", виробник " + add_model->getBrand ());
+    }
+    else {
+        ui->statusbar->clearMessage ();
     }
 }
 
@@ -348,6 +357,9 @@ void MainWindow::onActionEditModel() {
         Update(ui->main_table_view->currentIndex ().row ());
         ui->statusbar->showMessage ("Відредаговано модель " + edit_model->getModel () + ", виробник " + edit_model->getBrand ());
     }
+    else {
+        ui->statusbar->clearMessage ();
+    }
 }
 
 void MainWindow::onActionDelModel() {
@@ -374,15 +386,18 @@ void MainWindow::onActionReport() {
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
         if(!path.isEmpty ()) {
             QVector<QVariantList> table;
-            QString table_name;
             switch (report_dialog->GetReportType ()) {
             case SOLD_GOODS_REPORT:
                 table = sdb->SelectTable (SqlQueries::SelectTableForReport (SOLD_GOODS_TABLE, SALE_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ()));
-                table_name = SOLD_GOODS_TABLE;
+                for (int row = 0; row < REPORT_SOLD_GOODS_HEADERS_LIST.size (); ++row) {
+                    table[0][row] = QVariant(REPORT_SOLD_GOODS_HEADERS_LIST.at (row));
+                }
                 break;
             case AVAILABLE_GOODS_REPORT:
                 table = sdb->SelectTable (SqlQueries::SelectTableForReport (AVAILABLE_GOODS_TABLE, GOODS_DATE, report_dialog->GetDateFrom (), report_dialog->GetDateTo ()));
-                table_name = AVAILABLE_GOODS_TABLE;
+                for (int row = 0; row < REPORT_AVAILABLE_GOODS_HEADERS.size (); ++row) {
+                    table[0][row] = QVariant(REPORT_AVAILABLE_GOODS_HEADERS.at (row));
+                }
                 break;
             }
             CreateReportCSV (table, path);

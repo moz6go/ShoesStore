@@ -11,7 +11,7 @@ SaleDialog::SaleDialog(DataBase* data_base, const QVariantList &curr_row, QWidge
     sdb = data_base;
     row = curr_row;
     QSqlQueryModel* brand_model = new QSqlQueryModel(this);
-    brand_model->setQuery (SqlQueries::AvailableBrands());
+    brand_model->setQuery (SqlQueries::BrandsFrom(AVAILABLE_GOODS_TABLE));
     ui->brand_cb->setModel (brand_model);
     ui->brand_cb->setCurrentText (row.at (BRAND_COL).toString ());
     UpdateModelList (ui->brand_cb->currentText ());
@@ -64,7 +64,7 @@ void SaleDialog::ShowInfo(QString text) {
 
 void SaleDialog::UpdateModelList(QString brand) {
     QSqlQueryModel* model = new QSqlQueryModel(this);
-    model->setQuery (SqlQueries::ModelsListByBrand(brand));
+    model->setQuery (SqlQueries::ModelsListByBrand(AVAILABLE_GOODS_TABLE, brand));
     ui->model_cb->setModel (model);
     ui->model_cb->setCurrentText(row.at(MODEL_NAME_COL).toString ());
 }

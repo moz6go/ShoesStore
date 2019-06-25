@@ -105,22 +105,23 @@ QString SqlQueries::SoldGoods() {
 
 QString SqlQueries::SelectTableForReport(const QString &table_name, const QString &where, const QString &date_from, const QString &date_to)
 {
-    return "SELECT " + table_name + ".*, " + MODELS_TABLE + "." + CATEGORY + ", "
-                                           + MODELS_TABLE + "." + SEASON + ", "
+    return "SELECT " + table_name + ".*, " + MODELS_TABLE + "." + SEASON + ", "
+                                           + MODELS_TABLE + "." + CATEGORY + ", "
                                            + MODELS_TABLE + "." + WHOLESALE_PRICE + ", "
                                            + MODELS_TABLE + "." + RETAIL_PRICE +
            " FROM " + table_name +
            " INNER JOIN " + MODELS_TABLE + " ON " + table_name + "." + MODEL_ID + " = " + MODELS_TABLE + "." + MODEL_ID +
-           " WHERE " + where + " BETWEEN '" + date_from + "' AND '" + date_to + "'";
+            " WHERE " + where + " BETWEEN '" + date_from + "' AND '" + date_to + "'";
 }
 
-QString SqlQueries::AvailableBrands() {
-    return "SELECT DISTINCT " + BRAND + " FROM " + AVAILABLE_GOODS_TABLE;
+QString SqlQueries::BrandsFrom(const QString &table) {
+    return "SELECT DISTINCT " + BRAND + " FROM " + table;
 }
 
-QString SqlQueries::ModelsListByBrand(const QString &brand) {
-    return "SELECT DISTINCT " + MODEL_NAME + " FROM " + AVAILABLE_GOODS_TABLE + " WHERE " + BRAND + " = '" + brand + "'";
+QString SqlQueries::ModelsListByBrand(const QString &table, const QString &brand) {
+    return "SELECT DISTINCT " + MODEL_NAME + " FROM " + table + " WHERE " + BRAND + " = '" + brand + "'";
 }
+
 
 QString SqlQueries::AvailableSizesByModelId(const QString &model_id) {
     return "SELECT DISTINCT " + GOODS_SIZE + " FROM " + AVAILABLE_GOODS_TABLE + " WHERE " + MODEL_ID + " ='" + model_id + "'";

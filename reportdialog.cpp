@@ -13,11 +13,11 @@ ReportDialog::ReportDialog(DataBase* data_base, QWidget *parent) :
     ui_report->report_cb->addItems (REPORTS_TYPES);
 
     ui_report->date_from->setCalendarPopup (true);
-    ui_report->date_from->setDisplayFormat ("dd.MM.yyyy");
+    ui_report->date_from->setDisplayFormat (DATE_FORMAT);
     ui_report->date_from->setDate (QDate::currentDate ().addMonths (-1));
 
     ui_report->date_to->setCalendarPopup (true);
-    ui_report->date_to->setDisplayFormat ("dd.MM.yyyy");
+    ui_report->date_to->setDisplayFormat (DATE_FORMAT);
     ui_report->date_to->setDate (QDate::currentDate ());
 
     QObject::connect (ui_report->ok_pb, &QPushButton::clicked, this, &ReportDialog::accept);
@@ -25,11 +25,11 @@ ReportDialog::ReportDialog(DataBase* data_base, QWidget *parent) :
 }
 
 QString ReportDialog::GetDateFrom() {
-    return ui_report->date_from->date ().toString ("yyyy-MM-dd");
+    return ui_report->date_from->date ().toString (SQL_DATE_FORMAT);
 }
 
 QString ReportDialog::GetDateTo() {
-    return ui_report->date_to->date ().toString ("yyyy-MM-dd");
+    return ui_report->date_to->date ().toString (SQL_DATE_FORMAT);
 }
 
 int ReportDialog::GetReportType() {

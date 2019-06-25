@@ -51,7 +51,8 @@ AddModelDialog::AddModelDialog (DataBase* data_base, const QVariantList &curr_ro
             ui->close_pb->setVisible (false);
         }
 
-        if (sdb->SelectCount (AVAILABLE_GOODS_TABLE, MODEL_ID, "=", row.at(MODEL_ID_COL).toString()) || sdb->SelectCount (SOLD_GOODS_TABLE, MODEL_ID, "=", row.at(MODEL_ID_COL).toString())) {
+        if (sdb->SelectCount (AVAILABLE_GOODS_TABLE, MODEL_ID, "=", row.at(MODEL_ID_COL).toString()) ||
+            sdb->SelectCount (SOLD_GOODS_TABLE, MODEL_ID, "=", row.at(MODEL_ID_COL).toString())) {
             ui->model_le->setDisabled(true);
             ui->category_cb->setDisabled(true);
             ui->brand_cb->setDisabled(true);
