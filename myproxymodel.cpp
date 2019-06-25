@@ -14,12 +14,6 @@ QVariant MyProxyModel::data(const QModelIndex &index, int role) const
 //        if(this->data(this->index(index.row(), EVENT_STATUS_COL)).toString() == STATUS_LIST[CANCELED]) {
 //            color = Qt::darkGray;
 //        }
-//        else if (this->data(this->index(index.row(), EVENT_STATUS_COL)).toString() == STATUS_LIST[EXECUTED]) {
-//            color = Qt::darkGreen;
-//        }
-//        else if (this->data(this->index(index.row(), EVENT_PATIENT_ID_COL)).toString().isEmpty ()) {
-//            color = Qt::red;
-//        }
 //        return QBrush(color);
     }
     if (role == Qt::DisplayRole) {

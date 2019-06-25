@@ -467,7 +467,7 @@ void MainWindow::SetSearchType(QString type) {
 
 void MainWindow::ShowPic() {
     QPixmap pic;
-    pic.loadFromData (filter_model->data(filter_model->index (ui->main_table_view->currentIndex ().row (), 7)).toByteArray ());
+    pic.loadFromData (filter_model->data(filter_model->index (ui->main_table_view->currentIndex ().row (), PIC_COL)).toByteArray ());
     if (!pic.isNull ()){
         ui->pic_lbl->setPixmap (pic.scaledToHeight(ui->pic_lbl->height()));
     }
@@ -480,7 +480,7 @@ void MainWindow::ShowGoodsInfo() {
     if(filter_model->rowCount ()){
         TableInit(ui->goods_info_table, QStringList() << "Розмір" << "Кількість");
         int sum_count(0);
-        QString model_id = filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), 0)).toString ();
+        QString model_id = filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), MODEL_ID_COL)).toString ();
         for (int i = S36; i <= WITHOUT_SIZE; ++i) {
             QString size = i == WITHOUT_SIZE ? "б.р." : QString::number (i + 36);
             int count = sdb->SelectCount (AVAILABLE_GOODS_TABLE,
@@ -520,7 +520,7 @@ void MainWindow::UpdateButtons() {
     action_sale_goods->setEnabled (available_goods_table_count);
     action_return_goods->setEnabled (sold_goods_table_count);
     action_add_new_model->setEnabled (brand_table_count && season_table_count && category_table_count);
-    action_edit_model->setEnabled (models_table_count && !sold_goods_by_model_count && !available_goods_by_model_count);
+    action_edit_model->setEnabled (models_table_count /*&& !sold_goods_by_model_count && !available_goods_by_model_count*/);
     action_del_model->setEnabled (models_table_count && !sold_goods_by_last_year_count && !available_goods_by_model_count);
     action_report->setEnabled (available_goods_table_count || sold_goods_table_count);
     action_update->setEnabled (true);

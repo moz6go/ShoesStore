@@ -50,6 +50,15 @@ AddModelDialog::AddModelDialog (DataBase* data_base, const QVariantList &curr_ro
             ui->pic_lbl->setPixmap(QPixmap(":/pics/default_pic.png"));
             ui->close_pb->setVisible (false);
         }
+
+        if (sdb->SelectCount (AVAILABLE_GOODS_TABLE, MODEL_ID, "=", row.at(MODEL_ID_COL).toString()) || sdb->SelectCount (SOLD_GOODS_TABLE, MODEL_ID, "=", row.at(MODEL_ID_COL).toString())) {
+            ui->model_le->setDisabled(true);
+            ui->category_cb->setDisabled(true);
+            ui->brand_cb->setDisabled(true);
+            ui->season_cb->setDisabled(true);
+            ui->wholesalepr_sb->setDisabled(true);
+            ui->retailpr_sb->setDisabled(true);
+        }
         setWindowTitle ("Редагувати модель");
         EnableAddButton();
     }
