@@ -11,6 +11,7 @@
 #include "returngoodsdialog.h"
 #include "myproxymodel.h"
 #include "sqlqueries.h"
+#include "copyrestoredbdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -33,8 +34,7 @@ class MainWindow : public QMainWindow
     QAction* action_report;
     QAction* action_dictionary;
     QAction* action_update;
-    QAction* action_res_copy;
-    QAction* action_restore;
+    QAction* action_copy_restore;
 
     QLineEdit* search_line;
     QComboBox* search_combo;
@@ -56,6 +56,9 @@ class MainWindow : public QMainWindow
     void BuildToolBar();
     void SwitchButtons(State state);
     void CreateReportCSV(const QVector<QVariantList>& table, const QString& path);
+    void ReserveCopyDb();
+    void RestoreDb();
+
 public:
     explicit MainWindow(DataBase* data_base, QWidget *parent = nullptr);
     ~MainWindow();
@@ -69,8 +72,7 @@ private slots:
     void onActionReport();
     void onActionUpdate();
     void onActionDictionary();
-    void onActionReserveCopy();
-    void onActionRestore();
+    void onActionCopyRestoreDb();
     void SearchTextChanged(QString text);
     void SetSearchType(QString type);
     void ShowPic();

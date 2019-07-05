@@ -6,7 +6,7 @@ MyProxyModel::MyProxyModel(QObject *parent) : QSortFilterProxyModel (parent)
 
 QVariant MyProxyModel::data(const QModelIndex &index, int role) const
 {
-    if(!index.isValid()){
+    if(!index.isValid()) {
         return QVariant();
     }
     if (role == Qt::TextColorRole) {

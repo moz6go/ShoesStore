@@ -129,5 +129,9 @@ QString SqlQueries::AvailableSizesByModelId(const QString &model_id) {
 
 QString SqlQueries::SoldGoodsByLastYear(const QString &model_id) {
     return "SELECT COUNT(*) FROM " + SOLD_GOODS_TABLE +
-           " WHERE " + MODEL_ID + " = '" + model_id + "' AND " + SALE_DATE + " >= datetime('now', '-1 year')";
+            " WHERE " + MODEL_ID + " = '" + model_id + "' AND " + SALE_DATE + " >= datetime('now', '-1 year')";
+}
+
+QString SqlQueries::SoldGoodsForReturn() {
+    return "SELECT " + MODEL_NAME + ", " + BRAND + ", " + GOODS_SIZE + ", " + SALE_PRICE + ", " + SALE_DATE + ", " + GOODS_ID + " FROM " + SOLD_GOODS_TABLE + " WHERE " + SALE_DATE + " >= datetime('now', '-1 year')";
 }

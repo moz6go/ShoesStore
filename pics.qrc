@@ -12,10 +12,9 @@
         <file>pics/report_dialog.png</file>
         <file>pics/dictionary.png</file>
         <file>pics/return_goods.png</file>
-        <file>pics/reserve_copy.png</file>
-        <file>pics/restore.png</file>
         <file>pics/default_pic.png</file>
         <file>pics/edit_model.png</file>
         <file>pics/close.png</file>
+        <file>pics/db_copy_restore.png</file>
     </qresource>
 </RCC>

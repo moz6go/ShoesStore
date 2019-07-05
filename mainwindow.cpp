@@ -26,7 +26,10 @@ MainWindow::MainWindow(DataBase *data_base, QWidget *parent) :
     filter_model->setSourceModel (sql_model);
     filter_model->setFilterCaseSensitivity (Qt::CaseInsensitive);
     filter_model->setFilterKeyColumn (MODEL_NAME_COL);
+    filter_model->sort (DATE_COL, Qt::DescendingOrder);
+
     ui->main_table_view->setModel (filter_model);
+
 
     for(int col = 0; col < sql_model->columnCount(); ++col) {
         sql_model->setHeaderData(col, Qt::Horizontal, MODELS_TABLE_HEADERS_LIST[col]);
@@ -131,8 +134,7 @@ void MainWindow::BuildToolBar() {
     toolbar->addSeparator ();
     action_update = toolbar->addAction(QPixmap(":/pics/update.png"), "Оновити", this, SLOT(onActionUpdate()));
     toolbar->addSeparator ();
-    action_res_copy = toolbar->addAction(QPixmap(":/pics/reserve_copy.png"), "Створити резервну копію бази даних", this, SLOT(onActionReserveCopy()));
-    action_restore = toolbar->addAction(QPixmap(":/pics/restore.png"), "Відновити базу даних", this, SLOT(onActionRestore()));
+    action_copy_restore = toolbar->addAction(QPixmap(":/pics/db_copy_restore.png"), "Резервна копія/відновлення бази даних", this, SLOT(onActionCopyRestoreDb()));
     toolbar->addSeparator ();
     toolbar->addWidget (search_combo);
     toolbar->addWidget (search_line);
@@ -154,8 +156,7 @@ void MainWindow::SwitchButtons(State state) {
         action_report->setEnabled (true);
         action_update->setEnabled (true);
         action_dictionary->setEnabled (true);
-        action_res_copy->setEnabled (true);
-        action_restore ->setEnabled (true);
+        action_copy_restore->setEnabled (true);
 
         break;
     case DISABLED_ALL:
@@ -168,8 +169,7 @@ void MainWindow::SwitchButtons(State state) {
         action_report->setDisabled (true);
         action_update->setDisabled (true);
         action_dictionary->setDisabled (true);
-        action_res_copy->setDisabled (true);
-        action_restore ->setDisabled (true);
+        action_copy_restore->setDisabled (true);
         break;
     }
 }
@@ -212,7 +212,7 @@ void MainWindow::onActionAddGoods() {
                     if (!sdb->UpdateInsertData(sdb->GenerateInsertQuery (AVAILABLE_GOODS_TABLE, columns),
                                                   sdb->GenerateBindValues (columns),
                                                   data)) {
-                        QMessageBox::critical (this, "Error","Невдалось додати товари! Проблема з підключеням до бази даних\n\n" + sdb->LastError ());
+                        QMessageBox::critical (this, "Error","Невдалось додати товари! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
                         ui->statusbar->showMessage ("Невдалось додати товари! Проблема з підключеням до бази даних");
                     }
                 }
@@ -241,7 +241,7 @@ void MainWindow::onActionSaleGoods() {
                                         sdb->GenerateBindValues (columns),
                                         data))
             {
-                QMessageBox::critical (this, "Error!", "Невдалось виконати операцію! Проблема з підключеням до бази даних\n\n" + sdb->LastError ());
+                QMessageBox::critical (this, "Error!", "Невдалось виконати операцію! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
                 ui->statusbar->showMessage ("Невдалось виконати операцію! Проблема з підключеням до бази даних");
                 return;
             }
@@ -267,7 +267,7 @@ void MainWindow::onActionReturnGoods() {
                                        sdb->GenerateBindValues (columns),
                                        data))
         {
-            QMessageBox::critical (this, "Error!", "Невдалось виконати операцію! Проблема з підключеням до бази даних\n\n" + sdb->LastError ());
+            QMessageBox::critical (this, "Error!", "Невдалось виконати операцію! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
             ui->statusbar->showMessage ("Невдалось виконати операцію! Проблема з підключеням до бази даних");
             return;
         }
@@ -307,7 +307,7 @@ void MainWindow::onActionAddModel() {
         if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (MODELS_TABLE, columns),
                                        sdb->GenerateBindValues (columns),
                                        data)) {
-            QMessageBox::critical (this, "Error!", "Невдалось додати модель! Проблема з підключеням до бази даних\n\n" + sdb->LastError ());
+            QMessageBox::critical (this, "Error!", "Невдалось додати модель! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
             ui->statusbar->showMessage ("Невдалось додати модель! Проблема з підключеням до бази даних");
             return;
         }
@@ -350,7 +350,7 @@ void MainWindow::onActionEditModel() {
         if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (MODELS_TABLE, columns, MODEL_ID, row.at(MODEL_ID_COL).toString ()),
                                     sdb->GenerateBindValues (columns),
                                     data)) {
-            QMessageBox::critical (this, "Error!", "Невдалось відредагувати модель! Проблема з підключеням до бази даних\n\n" + sdb->LastError ());
+            QMessageBox::critical (this, "Error!", "Невдалось відредагувати модель! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
             ui->statusbar->showMessage ("Невдалось відредагувати модель! Проблема з підключеням до бази даних");
             return;
         }
@@ -415,7 +415,22 @@ void MainWindow::onActionDictionary() {
     Update(0);
 }
 
-void MainWindow::onActionReserveCopy() {
+void MainWindow::onActionCopyRestoreDb() {
+    CopyRestoreDbDialog* copy_restore_db = new CopyRestoreDbDialog(this);
+    if(copy_restore_db->exec () == QDialog::Accepted){
+        if (copy_restore_db->GetOption () == CREATE_COPY_DB){
+            ReserveCopyDb();
+        }
+        else {
+            RestoreDb();
+        }
+    }
+    else {
+        ui->statusbar->clearMessage ();
+    }
+}
+
+void MainWindow::ReserveCopyDb() {
     QString path = QFileDialog::getExistingDirectory(this, tr("Зберегти базу даних в ..."),
                                                     QDir::homePath (),
                                                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
@@ -424,10 +439,11 @@ void MainWindow::onActionReserveCopy() {
     }
     else {
         ui->statusbar->showMessage ("Не вдалось зробити копію бази даних!");
+        QMessageBox::critical (this, "Error!", "Не вдалось зробити копію бази даних!", QMessageBox::Ok);
     }
 }
 
-void MainWindow::onActionRestore() {
+void MainWindow::RestoreDb() {
     QMessageBox msgbox;
     msgbox.setIcon (QMessageBox::Warning);
     msgbox.setWindowTitle ("Відновлення бази даних");
@@ -447,7 +463,7 @@ void MainWindow::onActionRestore() {
                     }
                     Update(0);
                     ui->statusbar->showMessage ("Базу даних відновлено!");
-                    QMessageBox::information (this, "Shoes Store", "Для коректної роботи після відновлення бази даних, рекомендується перезапутити програму", QMessageBox::Ok);
+                    QMessageBox::information (this, "Shoes Store", "Для коректної роботи після відновлення бази даних, рекомендується перезапустити програму", QMessageBox::Ok);
                 }
                 else {
                     QMessageBox::critical (this, "Error!", "Не вдалось відновити базу даних!", QMessageBox::Ok);
@@ -521,7 +537,6 @@ void MainWindow::ShowGoodsInfo() {
 
 void MainWindow::Update(int row) {
     sql_model->select ();
-    filter_model->sort (DATE_COL, Qt::DescendingOrder);
     ui->main_table_view->selectRow (row);
     ShowPic ();
     SetSummary ();
@@ -540,8 +555,7 @@ void MainWindow::UpdateButtons() {
     action_report->setEnabled (available_goods_table_count || sold_goods_table_count);
     action_update->setEnabled (true);
     action_dictionary->setEnabled (true);
-    action_restore->setEnabled (true);
-    action_res_copy->setEnabled (QFile::exists (DB_PATH));
+    action_copy_restore->setEnabled (true);
 }
 
 void MainWindow::UpdateCounts() {

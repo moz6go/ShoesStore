@@ -26,6 +26,7 @@ public:
     static QString ModelsListByBrand(const QString& table, const QString& brand);
     static QString AvailableSizesByModelId(const QString& model_id);
     static QString SoldGoodsByLastYear(const QString& model_id);
+    static QString SoldGoodsForReturn();
 };
 
 #endif // SQLQUERIES_H

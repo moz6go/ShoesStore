@@ -3,6 +3,7 @@
 
 #include "general.h"
 #include "database.h"
+#include "sqlqueries.h"
 
 namespace Ui {
 class ReturnGoodsDialog;
@@ -12,11 +13,12 @@ class ReturnGoodsDialog : public QDialog
 {
     Q_OBJECT
     DataBase* sdb;
-//    QSqlTableModel* model;
     QSqlQueryModel* query_model;
-    Ui::ReturnGoodsDialog *ui_return;
+    Ui::ReturnGoodsDialog *ui;
     QString goods_id;
     void SoldGoodsTableInit();
+private slots:
+    void EnableReturnButton();
 public:
     explicit ReturnGoodsDialog(DataBase* data_base, QWidget *parent = nullptr);
     QString GetGoodsId();

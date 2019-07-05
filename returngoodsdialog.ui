@@ -35,6 +35,9 @@
     <normaloff>:/pics/return_goods.png</normaloff>:/pics/return_goods.png</iconset>
   </property>
   <widget class="QPushButton" name="return_pb">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>440</x>
@@ -68,6 +71,11 @@
      <width>621</width>
      <height>431</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Comic Sans MS</family>
+    </font>
    </property>
   </widget>
   <widget class="QLabel" name="label">

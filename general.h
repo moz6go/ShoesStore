@@ -82,7 +82,8 @@ const QString SALE_PRICE = "sale_price";
 const QString SALE_DATE = "sale_date";
 const QString PROFIT = "profit";
 
-
+const QString CREATE_COPY_DB = "Зробити резервну копію бази даних";
+const QString RESTORE_DB = "Відновити з резервної копії";
 
 //count of columns
 const int MODELS_COL_COUNT = 9;
