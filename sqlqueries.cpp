@@ -13,7 +13,8 @@ QString SqlQueries::CreateModelsTable()
             + WHOLESALE_PRICE + " REAL NOT NULL, "
             + RETAIL_PRICE + " REAL NOT NULL, "
             + PIC + " BLOB, "
-            + DATE + " TEXT NOT NULL)";
+            + DATE + " TEXT NOT NULL, "
+            + ARCHIVE + " INTEGER NOT NULL)";
 }
 
 QString SqlQueries::CreateAvailablesGoodsTable() {
@@ -134,4 +135,12 @@ QString SqlQueries::SoldGoodsByLastYear(const QString &model_id) {
 
 QString SqlQueries::SoldGoodsForReturn() {
     return "SELECT " + MODEL_NAME + ", " + BRAND + ", " + GOODS_SIZE + ", " + SALE_PRICE + ", " + SALE_DATE + ", " + GOODS_ID + " FROM " + SOLD_GOODS_TABLE + " WHERE " + SALE_DATE + " >= datetime('now', '-1 year')";
+}
+
+QString SqlQueries::GoodsCountMainTable() {
+    return "SELECT " + MODELS_TABLE + ".*, COUNT(" + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + ") FROM " + MODELS_TABLE + " LEFT JOIN " + AVAILABLE_GOODS_TABLE + " ON " + MODELS_TABLE + "." + MODEL_ID + " = " + AVAILABLE_GOODS_TABLE + "." + MODEL_ID + "  WHERE " + ARCHIVE + " = 0 GROUP BY " + MODELS_TABLE + "." + MODEL_ID;
+}
+
+QString SqlQueries::ModelsInArchive() {
+    return "SELECT " + MODELS_TABLE + ".* FROM " + MODELS_TABLE + "  WHERE " + ARCHIVE + " = 1";
 }

@@ -16,5 +16,7 @@
         <file>pics/edit_model.png</file>
         <file>pics/close.png</file>
         <file>pics/db_copy_restore.png</file>
+        <file>pics/add_to_archive.png</file>
+        <file>pics/view_archive.png</file>
     </qresource>
 </RCC>

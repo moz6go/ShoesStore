@@ -19,20 +19,19 @@ MainWindow::MainWindow(DataBase *data_base, QWidget *parent) :
     sold_goods_by_last_year_count = 0;
     sold_goods_by_model_count = 0;
 
-    sql_model = new QSqlTableModel(this);
-    sql_model->setTable (MODELS_TABLE);
+    main_tbl_sql_model = new QSqlQueryModel(this);
+    main_tbl_sql_model->setQuery (SqlQueries::GoodsCountMainTable ());
 
     filter_model = new MyProxyModel(this);
-    filter_model->setSourceModel (sql_model);
+    filter_model->setSourceModel (main_tbl_sql_model);
     filter_model->setFilterCaseSensitivity (Qt::CaseInsensitive);
     filter_model->setFilterKeyColumn (MODEL_NAME_COL);
     filter_model->sort (DATE_COL, Qt::DescendingOrder);
 
     ui->main_table_view->setModel (filter_model);
 
-
-    for(int col = 0; col < sql_model->columnCount(); ++col) {
-        sql_model->setHeaderData(col, Qt::Horizontal, MODELS_TABLE_HEADERS_LIST[col]);
+    for(int col = 0; col < main_tbl_sql_model->columnCount(); ++col) {
+        main_tbl_sql_model->setHeaderData(col, Qt::Horizontal, MODELS_TABLE_HEADERS_LIST[col]);
     }
 
     toolbar = new QToolBar(this);
@@ -42,7 +41,7 @@ MainWindow::MainWindow(DataBase *data_base, QWidget *parent) :
 
     TableInit(ui->goods_info_table, QStringList() << "Розмір" << "Кількість");
     TableInit(ui->summary_table, QStringList() << "Показник" << "Значення");
-    MainTableInit ();
+    MainTableInit (ui->main_table_view);
 
     QObject::connect (ui->main_table_view, &QTableView::clicked, [=]{Update(ui->main_table_view->currentIndex().row());});
     QObject::connect (search_combo, &QComboBox::currentTextChanged, this, &MainWindow::SetSearchType);
@@ -51,26 +50,27 @@ MainWindow::MainWindow(DataBase *data_base, QWidget *parent) :
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
-    for(int i = 0; i < sql_model->columnCount(); ++i) {
-        ui->main_table_view->setColumnWidth(i, this->width() / sql_model->columnCount());
+    for(int i = 0; i < main_tbl_sql_model->columnCount(); ++i) {
+        ui->main_table_view->setColumnWidth(i, this->width() / main_tbl_sql_model->columnCount());
     }
     QMainWindow::resizeEvent(event);
 }
 
-void MainWindow::MainTableInit() {
-    ui->main_table_view->setColumnHidden(MODEL_ID_COL, true);
-    ui->main_table_view->setColumnHidden(PIC_COL, true);
-    ui->main_table_view->setColumnHidden(DATE_COL, true);
-    ui->main_table_view->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
-    ui->main_table_view->verticalHeader ()->setDefaultSectionSize (18);
-    ui->main_table_view->verticalHeader()->setVisible(false);
-    ui->main_table_view->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->main_table_view->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->main_table_view->resizeColumnsToContents();
-    ui->main_table_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->main_table_view->horizontalHeader()->setStretchLastSection(true);
-    ui->main_table_view->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
-    ui->main_table_view->setSortingEnabled (true);
+void MainWindow::MainTableInit(QTableView *table) {
+    table->setColumnHidden(MODEL_ID_COL, true);
+    table->setColumnHidden(PIC_COL, true);
+    table->setColumnHidden(DATE_COL, true);
+    table->setColumnHidden(ARCHIVE_COL, true);
+    table->verticalHeader ()->setSectionResizeMode (QHeaderView::Fixed);
+    table->verticalHeader ()->setDefaultSectionSize (18);
+    table->verticalHeader()->setVisible(false);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    table->resizeColumnsToContents();
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->horizontalHeader()->setStretchLastSection(true);
+    table->horizontalHeader ()->resizeSections (QHeaderView::ResizeToContents);
+    table->setSortingEnabled (true);
 }
 
 void MainWindow::TableInit(QTableWidget* table, QStringList headers) {
@@ -128,6 +128,9 @@ void MainWindow::BuildToolBar() {
     action_add_new_model = toolbar->addAction(QPixmap(":/pics/add_model.png"), "Додати нову модель", this, SLOT(onActionAddModel()));
     action_edit_model = toolbar->addAction (QPixmap(":/pics/edit_model.png"), "Редагувати дані моделі", this, SLOT(onActionEditModel ()));
     action_del_model = toolbar->addAction(QPixmap(":/pics/delete.png"), "Видалити модель", this, SLOT(onActionDelModel()));
+    toolbar->addSeparator ();
+    action_add_to_archive = toolbar->addAction(QPixmap(":/pics/add_to_archive.png"), "Перемістити модель в архів", this, SLOT(onActionAddToArchive()));
+    action_view_archive = toolbar->addAction(QPixmap(":/pics/view_archive.png"), "Переглянути архів", this, SLOT(onActionViewArchive()));
     toolbar->addSeparator ();
     action_report = toolbar->addAction(QPixmap(":/pics/report.png"), "Згенерувати звіт", this, SLOT(onActionReport()));
     action_dictionary = toolbar->addAction (QPixmap(":/pics/dictionary.png"), "Змінити довідники", this, SLOT(onActionDictionary()));
@@ -302,8 +305,9 @@ void MainWindow::onActionAddModel() {
                               add_model->getWholesalepr (),
                               add_model->getRetailpr (),
                               pic_byte_arr,
-                              QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT) };
-        QStringList columns = { MODEL_NAME, SEASON, CATEGORY, BRAND, WHOLESALE_PRICE, RETAIL_PRICE, PIC, DATE };
+                              QDateTime::currentDateTime ().toString (SQL_DATE_TIME_FORMAT),
+                              0 };
+        QStringList columns = { MODEL_NAME, SEASON, CATEGORY, BRAND, WHOLESALE_PRICE, RETAIL_PRICE, PIC, DATE, ARCHIVE };
         if (!sdb->UpdateInsertData (sdb->GenerateInsertQuery (MODELS_TABLE, columns),
                                        sdb->GenerateBindValues (columns),
                                        data)) {
@@ -376,6 +380,31 @@ void MainWindow::onActionDelModel() {
         }
         Update(ui->main_table_view->currentIndex ().row () - 1);
     }
+}
+
+void MainWindow::onActionAddToArchive() {
+    QString model_id = filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), MODEL_ID_COL)).toString ();
+    QString model_name = filter_model->data (filter_model->index (ui->main_table_view->currentIndex ().row (), MODEL_NAME_COL)).toString ();
+    QVariantList data = { 1 };
+    QStringList columns = { ARCHIVE };
+
+    if (!sdb->UpdateInsertData (sdb->GenerateUpdateQuery (MODELS_TABLE, columns, MODEL_ID, model_id),
+                                sdb->GenerateBindValues (columns),
+                                data)) {
+        QMessageBox::critical (this, "Error!", "Невдалось перемістити модель в архів! Проблема з підключеням до бази даних!\n\nПомилка:\n" + sdb->LastError ());
+        return;
+    }
+    else {
+        ui->statusbar->showMessage ("Модель " + model_name + " переміщено в архів");
+    }
+    Update(ui->main_table_view->currentIndex ().row ());
+}
+
+void MainWindow::onActionViewArchive() {
+    ArchiveDialog* archive_dialog = new ArchiveDialog(sdb, this);
+    archive_dialog->exec ();
+    Update (0);
+    ui->statusbar->showMessage ("");
 }
 
 void MainWindow::onActionReport() {
@@ -536,7 +565,7 @@ void MainWindow::ShowGoodsInfo() {
 }
 
 void MainWindow::Update(int row) {
-    sql_model->select ();
+    main_tbl_sql_model->setQuery (SqlQueries::GoodsCountMainTable ());
     ui->main_table_view->selectRow (row);
     ShowPic ();
     SetSummary ();
@@ -552,6 +581,8 @@ void MainWindow::UpdateButtons() {
     action_add_new_model->setEnabled (brand_table_count && season_table_count && category_table_count);
     action_edit_model->setEnabled (models_table_count /*&& !sold_goods_by_model_count && !available_goods_by_model_count*/);
     action_del_model->setEnabled (models_table_count && !sold_goods_by_last_year_count && !available_goods_by_model_count);
+    action_add_to_archive->setEnabled (!available_goods_by_model_count && models_table_count);
+    action_view_archive->setEnabled (models_table_count);
     action_report->setEnabled (available_goods_table_count || sold_goods_table_count);
     action_update->setEnabled (true);
     action_dictionary->setEnabled (true);

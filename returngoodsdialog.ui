@@ -75,6 +75,7 @@
    <property name="font">
     <font>
      <family>Comic Sans MS</family>
+     <pointsize>8</pointsize>
     </font>
    </property>
   </widget>

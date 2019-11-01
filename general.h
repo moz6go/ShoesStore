@@ -73,6 +73,7 @@ const QString WHOLESALE_PRICE = "wholesale_price";
 const QString RETAIL_PRICE = "retail_price";
 const QString PIC = "pic";
 const QString DATE = "date";
+const QString ARCHIVE = "archive";
 
 const QString GOODS_ID = "goods_id";
 const QString GOODS_SIZE = "goods_size";
@@ -133,10 +134,12 @@ const QStringList MODELS_TABLE_HEADERS_LIST = {
     /*2*/"Сезон",
     /*3*/"Категорія",
     /*4*/"Виробник",
-    /*5*/"Оптова ціна, грн",
-    /*6*/"Роздрібна ціна, грн",
+    /*5*/"Ціна опт, грн",
+    /*6*/"Ціна роздріб, грн",
     /*7*/"!pic",
-    /*8*/"!date"
+    /*8*/"!date",
+    /*9*/"!archive",
+    /*10*/"Кількість"
 };
 
 const QStringList SOLD_GOODS_HEADERS_LIST = {
@@ -193,7 +196,9 @@ enum ModelsCol{
     WHOLESALE_PRICE_COL,
     RETAIL_PRICE_COL,
     PIC_COL,
-    DATE_COL
+    DATE_COL,
+    ARCHIVE_COL,
+    GOODS_COUNT_COL
 };
 
 enum AvGoodsCol {

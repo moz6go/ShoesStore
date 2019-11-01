@@ -12,16 +12,21 @@
 #include "myproxymodel.h"
 #include "sqlqueries.h"
 #include "copyrestoredbdialog.h"
+#include "archivedialog.h"
 
 namespace Ui {
 class MainWindow;
 }
 
+class ArchiveDialog;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+    friend ArchiveDialog;
+
     Ui::MainWindow *ui;
-    QSqlTableModel* sql_model;
+    QSqlQueryModel* main_tbl_sql_model;
     MyProxyModel* filter_model;
     DataBase* sdb;
     QToolBar* toolbar;
@@ -31,6 +36,8 @@ class MainWindow : public QMainWindow
     QAction* action_add_new_model;
     QAction* action_edit_model;
     QAction* action_del_model;
+    QAction* action_add_to_archive;
+    QAction* action_view_archive;
     QAction* action_report;
     QAction* action_dictionary;
     QAction* action_update;
@@ -50,7 +57,7 @@ class MainWindow : public QMainWindow
     int sold_goods_by_model_count;
 
     void resizeEvent(QResizeEvent *event);
-    void MainTableInit();
+    static void MainTableInit(QTableView* table);
     void TableInit(QTableWidget* table, QStringList headers);
     void SetSummary();
     void BuildToolBar();
@@ -69,6 +76,8 @@ private slots:
     void onActionAddModel();
     void onActionEditModel();
     void onActionDelModel();
+    void onActionAddToArchive();
+    void onActionViewArchive();
     void onActionReport();
     void onActionUpdate();
     void onActionDictionary();

@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     returngoodsdialog.cpp \
     myproxymodel.cpp \
     sqlqueries.cpp \
-    copyrestoredbdialog.cpp
+    copyrestoredbdialog.cpp \
+    archivedialog.cpp
 
 HEADERS  +=    \
     general.h \
@@ -39,7 +40,8 @@ HEADERS  +=    \
     returngoodsdialog.h \
     myproxymodel.h \
     sqlqueries.h \
-    copyrestoredbdialog.h
+    copyrestoredbdialog.h \
+    archivedialog.h
 
 FORMS    +=    \
     addmodeldialog.ui \
@@ -49,7 +51,8 @@ FORMS    +=    \
     reportdialog.ui \
     dictionarydialog.ui \
     returngoodsdialog.ui \
-    copyrestoredbdialog.ui
+    copyrestoredbdialog.ui \
+    archivedialog.ui
 
 RESOURCES += \
     pics.qrc

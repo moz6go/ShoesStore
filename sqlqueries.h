@@ -27,6 +27,8 @@ public:
     static QString AvailableSizesByModelId(const QString& model_id);
     static QString SoldGoodsByLastYear(const QString& model_id);
     static QString SoldGoodsForReturn();
+    static QString GoodsCountMainTable();
+    static QString ModelsInArchive();
 };
 
 #endif // SQLQUERIES_H

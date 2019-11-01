@@ -10,11 +10,11 @@ QVariant MyProxyModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
     if (role == Qt::TextColorRole) {
-//        QColor color;
-//        if(....) {
-//            color = Qt::darkGray;
-//        }
-//        return QBrush(color);
+        QColor color;
+        if(this->data(this->index(index.row(), GOODS_COUNT_COL)).toInt () == 0) {
+            color = Qt::darkGray;
+        }
+        return QBrush(color);
     }
     if (role == Qt::DisplayRole) {
         if (index.column() == WHOLESALE_PRICE_COL || index.column() == RETAIL_PRICE_COL ){
